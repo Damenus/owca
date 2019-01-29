@@ -24,7 +24,7 @@ EOF_line = "..."
 
 def parse(input: TextIOWrapper, regexp: str, separator: str = None,
           labels: Dict[str, str] = {}, metric_name_prefix: str = '') -> List[Metric]:
-    """Custom parse function for mutilate
+    """Custom parse function for stress_ng
         stress-ng: info:  [99] Time 1546433449, counter=173
         stress-ng: info:  [96] Time 1546433449, counter=210
         stress-ng: info:  [103] Time 1546433449, counter=191
@@ -101,12 +101,12 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
                      r'(?P<bogo_ops_per_second_usr_sys_time>\d+.\d*)',
                      new_line)
     if brief is not None:
-        bogo_ops = brief['bogo_ops']
-        real_time = brief['real_time']
-        user_time = brief['user_time']
-        system_time = brief['system_time']
-        bogo_ops_real = brief['bogo_ops_per_second_real_time']
-        bogo_ops_usr_sys = brief['bogo_ops_per_second_usr_sys_time']
+        bogo_ops = float(brief['bogo_ops'])
+        real_time = float(brief['real_time'])
+        user_time = float(brief['user_time'])
+        system_time = float(brief['system_time'])
+        bogo_ops_real = float(brief['bogo_ops_per_second_real_time'])
+        bogo_ops_usr_sys = float(brief['bogo_ops_per_second_usr_sys_time'])
 
         new_metrics.append(
             Metric(metric_name_prefix + 'bogo_ops', bogo_ops,
