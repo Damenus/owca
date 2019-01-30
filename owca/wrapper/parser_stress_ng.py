@@ -93,13 +93,14 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
     new_line = readline_with_check(input, EOF_line)
 
     # Parse metric summary on the end stressing
-    brief = re.search(r'(?P<bogo_ops>\d+.\d*) +'
-                     r'(?P<real_time>\d+.\d*) +'
-                     r'(?P<user_time>\d+.\d*) +'
-                     r'(?P<system_time>\d+.\d*) +'
-                     r'(?P<bogo_ops_per_second_real_time>\d+.\d*) +'
-                     r'(?P<bogo_ops_per_second_usr_sys_time>\d+.\d*)',
-                     new_line)
+    brief = re.search(
+        r'(?P<bogo_ops>\d+.\d*) +'
+        r'(?P<real_time>\d+.\d*) +'
+        r'(?P<user_time>\d+.\d*) +'
+        r'(?P<system_time>\d+.\d*) +'
+        r'(?P<bogo_ops_per_second_real_time>\d+.\d*) +'
+        r'(?P<bogo_ops_per_second_usr_sys_time>\d+.\d*)',
+        new_line)
     if brief is not None:
         bogo_ops = float(brief['bogo_ops'])
         real_time = float(brief['real_time'])
