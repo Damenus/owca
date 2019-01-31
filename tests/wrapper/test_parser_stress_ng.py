@@ -34,14 +34,18 @@ def test_parse():
     for _ in range(number_of_reads):
         got.extend(parse(input_, '', None, {}, 'stress_ng_'))
     expected = [
-        Metric('stress_ng_counter', value=173, labels={'id_proc_stress_ng': '99'},
-               type=MetricType.COUNTER, help="Counter stress-ng"),
-        Metric('stress_ng_counter', value=210, labels={'id_proc_stress_ng': '96'},
-               type=MetricType.COUNTER, help="Counter stress-ng"),
-        Metric('stress_ng_counter', value=191, labels={'id_proc_stress_ng': '103'},
-               type=MetricType.COUNTER, help="Counter stress-ng"),
-        Metric('stress_ng_counter', value=195, labels={'id_proc_stress_ng': '104'},
-               type=MetricType.COUNTER, help="Counter stress-ng")
+        Metric('stress_ng_bogo_ops_counter', value=173, labels={'id_proc_stress_ng': '99'},
+               type=MetricType.COUNTER,
+               help="Counter bogo ops per proc stress-ng, updated per 1 sec"),
+        Metric('stress_ng_bogo_ops_counter', value=210, labels={'id_proc_stress_ng': '96'},
+               type=MetricType.COUNTER,
+               help="Counter bogo ops per proc stress-ng, updated per 1 sec"),
+        Metric('stress_ng_bogo_ops_counter', value=191, labels={'id_proc_stress_ng': '103'},
+               type=MetricType.COUNTER,
+               help="Counter bogo ops per proc stress-ng, updated per 1 sec"),
+        Metric('stress_ng_bogo_ops_counter', value=195, labels={'id_proc_stress_ng': '104'},
+               type=MetricType.COUNTER,
+               help="Counter bogo ops per proc stress-ng, updated per 1 sec")
     ]
 
     assert expected == got
@@ -101,17 +105,17 @@ def test_parse_end_stress():
         got.extend(parse(input_, '', None, {}, 'stress_ng_'))
     expected = [
         Metric('stress_ng_bogo_ops', value=2250, labels={},
-               type=MetricType.GAUGE, help="Bogo ops"),
+               type=MetricType.GAUGE, help="Summary bogo ops"),
         Metric('stress_ng_real_time', value=6.01, labels={},
-               type=MetricType.GAUGE, help="real_time (secs)"),
+               type=MetricType.GAUGE, help="Summary real_time (secs)"),
         Metric('stress_ng_user_time', value=40.81, labels={},
-               type=MetricType.GAUGE, help="user_time (secs)"),
+               type=MetricType.GAUGE, help="Summary user_time (secs)"),
         Metric('stress_ng_system_time', value=0.39, labels={},
-               type=MetricType.GAUGE, help="system_time (secs)"),
+               type=MetricType.GAUGE, help="Summary system_time (secs)"),
         Metric('stress_ng_bogo_ops_per_second_real_time', value=374.12, labels={},
-               type=MetricType.GAUGE, help="bogo ops/s real time"),
+               type=MetricType.GAUGE, help="Summary bogo ops/s real time"),
         Metric('stress_ng_bogo_ops_per_second_usr_sys_time', value=54.61, labels={},
-               type=MetricType.GAUGE, help="bogo ops/s usr+sys time")
+               type=MetricType.GAUGE, help="Summary bogo ops/s usr+sys time")
     ]
 
     assert expected == got

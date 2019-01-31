@@ -112,27 +112,27 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
         new_metrics.append(
             Metric(metric_name_prefix + 'bogo_ops', bogo_ops,
                    type=MetricType.GAUGE, labels=labels,
-                   help="Bogo ops"))
+                   help="Summary bogo ops"))
         new_metrics.append(
             Metric(metric_name_prefix + 'real_time', real_time,
                    type=MetricType.GAUGE, labels=labels,
-                   help="real_time (secs)"))
+                   help="Summary real_time (secs)"))
         new_metrics.append(
             Metric(metric_name_prefix + 'user_time', user_time,
                    type=MetricType.GAUGE, labels=labels,
-                   help="user_time (secs)"))
+                   help="Summary user_time (secs)"))
         new_metrics.append(
             Metric(metric_name_prefix + 'system_time', system_time,
                    type=MetricType.GAUGE, labels=labels,
-                   help="system_time (secs)"))
+                   help="Summary system_time (secs)"))
         new_metrics.append(
             Metric(metric_name_prefix + 'bogo_ops_per_second_real_time', bogo_ops_real,
                    type=MetricType.GAUGE, labels=labels,
-                   help="bogo ops/s real time"))
+                   help="Summary bogo ops/s real time"))
         new_metrics.append(
             Metric(metric_name_prefix + 'bogo_ops_per_second_usr_sys_time', bogo_ops_usr_sys,
                    type=MetricType.GAUGE, labels=labels,
-                   help="bogo ops/s usr+sys time"))
+                   help="Summary bogo ops/s usr+sys time"))
 
     info = re.search(r'stress-ng: info: {2}\[(?P<id>\d*)\]+ ' +
                      r'Time (?P<time>\d*), counter=(?P<counter>\d*)', new_line)
@@ -144,9 +144,9 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
         labels.update({"id_proc_stress_ng": id_proc})
 
         new_metrics.append(
-            Metric(metric_name_prefix + 'counter', counter,
+            Metric(metric_name_prefix + 'bogo_ops_counter', counter,
                    type=MetricType.COUNTER, labels=labels,
-                   help="Counter stress-ng"))
+                   help="Counter bogo ops per proc stress-ng, updated per 1 sec"))
 
     return new_metrics
 
