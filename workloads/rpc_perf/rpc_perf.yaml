@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rpcperf
+spec:
+  containers:
+  - name: rpcperf
+    image: ddarczuk/rpc-perf
+    resources:
+      limits:
+        cpu: "0.1"
+    securityContext:
+      runAsUser: 0
+    command: ["rpc_perf_wrapper.pex"]

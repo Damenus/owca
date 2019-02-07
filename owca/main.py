@@ -31,6 +31,27 @@ from owca import platforms
 log = logging.getLogger('owca.main')
 
 
+def show_owca():
+    log.info("""
+
+              ,-''''-.
+             (.  ,.   L        ___...__
+             /7} ,-`  `'-==''``        ''._
+            //{                           '`.
+            \_,X ,                         : )
+                7          OWCA            ;`
+                :                  ,       /
+                 \_,                \     ;
+                   Y   L_    __..--':`.    L
+                   |  /| ````       ;  y  J
+                   [ j J            / / L ;
+                   | |Y \          /_J  | |
+                   L_J/_)         /_)   L_J
+                  /_)               sk /_)
+
+        """)
+
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -57,6 +78,8 @@ def main():
     parser.add_argument(
         '-0', '--root', help="Allow OWCA process to be run using root account",
         dest='is_root_allowed', action='store_true')
+    parser.add_argument(
+        '--meee', action='show_owca', show_owca=show_owca())
 
     args = parser.parse_args()
 
