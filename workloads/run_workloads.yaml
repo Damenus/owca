@@ -24,6 +24,7 @@
     job_key: "{{cluster}}/{{role}}/staging{{env_uniq_id}}/{{job_name}}"
     aurora_file: "{{job_id}}/{{job_id}}.aurora"
     create_job_command: "aurora job create {{job_key}} {{aurora_file}}"
+    create_job_command_k8s: "python {{job_id}}/{{job_id}}.py | kubeclt create -f -"
 
     workload_version: "{{workloads[workload_name][workload_version_name] if workload_name in workloads else dict(count=0) }}"
 
@@ -178,14 +179,14 @@
         vars:
           job_id: redis
           own_ip: "{{application_host_ip}}"
-        command: "{{create_job_command}}"
+        command: "{{create_job_command_k8s}}"
         loop: "{{instances_version_iterator}}"
         tags: redis_rpc_perf--redis
       - name: Create rpc-perf for redis
         vars:
           job_id: rpc_perf
           own_ip: "{{load_generator_host_ip}}"
-        command: "{{create_job_command}}"
+        command: "{{create_job_command_k8s}}"
         loop: "{{instances_version_iterator}}"
         tags: redis_rpc_perf--rpc_perf
       delegate_to: localhost

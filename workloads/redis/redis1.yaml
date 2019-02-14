@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis
+spec:
+  volumes:
+    - name: shared-data
+  initContainers:
+    - name: prep-config
+      image: centos/redis
+      securityContext:
+        runAsUser: 0
+      command: ["sh", "-c", "set -x &&
+      cd /prep_config &&
+      cp /etc/redis.conf . &&
+      sed -i 's/port 6379/port 6379/' redis.conf &&
+      sed -i 's/bind 127.0.0.1/bind 127.0.0.1/' redis.conf "]
+      volumeMounts:
+        - name: shared-data
+          mountPath: /prep_config
+  containers:
+  - name: redis
+    image: centos/redis
+    env:
+    - name: MASTER
+      value: "true"
+    ports:
+    - containerPort: 6379
+    resources:
+      limits:
+        cpu: "0.1"
+    securityContext:
+      runAsUser: 0
+    volumeMounts:
+      - name: shared-data
+        mountPath: /prep_config
+    command: ["sh", "-c", "redis-server /prep_config/redis.conf"]
+#    args: []
+#    volumeMounts:
+#    - mountPath: /redis-master-data
+#      name: data
+#    - mountPath: /redis-master
+#      name: config
+#  volumes:
+#    - name: data
+#      emptyDir: {}
+#    - name: config
+#      configMap:
+#        name: example-redis-config
+#        items:
+#        - key: redis-config
+#          path: redis.conf

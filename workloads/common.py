@@ -1,0 +1,167 @@
+# Copyright (c) 2018 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import textwrap
+import os
+import json
+
+### Common environment variables for all workloads.
+
+# Workload idenfitication
+workload_name = os.environ['workload_name']
+workload_version_name = os.environ.get('workload_version_name', 'default')
+replica_index = os.environ.get('replica_index', 0)
+job_uniq_id = os.environ['job_uniq_id']
+job_name = os.environ['job_name']
+
+application = os.environ['application']
+load_generator = os.environ.get('load_generator', None)
+
+# Cluster job key identification.
+cluster = os.environ.get('cluster', 'example')
+role = os.environ.get('role', os.environ['USER'])
+env_uniq_id = os.environ['env_uniq_id']
+
+environment = 'staging' + env_uniq_id
+
+# For workloads like tensorflow ignore load_generator_host_ip is ignored.
+application_host_ip = os.environ['application_host_ip']
+load_generator_host_ip = os.environ['load_generator_host_ip']
+own_ip = os.environ['own_ip']
+
+# Performance related variables
+slo = os.environ.get('slo', "inf") # optional: default to inf
+
+# Docker image.
+image_tag = os.environ['image_tag']
+image_name = os.environ['image_name']
+print('image_tag:', image_tag)
+print('image_name:', image_name)
+
+# Resources:
+cpu = float(os.environ.get('cpu', 1))
+ram = float(os.environ.get('ram', 1))# * GB
+disk = float(os.environ.get('disk', 1))# * GB
+
+
+# Wrapper variables:
+wrapper_kafka_brokers = os.environ.get('wrapper_kafka_brokers', '')
+wrapper_kafka_topic = os.environ.get('wrapper_kafka_topic', '')
+wrapper_log_level = os.environ.get('wrapper_log_level', 'DEBUG')
+# Here as dict, must be passed to wrapper as json string.
+#   Can be extended as desired in workload's aurora manifests.
+extra_labels = json.loads(os.environ.get('labels', '{}'))
+wrapper_labels = {
+    'workload_name': workload_name,
+    'workload_version_name': workload_version_name,
+    'replica_index': replica_index,
+    'name': job_name,       # not to break compability
+    'job_name': job_name,   #
+    'application': application,
+    'load_generator': load_generator,
+    'job_uniq_id': job_uniq_id,
+    'env_uniq_id': env_uniq_id,
+    'own_ip': own_ip,
+    'application_host_ip': application_host_ip,
+    'load_generator_host_ip': load_generator_host_ip,
+}
+wrapper_labels.update(extra_labels)
+
+# For debug purposes.
+print('job_uniq_id:', job_uniq_id)
+print('job_name:', job_name)
+print('workload_name:', workload_name)
+print('application:', application)
+print('load_generator:', load_generator)
+print('application_host_ip:', application_host_ip)
+print('load_generator_host_ip:', load_generator_host_ip)
+print('own_ip:', own_ip)
+print('slo:', slo)
+print('cpu:', cpu)
+print('ram:', ram)
+print('disk:', disk)
+
+
+# Pre 0.20 way of adding metadata
+class AddMetadata:
+
+    def __init__(self, labels):
+        self.labels = labels
+
+    def pre_create_job(self, config):
+        for label_nama, label_value in self.labels.items():
+            config.add_metadata(label_nama, label_value)
+        return config
+
+
+def dedent(s):
+    return textwrap.dedent(s).replace('\n', ' ')
+
+# WorkloadService = Service(
+#     constraints=dict(own_ip=own_ip),
+#     name=job_name,
+#     cluster=cluster,
+#     environment=environment,
+#     role=role,
+#     enable_hooks=True,
+#     container=Mesos(image=DockerImage(
+#         name=image_name, tag=image_tag,
+#     )),
+# )
+
+
+command = ["sh", "-c"]
+
+securityContext = {
+    "runAsUser": 0
+}
+
+limits = {
+    "cpu": cpu,
+    "ram": ram,
+    "disk": disk,
+}
+
+volumes = []
+initContainers = []
+
+containers = [
+    {
+        "name": workload_name,
+        "image": image_name + ":" + image_tag,
+        "limits": limits,
+        "securityContext": securityContext,
+        "command": command
+    }
+]
+
+metadata = {
+    "name": workload_name,
+    "labels": wrapper_labels
+}
+
+pod = {
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": metadata,
+    "spec": {
+        "volumes": volumes,
+        "initContainers": initContainers,
+        "containers": containers,
+    }
+}
+
+
+hooks = [AddMetadata(wrapper_labels)]
