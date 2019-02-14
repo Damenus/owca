@@ -15,7 +15,8 @@
 
 import os
 
-from ..common import *
+from owca.workloads.common import *
+import owca.workloads.common
 
 # ----------------------------------------------------------------------------------------------------
 ###
