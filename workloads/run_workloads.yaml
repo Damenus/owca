@@ -48,6 +48,7 @@
     communication_port: "{{workload_version.communication_port | int + item.workload_instance_index }}"
 
     application_host_ip: "{{inventory_hostname}}"
+    orchestrator: "Kubernetes"
 
 
   environment:
@@ -103,10 +104,16 @@
         communication_port: 
         own_ip: 
         job_id: 
-        job_uniq_id: 
-#      shell: "aurora job list {{cluster}}/{{role}}/staging{{env_uniq_id}}{{'/'+kill_job_name if kill_job_name is defined else ''}} |
-#              xargs --no-run-if-empty -n 1 -P0 aurora job killall"
-      shell: "kubectl delete --all pods"
+        job_uniq_id:
+      block:
+      - name: Mesos | Clean jobs
+        shell: "aurora job list {{cluster}}/{{role}}/staging{{env_uniq_id}}
+        {{'/'+kill_job_name if kill_job_name is defined else ''}} |
+        xargs --no-run-if-empty -n 1 -P0 aurora job killall"
+        when: orchestrator == "Mesos"
+      - name: Kubernetes | Clean jobs
+        shell: "kubectl delete --all pods"
+        when: orchestrator == "Kubernetes"
       delegate_to: localhost
       tags: clean_jobs
 
@@ -181,15 +188,32 @@
         vars:
           job_id: redis
           own_ip: "{{application_host_ip}}"
-        shell: "{{create_job_command_k8s}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create redis
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create redis
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
+
         tags: redis_rpc_perf--redis
       - name: Create rpc-perf for redis
         vars:
           job_id: rpc_perf
           own_ip: "{{load_generator_host_ip}}"
-        shell: "{{create_job_command_k8s}}"
-        loop: "{{instances_version_iterator}}"
+#        shell: "{{create_job_command_k8s}}"
+        block:
+        - name: Mesos | Create rpc-perf for redis
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create rpc-perf for redis
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
+#        loop: "{{instances_version_iterator}}"
         tags: redis_rpc_perf--rpc_perf
       delegate_to: localhost
       tags: redis_rpc_perf
