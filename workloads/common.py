@@ -20,49 +20,49 @@ import json
 ### Common environment variables for all workloads.
 
 # Workload idenfitication
-workload_name = os.environ['workload_name']
-workload_version_name = os.environ.get('workload_version_name', 'default')
-replica_index = os.environ.get('replica_index', 0)
-job_uniq_id = os.environ['job_uniq_id']
-job_name = os.environ['job_name']
+workload_name = os.getenv('workload_name')
+workload_version_name = os.getenv('workload_version_name', 'default')
+replica_index = os.getenv('replica_index', 0)
+job_uniq_id = os.getenv('job_uniq_id')
+job_name = os.getenv('job_name')
 
-application = os.environ['application']
-load_generator = os.environ.get('load_generator', None)
+application = os.getenv('application')
+load_generator = os.getenv('load_generator', None)
 
 # Cluster job key identification.
-cluster = os.environ.get('cluster', 'example')
-role = os.environ.get('role', os.environ['USER'])
-env_uniq_id = os.environ['env_uniq_id']
+cluster = os.getenv('cluster', 'example')
+role = os.getenv('role', os.getenv('USER'))
+env_uniq_id = os.getenv('env_uniq_id')
 
 environment = 'staging' + env_uniq_id
 
 # For workloads like tensorflow ignore load_generator_host_ip is ignored.
-application_host_ip = os.environ['application_host_ip']
-load_generator_host_ip = os.environ['load_generator_host_ip']
-own_ip = os.environ['own_ip']
+application_host_ip = os.getenv('application_host_ip')
+load_generator_host_ip = os.getenv('load_generator_host_ip')
+own_ip = os.getenv('own_ip')
 
 # Performance related variables
-slo = os.environ.get('slo', "inf") # optional: default to inf
+slo = os.getenv('slo', 'inf') # optional: default to inf
 
 # Docker image.
-image_tag = os.environ['image_tag']
-image_name = os.environ['image_name']
-print('image_tag:', image_tag)
-print('image_name:', image_name)
+image_tag = os.getenv('image_tag')
+image_name = os.getenv('image_name')
+# print('image_tag:', image_tag)
+# print('image_name:', image_name)
 
 # Resources:
-cpu = float(os.environ.get('cpu', 1))
-ram = float(os.environ.get('ram', 1))# * GB
-disk = float(os.environ.get('disk', 1))# * GB
+cpu = os.getenv('cpu', '1')
+ram = os.getenv('ram', '1') + 'Gi'
+disk = os.getenv('disk', '1') + 'Gi'
 
 
 # Wrapper variables:
-wrapper_kafka_brokers = os.environ.get('wrapper_kafka_brokers', '')
-wrapper_kafka_topic = os.environ.get('wrapper_kafka_topic', '')
-wrapper_log_level = os.environ.get('wrapper_log_level', 'DEBUG')
+wrapper_kafka_brokers = os.getenv('wrapper_kafka_brokers', '')
+wrapper_kafka_topic = os.getenv('wrapper_kafka_topic', '')
+wrapper_log_level = os.getenv('wrapper_log_level', 'DEBUG')
 # Here as dict, must be passed to wrapper as json string.
 #   Can be extended as desired in workload's aurora manifests.
-extra_labels = json.loads(os.environ.get('labels', '{}'))
+extra_labels = json.loads(os.getenv('labels', '{}'))
 wrapper_labels = {
     'workload_name': workload_name,
     'workload_version_name': workload_version_name,
@@ -80,18 +80,18 @@ wrapper_labels = {
 wrapper_labels.update(extra_labels)
 
 # For debug purposes.
-print('job_uniq_id:', job_uniq_id)
-print('job_name:', job_name)
-print('workload_name:', workload_name)
-print('application:', application)
-print('load_generator:', load_generator)
-print('application_host_ip:', application_host_ip)
-print('load_generator_host_ip:', load_generator_host_ip)
-print('own_ip:', own_ip)
-print('slo:', slo)
-print('cpu:', cpu)
-print('ram:', ram)
-print('disk:', disk)
+# print('job_uniq_id:', job_uniq_id)
+# print('job_name:', job_name)
+# print('workload_name:', workload_name)
+# print('application:', application)
+# print('load_generator:', load_generator)
+# print('application_host_ip:', application_host_ip)
+# print('load_generator_host_ip:', load_generator_host_ip)
+# print('own_ip:', own_ip)
+# print('slo:', slo)
+# print('cpu:', cpu)
+# print('ram:', ram)
+# print('disk:', disk)
 
 
 # Pre 0.20 way of adding metadata
@@ -107,7 +107,7 @@ class AddMetadata:
 
 
 def dedent(s):
-    return textwrap.dedent(s).replace('\n', ' ')
+    return textwrap.dedent(s).replace('\n',' ').replace('\'', '"')
 
 # WorkloadService = Service(
 #     constraints=dict(own_ip=own_ip),
@@ -130,25 +130,29 @@ securityContext = {
 
 limits = {
     "cpu": cpu,
-    "ram": ram,
-    "disk": disk,
+    "memory": ram,
+    "ephemeral-storage": disk,
 }
 
-volumes = []
+volumes = [{"name": "shared-data"}]
 initContainers = []
+
+volumeMounts = []
 
 containers = [
     {
-        "name": workload_name,
+        "name": job_name.replace('_','-').replace('.','-'),
         "image": image_name + ":" + image_tag,
-        "limits": limits,
+        "resources": {"limits": limits},
         "securityContext": securityContext,
-        "command": command
+        "volumeMounts": volumeMounts,
+        "command": command,
+
     }
 ]
 
 metadata = {
-    "name": workload_name,
+    "name": job_name.replace('_','-').replace('.','-'),
     "labels": wrapper_labels
 }
 
@@ -158,10 +162,11 @@ pod = {
     "metadata": metadata,
     "spec": {
         "volumes": volumes,
+        "hostNetwork": True,
         "initContainers": initContainers,
         "containers": containers,
     }
 }
 
 
-hooks = [AddMetadata(wrapper_labels)]
+#hooks = [AddMetadata(wrapper_labels)]

@@ -24,7 +24,7 @@
     job_key: "{{cluster}}/{{role}}/staging{{env_uniq_id}}/{{job_name}}"
     aurora_file: "{{job_id}}/{{job_id}}.aurora"
     create_job_command: "aurora job create {{job_key}} {{aurora_file}}"
-    create_job_command_k8s: "python {{job_id}}/{{job_id}}.py | kubeclt create -f -"
+    create_job_command_k8s: "python36 {{job_id}}/{{job_id}}.py | kubectl create -f -"
 
     workload_version: "{{workloads[workload_name][workload_version_name] if workload_name in workloads else dict(count=0) }}"
 
@@ -51,6 +51,7 @@
 
 
   environment:
+    PYTHONPATH: "."
     job_key: "{{job_key}}"
     job_name: "{{job_name}}"
     role: "{{role}}"
@@ -103,8 +104,9 @@
         own_ip: 
         job_id: 
         job_uniq_id: 
-      shell: "aurora job list {{cluster}}/{{role}}/staging{{env_uniq_id}}{{'/'+kill_job_name if kill_job_name is defined else ''}} |
-              xargs --no-run-if-empty -n 1 -P0 aurora job killall"
+#      shell: "aurora job list {{cluster}}/{{role}}/staging{{env_uniq_id}}{{'/'+kill_job_name if kill_job_name is defined else ''}} |
+#              xargs --no-run-if-empty -n 1 -P0 aurora job killall"
+      shell: "kubectl delete --all pods"
       delegate_to: localhost
       tags: clean_jobs
 
@@ -179,14 +181,14 @@
         vars:
           job_id: redis
           own_ip: "{{application_host_ip}}"
-        command: "{{create_job_command_k8s}}"
+        shell: "{{create_job_command_k8s}}"
         loop: "{{instances_version_iterator}}"
         tags: redis_rpc_perf--redis
       - name: Create rpc-perf for redis
         vars:
           job_id: rpc_perf
           own_ip: "{{load_generator_host_ip}}"
-        command: "{{create_job_command_k8s}}"
+        shell: "{{create_job_command_k8s}}"
         loop: "{{instances_version_iterator}}"
         tags: redis_rpc_perf--rpc_perf
       delegate_to: localhost

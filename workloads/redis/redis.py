@@ -14,9 +14,7 @@
 
 
 import os
-
-from owca.workloads.common import *
-import owca.workloads.common
+from common import *
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -24,16 +22,31 @@ import owca.workloads.common
 ###
 
 # Port that stressed application listens on.
+
+
 communication_port = os.environ.get('communication_port', 11211)
 # ----------------------------------------------------------------------------------------------------
 
-cmdline_config = "set -x && cp /etc/redis.conf . && " \
-                 "sed -i 's/port 6379/port {communication_port}/' redis.conf && " \
-                 "sed -i 's/bind 127.0.0.1/bind {application_host_ip}/' redis.conf " \
-    .format(
-        communication_port=communication_port,
-        application_host_ip=application_host_ip
-    )
+
+vloume = {"name": "shared-data"}
+#volumes.append(vloume)
+
+
+cmdline_config = ["sh", "-c",
+                  ("set -x && "               
+                   "cd /prep_config && "
+                   "cp /etc/redis.conf . && " \
+                   "sed -i \"s/port 6379/port {communication_port}/\" redis.conf && " \
+                   "sed -i \"s/bind 127.0.0.1/bind {application_host_ip}/\" redis.conf "\
+                        .format(
+                            communication_port=communication_port,
+                            application_host_ip=application_host_ip
+                        ))]
+
+volume_prep_config = {
+    "name": "shared-data",
+    "mountPath": "/prep_config"
+}
 
 initContainer = {
     "name": "prep-config",
@@ -41,19 +54,20 @@ initContainer = {
     "securityContext": securityContext,
     "command": cmdline_config,
     "volumeMounts": [
-        {
-            "name": "shared-data",
-            "mountPath": "/prep_config"
-        }
+        volume_prep_config
     ]
 }
 initContainers.append(initContainer)
 
-cmdline = 'redis-server redis.conf'
+
+volumeMounts.append(volume_prep_config)
+
+cmdline = "redis-server redis.conf"
 cmd = "redis-server /prep_config/redis.conf"
 command.append(cmd)
 
-print(pod)
+json_format = json.dumps(pod)
+print(json_format)
 
 
 # jobs = [
@@ -74,3 +88,4 @@ print(pod)
 #         ),
 #     ),
 # ]
+

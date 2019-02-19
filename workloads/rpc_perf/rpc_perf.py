@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-from owca.workloads.common import *
+import os
+from common import *
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -57,16 +58,15 @@ sli_metric_name = "{application}_p99".format(application=application)
 load_metric_name = "{application}_rate".format(application=application)
 
 cmd = dedent("""rpc_perf_wrapper.pex
-                        --command "rpc-perf --config /etc/rpc-perf.toml -p {protocol} 
-                        --server {ip}:{port}"
+                        --command 'rpc-perf --config /etc/rpc-perf.toml -p {protocol} --server {ip}:{port}'
                         --log_level {log_level}
                         --stderr 0
-                        --labels "{labels}"
-                        --metric_name_prefix "{application}_"
+                        --labels '{labels}'
+                        --metric_name_prefix '{application}_'
                         --kafka_topic {kafka_topic}
                         --kafka_brokers {kafka_brokers}
-                        --peak_load "{peak_load}" --load_metric_name "{load_metric_name}"
-                        --slo {slo} --sli_metric_name "{sli_metric_name}"
+                        --peak_load '{peak_load}' --load_metric_name '{load_metric_name}'
+                        --slo {slo} --sli_metric_name '{sli_metric_name}'
                             """).format(
                                 protocol=rpcperf_protocol,
                                 ip=application_host_ip,
@@ -83,7 +83,8 @@ cmd = dedent("""rpc_perf_wrapper.pex
 
 # if K8s
 command.append(cmd)
-print(pod)
+json_format = json.dumps(pod)
+print(json_format)
 
 # if Mesos Aurora
 # jobs = [
@@ -100,5 +101,3 @@ print(pod)
 #         )
 #     ),
 # ]
-
-
