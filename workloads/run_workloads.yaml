@@ -51,6 +51,7 @@
     orchestrator: "Kubernetes"
 
 
+
   environment:
     PYTHONPATH: "."
     job_key: "{{job_key}}"
@@ -86,7 +87,7 @@
 
   tasks:
     - name: Clean jobs
-      # Compatbility with Ansible 2.7
+      # Compatibility with Ansible 2.7
       # Fill all normally required parameters for workload that 
       # make no sense for this task.
       vars:
@@ -134,15 +135,29 @@
           own_ip: "{{application_host_ip}}"
         environment:
           jmx_port: "{{workload_version.jmx_port + item.workload_instance_index}}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create Cassandra
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create Cassandra
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: cassandra_ycsb--cassandra
       - name: Create ycsb for cassandra
         vars:
           job_id: ycsb
           own_ip: "{{load_generator_host_ip}}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create ycsb
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create ycsb
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: cassandra_ycsb--ycsb
       delegate_to: localhost
       tags: cassandra_ycsb
@@ -162,15 +177,29 @@
           own_ip: "{{application_host_ip}}"
         environment:
           jmx_port: "{{workload_version.jmx_port + item.workload_instance_index}}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create Cassandra
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create Cassandra
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: cassandra_stress--cassandra
       - name: Create cassandra_stress
         vars:
           job_id: cassandra_stress
           own_ip: "{{load_generator_host_ip}}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create Cassandra Stress
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create Cassandra Stress
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: cassandra_stress--stress
       delegate_to: localhost
       tags: cassandra_stress
