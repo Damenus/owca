@@ -65,7 +65,7 @@
     env_uniq_id: "{{env_uniq_id}}"
     image_name: "{{image_name}}"
     image_tag: "{{image_tag_}}"
-    labels: "{{workload_version.labels | default({}) | to_json }}"
+    labels: "{{workload_version.labels | default({}) | combine(additional_labels | default({})) | to_json }}"
 
     cpu: "{{resources.cpu}}"
     ram: "{{resources.ram}}"
@@ -93,13 +93,11 @@
       vars:
         item: {'workload_instance_index': 0, 'workload_version_name': 0, 'job_replica_index': 0}
         workload_name: 
+        workload_version: {'slo': 0}
         workload_version_name:
         image_tag_:
         image_name:
-        resources:
-          cpu:
-          ram:
-          disk:
+        resources: {'cpu': '', 'ram': '', 'disk': ''}
         application:
         load_generator: 
         communication_port: 
@@ -260,15 +258,29 @@
         vars:
           job_id: twemcache
           own_ip: "{{application_host_ip}}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create twemcache
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create twemcache
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: twemcache_rpc_perf--twemcache
       - name: Create rpc-perf for twemcache
         vars:
           job_id: rpc_perf
           own_ip: "{{load_generator_host_ip}}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create rpc-perf
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create rpc-perf
+          shell: "{{create_job_command_k8s}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: twemcache_rpc_perf--rpc_perf
       delegate_to: localhost
       tags: twemcache_rpc_perf
@@ -428,3 +440,32 @@
       tags: tensorflow_benchmark_prediction
       command: "{{create_job_command}}"
       loop: "{{instances_version_iterator}}"
+
+
+    - name: Create stress_ng workload
+      vars:
+        workload_name: stress_ng
+        job_uniq_id: "{{item.workload_instance_index}}"
+        load_generator: stress_ng
+        application: stress_ng
+        job_id: stress_ng
+        job_name: "{{job_id}}.{{workload_version_name}}--{{job_uniq_id}}"
+        own_ip: "{{application_host_ip}}"
+        communication_port: 0
+        resources: "{{workload_version.resources | default(default_resources)}}"
+        image_subname: stress_ng
+      environment:
+        timeout: "{{workload_version.timeout}}"
+        stressor: "{{workload_version.stressor}}"
+        number_workers: "{{workload_version.number_workers}}"
+      block:
+      - name: Mesos | Create stress_ng
+        shell: "{{create_job_command}}"
+        loop: "{{instances_version_iterator}}"
+        when: orchestrator == "Mesos"
+      - name: Kubernetes | Create stress_ng
+        shell: "{{create_job_command_k8s}}"
+        loop: "{{instances_version_iterator}}"
+        when: orchestrator == "Kubernetes"
+      delegate_to: localhost
+      tags: stress_ng
