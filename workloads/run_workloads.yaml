@@ -340,24 +340,45 @@
           job_id: backend
           own_ip: "{{application_host_ip}}"
         environment: "{{workload_version[job_id].env | default({}) }}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create specjbb backends
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create specjbb backend
+          shell: "python36 {{workload_name}}/{{workload_name}}.py | kubectl create -f -"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: specjbb--backend
       - name: Create specjbb injectors
         vars:
           job_id: injector
           own_ip: "{{load_generator_host_ip}}"
         environment: "{{workload_version[job_id].env | default({}) }}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create specjbb injector 
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create specjbb injector
+          shell: "python36 {{workload_name}}/{{workload_name}}.py | kubectl create -f -"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: specjbb--injector
       - name: Create specjbb controllers
         vars:
           job_id: controller
           own_ip: "{{load_generator_host_ip}}"
         environment: "{{workload_version[job_id].env | default({}) }}"
-        command: "{{create_job_command}}"
-        loop: "{{instances_version_iterator}}"
+        block:
+        - name: Mesos | Create specjbb controllers
+          shell: "{{create_job_command}}"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Mesos"
+        - name: Kubernetes | Create specjbb controllers
+          shell: "python36 {{workload_name}}/{{workload_name}}.py | kubectl create -f -"
+          loop: "{{instances_version_iterator}}"
+          when: orchestrator == "Kubernetes"
         tags: specjbb--controller
       delegate_to: localhost
       tags: specjbb
