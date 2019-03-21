@@ -356,7 +356,7 @@
           own_ip: "{{load_generator_host_ip}}"
         environment: "{{workload_version[job_id].env | default({}) }}"
         block:
-        - name: Mesos | Create specjbb injector 
+        - name: Mesos | Create specjbb injector
           shell: "{{create_job_command}}"
           loop: "{{instances_version_iterator}}"
           when: orchestrator == "Mesos"

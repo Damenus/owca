@@ -43,6 +43,10 @@ application_hosts:
     wrapper_kafka_brokers: 10.10.10.99
     docker_registry: 10.10.10.99:80
 
+    # Allow to add additional labels to all newly created workloads.
+    additional_labels:
+      key: "value"
+
     default_resources:
       cpu: 1
       ram: 1
@@ -57,8 +61,6 @@ application_hosts:
           slo: 2500
           jmx_port: 7199
           communication_port: 9042
-          labels:
-            workload_kind:
           cassandra:
             image_name: cassandra
             image_tag: 3.11.3
@@ -175,3 +177,15 @@ application_hosts:
             cpu: 10
             ram: 50
             disk: 30
+
+      stress_ng:
+        default:
+          count: 1
+          timeout: 30
+          stressor: stream
+          number_workers: 2
+          resources:
+            cpu: 1
+            ram: 1
+            disk: 1
+
