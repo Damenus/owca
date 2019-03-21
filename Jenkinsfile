@@ -237,6 +237,8 @@ pipeline {
                             sh '''
                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/specjbb:${GIT_COMMIT}
                             IMAGE_DIR=${WORKSPACE}/workloads/specjbb
+                            cat ${IMAGE_DIR}
+                            ls ${IMAGE_DIR}
                             cp ${SPECJBB_TAR} ${IMAGE_DIR}
                             tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
                             cp -r dist ${IMAGE_DIR}
