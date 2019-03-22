@@ -55,6 +55,7 @@ initContainer = {
 initContainers.append(initContainer)
 volumeMounts.append(volume_prep_config)
 
+# TODO: make this beautiful
 ram2 = int(os.getenv('ram', '1')) * 1024
 ram3 = int(float(ram2) / 4.0)
 
@@ -64,6 +65,7 @@ ram3 = str(ram3) + 'M'
 #cmd = dedent(("""cp /prep_config/cassandra.yaml /etc/cassandra && \
 #cp /prep_config/cassandra-env.sh /etc/cassandra && \
 #MAX_HEAP_SIZE={ram} HEAP_NEWSIZE={ram2} /docker-entrypoint.sh""").format(ram=ram2, ram2=ram3)) # env CASSANDRA_CONFIG=/etc/cassandra /docker-entrypoint.sh
+# TODO: set correct MAX_HEAP_SIZE and HEAP_NEWSIZE
 cmd = dedent("""cp /prep_config/cassandra.yaml /etc/cassandra && \
 cp /prep_config/cassandra-env.sh /etc/cassandra && \
 MAX_HEAP_SIZE="2G" HEAP_NEWSIZE="400M" /docker-entrypoint.sh""")

@@ -111,7 +111,7 @@
         xargs --no-run-if-empty -n 1 -P0 aurora job killall"
         when: orchestrator == "Mesos"
       - name: Kubernetes | Clean jobs
-        shell: "kubectl delete --all pods"
+        shell: "kubectl delete --all pods --namespace=default"
         when: orchestrator == "Kubernetes"
       delegate_to: localhost
       tags: clean_jobs

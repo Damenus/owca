@@ -156,6 +156,29 @@ metadata = {
     "labels": wrapper_labels
 }
 
+affinity = {
+    "nodeAffinity": {
+        "requiredDuringSchedulingIgnoredDuringExecution": {
+            "nodeSelectorTerms":
+                [
+                    {
+                        "matchExpressions":
+                            [
+                                {
+                                    "key": "own_ip",
+                                    "operator": "In",
+                                    "values":
+                                        [
+                                            own_ip
+                                        ]
+                                }
+                            ]
+                    }
+                ]
+        }
+    }
+}
+
 pod = {
     "apiVersion": "v1",
     "kind": "Pod",
@@ -165,6 +188,10 @@ pod = {
         "hostNetwork": True,
         "initContainers": initContainers,
         "containers": containers,
+        #"affinity": affinity
+        "nodeSelector": {
+            "own_ip": own_ip
+        }
     }
 }
 
