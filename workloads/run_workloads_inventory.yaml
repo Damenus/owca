@@ -67,6 +67,7 @@ application_hosts:
           count: 1
           slo: 2500
           jmx_port: 7199
+          storage_port: 7100
           communication_port: 9042
           cassandra:
             image_name: cassandra
@@ -78,6 +79,7 @@ application_hosts:
           count: 1
           communication_port: 9142
           jmx_port: 7299
+          storage_port: 7200
           slo: 1000
           cassandra:
             image_name: cassandra
@@ -88,7 +90,7 @@ application_hosts:
         default:
           labels:
               foo: bar
-          count: 1
+          count: 0
           slo: 100000
           communication_port: 6789
           redis:
@@ -98,7 +100,7 @@ application_hosts:
 
       twemcache_rpc_perf:
         default:
-          count: 1
+          count: 0
           slo: 100000
           communication_port: 11211
           twemcache:
@@ -109,7 +111,7 @@ application_hosts:
 
       twemcache_mutilate:
         small:
-          count: 1
+          count: 0
           slo: 3200
           communication_port: 11311
           twemcache:
@@ -118,7 +120,7 @@ application_hosts:
 
       specjbb:
         default:
-          count: 1
+          count: 0
           slo: 26000000
           communication_port: 42000
           backend:

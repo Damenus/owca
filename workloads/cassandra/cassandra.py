@@ -22,6 +22,8 @@ from common import *
 
 # Port that Cassnadra will bind to.
 cassandra_port = os.environ.get('communication_port', '9042')
+jmx_port = os.environ.get('jmx_port', '7199')
+storage_port = os.environ.get('storage_port', '7000')
 # ----------------------------------------------------------------------------------------------------
 
 volume = {"name": "shared-data"}
@@ -33,12 +35,11 @@ cd /prep_config && \
 cp /etc/cassandra/cassandra.yaml . && \
 cp /etc/cassandra/cassandra-env.sh .  \
 && sed -i 's/native_transport_port: 9042/native_transport_port: {cassandra_port}/' cassandra.yaml \
-&& export STORAGE_PORT=$(( ( RANDOM  % 10000 )  + 20000 )) \
-&& sed -i "s/storage_port: 7000/storage_port: $STORAGE_PORT/" cassandra.yaml \
-&& export JMX_PORT=$(( ( RANDOM  % 10000 )  + 20000 )) \
-&& sed -i "s/JMX_PORT=\"7199\"/JMX_PORT=\"$JMX_PORT\"/" cassandra-env.sh \
-&& cat cassandra.yaml
-""".format(cassandra_port=cassandra_port)]
+&& sed -i "s/storage_port: 7000/storage_port: {storage_port}/" cassandra.yaml \
+&& sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"{jmx_port}\"/' cassandra-env.sh \
+&& cat cassandra-env.sh | grep 'JMX_PORT' \
+&& cat cassandra.yaml | grep 'storage_port'
+""".format(cassandra_port=cassandra_port, storage_port=storage_port, jmx_port=jmx_port)]
 
 volume_prep_config = {
     "name": "shared-data",
@@ -68,10 +69,9 @@ ram3 = str(ram3) + 'M'
 # TODO: set correct MAX_HEAP_SIZE and HEAP_NEWSIZE
 cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra && "
 "cp /prep_config/cassandra-env.sh /etc/cassandra && "
-"cat /prep_config/cassandra-env.sh && "
-"ls /etc/cassandra && "
+"cat /prep_config/cassandra-env.sh | grep 'JMX_PORT' && "
 "sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"7101\"/' /etc/cassandra/cassandra-env.sh && "
-"cat /etc/cassandra/cassandra-env.sh && "
+"cat /etc/cassandra/cassandra-env.sh | grep 'JMX_PORT' && "
 "MAX_HEAP_SIZE=\"2G\" HEAP_NEWSIZE=\"400M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh")
 command.append(cmd)
 
