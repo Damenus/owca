@@ -66,9 +66,13 @@ ram3 = str(ram3) + 'M'
 #cp /prep_config/cassandra-env.sh /etc/cassandra && \
 #MAX_HEAP_SIZE={ram} HEAP_NEWSIZE={ram2} /docker-entrypoint.sh""").format(ram=ram2, ram2=ram3)) # env CASSANDRA_CONFIG=/etc/cassandra /docker-entrypoint.sh
 # TODO: set correct MAX_HEAP_SIZE and HEAP_NEWSIZE
-cmd = dedent("""cp /prep_config/cassandra.yaml /etc/cassandra && \
-cp /prep_config/cassandra-env.sh /etc/cassandra && \
-MAX_HEAP_SIZE="2G" HEAP_NEWSIZE="400M" /docker-entrypoint.sh""")
+cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra && "
+"cp /prep_config/cassandra-env.sh /etc/cassandra && "
+"cat /prep_config/cassandra-env.sh && "
+"ls /etc/cassandra && "
+"sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"7101\"/' /etc/cassandra/cassandra-env.sh && "
+"cat /etc/cassandra/cassandra-env.sh && "
+"MAX_HEAP_SIZE=\"2G\" HEAP_NEWSIZE=\"400M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh")
 command.append(cmd)
 
 json_format = json.dumps(pod)
