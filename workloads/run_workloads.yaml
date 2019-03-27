@@ -489,3 +489,5 @@
         when: orchestrator == "Kubernetes"
       delegate_to: localhost
       tags: stress_ng
+      command: "{{create_job_command}}"
+      loop: "{{instances_version_iterator}}"
