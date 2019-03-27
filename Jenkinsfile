@@ -184,13 +184,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-                    post {
-                        always {
-                            sh '''
-                            rm -rf ${WORKSPACE}/workloads/ycsb/dist
-                            '''
-                        }
-                    }
                 }
                 stage("Build and push Cassandra Stress Docker image") {
                     steps {
