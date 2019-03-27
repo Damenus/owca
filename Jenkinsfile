@@ -9,7 +9,6 @@ pipeline {
                 sh '''
                   make venv owca_package wrapper_package
                 '''
-                stash(name: "wrappers", includes: "dist/**")
                 archiveArtifacts(artifacts: "dist/**")
             }
 
