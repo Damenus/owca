@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label '100.64.176.16'}
     environment {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
     }
