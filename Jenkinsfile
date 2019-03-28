@@ -11,14 +11,12 @@ pipeline {
                 '''
                 archiveArtifacts(artifacts: "dist/**")
             }
-
         }
         stage("Building Docker images in parallel") {
             parallel {
                 stage("Build and push Tensorflow training Docker image") {
                     steps {
                         withCredentials([file(credentialsId: 'kaggle.json', variable: 'KAGGLE_JSON')]) {
-
                             sh '''
                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/tensorflow_train:${GIT_COMMIT}
                             IMAGE_DIR=${WORKSPACE}/workloads/tensorflow_train
@@ -34,7 +32,6 @@ pipeline {
                 stage("Build and push Tensorflow inference Docker image") {
                     steps {
                         withCredentials([file(credentialsId: 'kaggle.json', variable: 'KAGGLE_JSON')]) {
-
                             sh '''
                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/tensorflow_inference:${GIT_COMMIT}
                             IMAGE_DIR=${WORKSPACE}/workloads/tensorflow_inference
@@ -49,7 +46,6 @@ pipeline {
                 }
                 stage("Build and push Tensorflow Benchmark Docker image") {
                     steps {
-
                         sh '''
                         IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/tensorflow_benchmark:${GIT_COMMIT}
                         IMAGE_DIR=${WORKSPACE}/workloads/tensorflow_benchmark
@@ -74,7 +70,6 @@ pipeline {
                 }
                 stage("Build and push stress-ng Docker image") {
                     steps {
-
                         sh '''
                         IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/stress_ng:${GIT_COMMIT}
                         IMAGE_DIR=${WORKSPACE}/workloads/stress_ng
@@ -87,7 +82,6 @@ pipeline {
                 }
                 stage("Build and push rpc-perf Docker image") {
                     steps {
-
                         sh '''
                         IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/rpc_perf:${GIT_COMMIT}
                         IMAGE_DIR=${WORKSPACE}/workloads/rpc_perf
@@ -112,7 +106,6 @@ pipeline {
                 }
                 stage("Build and push YCSB Docker image") {
                     steps {
-
                         sh '''
                         IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/ycsb:${GIT_COMMIT}
                         IMAGE_DIR=${WORKSPACE}/workloads/ycsb
@@ -124,7 +117,6 @@ pipeline {
                 }
                 stage("Build and push Cassandra Stress Docker image") {
                     steps {
-
                         sh '''
                         IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/cassandra_stress:${GIT_COMMIT}
                         IMAGE_DIR=${WORKSPACE}/workloads/cassandra_stress
@@ -137,7 +129,6 @@ pipeline {
                 }
                 stage("Build and push mutilate Docker image") {
                     steps {
-
                         sh '''
                         IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/mutilate:${GIT_COMMIT}
                         IMAGE_DIR=${WORKSPACE}/workloads/mutilate
@@ -151,7 +142,6 @@ pipeline {
                 stage("Build and push SpecJBB Docker image") {
                     steps {
                         withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
-
                             sh '''
                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca/specjbb:${GIT_COMMIT}
                             IMAGE_DIR=${WORKSPACE}/workloads/specjbb
