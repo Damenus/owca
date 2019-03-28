@@ -36,9 +36,7 @@ cp /etc/cassandra/cassandra.yaml . && \
 cp /etc/cassandra/cassandra-env.sh .  \
 && sed -i 's/native_transport_port: 9042/native_transport_port: {cassandra_port}/' cassandra.yaml \
 && sed -i "s/storage_port: 7000/storage_port: {storage_port}/" cassandra.yaml \
-&& sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"{jmx_port}\"/' cassandra-env.sh \
-&& cat cassandra-env.sh | grep 'JMX_PORT' \
-&& cat cassandra.yaml | grep 'storage_port'
+&& sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"{jmx_port}\"/' cassandra-env.sh
 """.format(cassandra_port=cassandra_port, storage_port=storage_port, jmx_port=jmx_port)]
 
 volume_prep_config = {
@@ -69,9 +67,6 @@ ram3 = str(ram3) + 'M'
 # TODO: set correct MAX_HEAP_SIZE and HEAP_NEWSIZE
 cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra && "
 "cp /prep_config/cassandra-env.sh /etc/cassandra && "
-"cat /prep_config/cassandra-env.sh | grep 'JMX_PORT' && "
-"sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"7101\"/' /etc/cassandra/cassandra-env.sh && "
-"cat /etc/cassandra/cassandra-env.sh | grep 'JMX_PORT' && "
 "MAX_HEAP_SIZE=\"2G\" HEAP_NEWSIZE=\"400M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh")
 command.append(cmd)
 
