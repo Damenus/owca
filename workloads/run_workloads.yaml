@@ -296,7 +296,7 @@
       - name: Create twemcache for mutilate
         vars:
           job_id: twemcache
-          own_ip: "{{load_generator_host_ip}}"
+          own_ip: "{{application_host_ip}}"
         block:
         - name: Mesos | Create twemcache
           shell: "{{create_job_command}}"
@@ -489,5 +489,3 @@
         when: orchestrator == "Kubernetes"
       delegate_to: localhost
       tags: stress_ng
-      command: "{{create_job_command}}"
-      loop: "{{instances_version_iterator}}"
