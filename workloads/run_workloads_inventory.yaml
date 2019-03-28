@@ -11,7 +11,7 @@ application_hosts:
   hosts:
     100.64.176.33:
       env_uniq_id: 1
-      load_generator_host_ip: 100.64.176.33
+      load_generator_host_ip: 100.64.176.34
 #      workloads:
 #        cassandra_ycsb: {'count': 0, 'resources': {'cpu', 0.1}}
 #        cassandra_stress: {'count': 0}
@@ -49,7 +49,7 @@ application_hosts:
     # Global variables to run workloads.
     cluster: example
     role: ddarczuk
-    image_tag: a159ffd5c6d83ac908178a50e88d6742346c1099
+    image_tag: 7f7604f09a370b17118a61aa4d0f605478395893
 
     wrapper_kafka_brokers: 100.64.176.12
     docker_registry: 100.64.176.12:80
@@ -64,9 +64,9 @@ application_hosts:
 
       cassandra_ycsb:
         default:
-          count: 1
+          count: 3
           slo: 2500
-          jmx_port: 7199
+          jmx_port: 7150
           storage_port: 7100
           communication_port: 9042
           cassandra:
@@ -76,9 +76,9 @@ application_hosts:
 
       cassandra_stress:
         default:
-          count: 1
+          count: 3
           communication_port: 9142
-          jmx_port: 7299
+          jmx_port: 7250
           storage_port: 7200
           slo: 1000
           cassandra:
@@ -90,7 +90,7 @@ application_hosts:
         default:
           labels:
               foo: bar
-          count: 0
+          count: 3
           slo: 100000
           communication_port: 6789
           redis:
@@ -100,7 +100,7 @@ application_hosts:
 
       twemcache_rpc_perf:
         default:
-          count: 0
+          count: 3
           slo: 100000
           communication_port: 11211
           twemcache:
@@ -111,7 +111,7 @@ application_hosts:
 
       twemcache_mutilate:
         small:
-          count: 0
+          count: 3
           slo: 3200
           communication_port: 11311
           twemcache:
@@ -120,7 +120,7 @@ application_hosts:
 
       specjbb:
         default:
-          count: 0
+          count: 3
           slo: 26000000
           communication_port: 42000
           backend:
