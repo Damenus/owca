@@ -110,6 +110,7 @@
         own_ip: 
         job_id: 
         job_uniq_id:
+        cmd:
       block:
       - name: Mesos | Clean jobs
         shell: "aurora job list {{cluster}}/{{role}}/staging{{env_uniq_id}}
