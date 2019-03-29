@@ -14,10 +14,16 @@
 
 
 import textwrap
-import os
+import subprocess, os
 import json
 
+#Copy env from ansible
+my_env = os.environ.copy()
+
 ### Common environment variables for all workloads.
+orchestrator = os.getenv('orchestrator')
+job_key = os.getenv('job_key')
+aurora_file = os.getenv('aurora_file')
 
 # Workload idenfitication
 workload_name = os.getenv('workload_name')

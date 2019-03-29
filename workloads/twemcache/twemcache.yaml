@@ -1,0 +1,34 @@
+---
+
+- name: Create tewmcache
+  var:
+    cmd: "twemcache --prealloc --hash-power=20 --max-memory={{max_memory}} \
+      --port={{communication_port}} --eviction-strategy=2 --verbosity=4 \
+      --threads={{worker_threads}} --backlog=128 -u twemcache \
+      --maximize-core-limit --slab-size=1048576"
+  block:
+  - name: Mesos | Create tewmcache
+    shell: "aurora job create {{job_key}} {{aurora_file}}"
+    loop: "{{instances_version_iterator}}"
+    when: orchestrator == "Mesos"
+
+  - name: Kubernetes | Create tewmcache
+    k8s:
+      definition:
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: "{{job_name | replace('_','-') | replace('.','-')}}"
+        spec:
+          hostNetwork: True
+          nodeSelector:
+              own_ip: "{{own_ip}}"
+          containers:
+            name: "{{job_name | replace('_','-') | replace('.','-')}}"
+            image: "{{image_name}}:{{image_tag}}"
+            securityContext:
+              runAsUser: 0
+            command: "ssh -c {{cmd}}"
+
+    loop: "{{instances_version_iterator}}"
+    when: orchestrator == "Kubernetes"

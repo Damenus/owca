@@ -49,7 +49,8 @@ application_hosts:
     # Global variables to run workloads.
     cluster: example
     role: ddarczuk
-    image_tag: 7f7604f09a370b17118a61aa4d0f605478395893
+    image_tag: 30ca7a36e3a4be0a121dd392c8289d5439af2c50
+    orchestrator: Kubernetes
 
     wrapper_kafka_brokers: 100.64.176.12
     docker_registry: 100.64.176.12:80
@@ -64,7 +65,7 @@ application_hosts:
 
       cassandra_ycsb:
         default:
-          count: 3
+          count: 0
           slo: 2500
           jmx_port: 7150
           storage_port: 7100
@@ -76,10 +77,10 @@ application_hosts:
 
       cassandra_stress:
         default:
-          count: 3
+          count: 0
           communication_port: 9142
-          jmx_port: 7250
-          storage_port: 7200
+          jmx_port: 7350
+          storage_port: 7300
           slo: 1000
           cassandra:
             image_name: cassandra
@@ -90,7 +91,7 @@ application_hosts:
         default:
           labels:
               foo: bar
-          count: 3
+          count: 0
           slo: 100000
           communication_port: 6789
           redis:
@@ -100,7 +101,7 @@ application_hosts:
 
       twemcache_rpc_perf:
         default:
-          count: 3
+          count: 1
           slo: 100000
           communication_port: 11211
           twemcache:
@@ -111,7 +112,7 @@ application_hosts:
 
       twemcache_mutilate:
         small:
-          count: 3
+          count: 0
           slo: 3200
           communication_port: 11311
           twemcache:
@@ -120,7 +121,7 @@ application_hosts:
 
       specjbb:
         default:
-          count: 3
+          count: 0
           slo: 26000000
           communication_port: 42000
           backend:

@@ -19,6 +19,8 @@ import json
 
 ### Common environment variables for all workloads.
 
+cmd = os.environ.get('cmd')
+
 # Workload idenfitication
 workload_name = os.environ['workload_name']
 workload_version_name = os.environ.get('workload_version_name', 'default')

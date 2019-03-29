@@ -22,7 +22,8 @@
     workload_version_name: "{{item.workload_version_name}}"
     job_name: "{{workload_name}}.{{workload_version_name}}--{{job_id}}--{{job_uniq_id}}.{{item.job_replica_index}}"
     job_key: "{{cluster}}/{{role}}/staging{{env_uniq_id}}/{{job_name}}"
-    aurora_file: "{{job_id}}/{{job_id}}.aurora"
+
+    job_command: "python36 {{job_id}}/{{job_id}}.py"
     create_job_command: "aurora job create {{job_key}} {{aurora_file}}"
     create_job_command_k8s: "python36 {{job_id}}/{{job_id}}.py | kubectl create -f -"
 
@@ -48,11 +49,14 @@
     communication_port: "{{workload_version.communication_port | int + item.workload_instance_index }}"
 
     application_host_ip: "{{inventory_hostname}}"
-    orchestrator: "Kubernetes"
+
+    aurora_file: "{{job_id}}/{{job_id}}.aurora"
 
 
 
   environment:
+    orchestrator: "{{orchestrator}}"
+    aurora_file: "{{aurora_file}}"
     PYTHONPATH: "."
     job_key: "{{job_key}}"
     job_name: "{{job_name}}"
@@ -70,6 +74,8 @@
     cpu: "{{resources.cpu}}"
     ram: "{{resources.ram}}"
     disk: "{{resources.disk}}"
+
+    cmd: "{{cmd}}"
 
     job_uniq_id: "{{job_uniq_id}}"
     workload_version_name: "{{workload_version_name}}"
@@ -257,29 +263,18 @@
         vars:
           job_id: twemcache
           own_ip: "{{application_host_ip}}"
+#        shell: "{{job_command}}"
         block:
-        - name: Mesos | Create twemcache
-          shell: "{{create_job_command}}"
-          loop: "{{instances_version_iterator}}"
-          when: orchestrator == "Mesos"
-        - name: Kubernetes | Create twemcache
-          shell: "{{create_job_command_k8s}}"
-          loop: "{{instances_version_iterator}}"
-          when: orchestrator == "Kubernetes"
+        - name: DD
+          import_tasks: twemcache/twemcache.yaml
+#        loop: "{{instances_version_iterator}}"
         tags: twemcache_rpc_perf--twemcache
       - name: Create rpc-perf for twemcache
         vars:
           job_id: rpc_perf
           own_ip: "{{load_generator_host_ip}}"
-        block:
-        - name: Mesos | Create rpc-perf
-          shell: "{{create_job_command}}"
-          loop: "{{instances_version_iterator}}"
-          when: orchestrator == "Mesos"
-        - name: Kubernetes | Create rpc-perf
-          shell: "{{create_job_command_k8s}}"
-          loop: "{{instances_version_iterator}}"
-          when: orchestrator == "Kubernetes"
+        shell: "{{job_command}}"
+        loop: "{{instances_version_iterator}}"
         tags: twemcache_rpc_perf--rpc_perf
       delegate_to: localhost
       tags: twemcache_rpc_perf

@@ -14,6 +14,7 @@
 
 import os
 from common import *
+import subprocess
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -37,7 +38,15 @@ cmd = """twemcache --prealloc --hash-power=20 --max-memory={max_memory} \
     communication_port=communication_port,
     worker_threads=worker_threads,
     max_memory=max_memory)
-command.append(cmd)
 
-json_format = json.dumps(pod)
-print(json_format)
+if (orchestrator == 'Mesos'):
+    my_env["cmd"] = cmd
+    subprocess.run(["aurora", "job", "create", job_key, aurora_file], env=my_env)
+elif (orchestrator == 'Kubernetes'):
+    command.append(cmd)
+    json_format = json.dumps(pod)
+    #print(json_format)
+
+    ps = subprocess.Popen(('echo', json_format), stdout=subprocess.PIPE)
+    output = subprocess.check_output(('kubectl', 'create', '-f', '-'), stdin=ps.stdout)
+    ps.wait()

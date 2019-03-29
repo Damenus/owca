@@ -81,23 +81,15 @@ cmd = dedent("""rpc_perf_wrapper.pex
                                 slo=slo,
                                 sli_metric_name=sli_metric_name)
 
-# if K8s
-command.append(cmd)
-json_format = json.dumps(pod)
-print(json_format)
 
-# if Mesos Aurora
-# jobs = [
-#     WorkloadService(
-#         task=Task(
-#             name=job_name,
-#             resources=Resources(cpu=cpu, ram=ram, disk=disk),
-#             processes=[
-#                 Process(
-#                     name='rpc-perf',
-#                     cmdline=cmd
-#                 )
-#             ],
-#         )
-#     ),
-# ]
+if (orchestrator == 'Mesos'):
+    my_env["cmd"] = cmd
+    subprocess.run(["aurora", "job", "create", job_key, aurora_file], env=my_env)
+elif (orchestrator == 'Kubernetes'):
+    command.append(cmd)
+    json_format = json.dumps(pod)
+    #print(json_format)
+
+    ps = subprocess.Popen(('echo', json_format), stdout=subprocess.PIPE)
+    output = subprocess.check_output(('kubectl', 'create', '-f', '-'), stdin=ps.stdout)
+    ps.wait()
