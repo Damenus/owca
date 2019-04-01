@@ -111,7 +111,7 @@
         xargs --no-run-if-empty -n 1 -P0 aurora job killall"
         when: orchestrator == "Mesos"
       - name: Kubernetes | Clean jobs
-        shell: "kubectl delete --all pods"
+        shell: "kubectl delete --all pods --namespace=default"
         when: orchestrator == "Kubernetes"
       delegate_to: localhost
       tags: clean_jobs
@@ -133,6 +133,7 @@
           own_ip: "{{application_host_ip}}"
         environment:
           jmx_port: "{{workload_version.jmx_port + item.workload_instance_index}}"
+          storage_port: "{{workload_version.storage_port + item.workload_instance_index}}"
         block:
         - name: Mesos | Create Cassandra
           shell: "{{create_job_command}}"
@@ -175,6 +176,7 @@
           own_ip: "{{application_host_ip}}"
         environment:
           jmx_port: "{{workload_version.jmx_port + item.workload_instance_index}}"
+          storage_port: "{{workload_version.storage_port + item.workload_instance_index}}"
         block:
         - name: Mesos | Create Cassandra
           shell: "{{create_job_command}}"
@@ -294,7 +296,7 @@
       - name: Create twemcache for mutilate
         vars:
           job_id: twemcache
-          own_ip: "{{load_generator_host_ip}}"
+          own_ip: "{{application_host_ip}}"
         block:
         - name: Mesos | Create twemcache
           shell: "{{create_job_command}}"
@@ -356,7 +358,7 @@
           own_ip: "{{load_generator_host_ip}}"
         environment: "{{workload_version[job_id].env | default({}) }}"
         block:
-        - name: Mesos | Create specjbb injector 
+        - name: Mesos | Create specjbb injector
           shell: "{{create_job_command}}"
           loop: "{{instances_version_iterator}}"
           when: orchestrator == "Mesos"

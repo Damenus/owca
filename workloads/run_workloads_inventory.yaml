@@ -9,25 +9,36 @@
 
 application_hosts:
   hosts:
-    10.10.10.1:
+    100.64.176.33:
       env_uniq_id: 1
-      load_generator_host_ip: 10.10.10.11
+      load_generator_host_ip: 100.64.176.34
+#      workloads:
+#        cassandra_ycsb: {'count': 0, 'resources': {'cpu', 0.1}}
+#        cassandra_stress: {'count': 0}
+#        redis_rpc_perf: {'count': 1}
+#        twemcache_rpc_perf: {'count': 0}
+#        twemcache_mutilate: {'count': 0}
+#        specjbb: {'count': 0}
+#        tensorflow_train: {'count': 0}
+#        tensorflow_inference: {'count': 0}
+#        tensorflow_benchmark_prediction: {'count': 0}
+#        tensorflow_benchmark_train: {'count': 0}
 
-    10.10.10.2:
-      env_uniq_id: 2
-      load_generator_host_ip: 10.10.10.12
-      # Overwrite choosen keys.
-      workloads:
-        cassandra_ycsb: {'count': 1, 'resources': {'cpu', 0.1}}
-        cassandra_stress: {'count': 0}
-        redis_rpc_perf: {'count': 0}
-        twemcache_rpc_perf: {'count': 0}
-        twemcache_mutilate: {'count': 0}
-        specjbb: {'count': 1}
-        tensorflow_train: {'count': 0}
-        tensorflow_inference: {'count': 0}
-        tensorflow_benchmark_prediction: {'count': 0}
-        tensorflow_benchmark_train: {'count': 0}
+#    10.10.10.2:
+#      env_uniq_id: 2
+#      load_generator_host_ip: 10.10.10.12
+#      # Overwrite choosen keys.
+#      workloads:
+#        cassandra_ycsb: {'count': 1, 'resources': {'cpu', 0.1}}
+#        cassandra_stress: {'count': 0}
+#        redis_rpc_perf: {'count': 0}
+#        twemcache_rpc_perf: {'count': 0}
+#        twemcache_mutilate: {'count': 0}
+#        specjbb: {'count': 1}
+#        tensorflow_train: {'count': 0}
+#        tensorflow_inference: {'count': 0}
+#        tensorflow_benchmark_prediction: {'count': 0}
+#        tensorflow_benchmark_train: {'count': 0}
 
   vars:
     # Variables for setting ansible.
@@ -37,29 +48,25 @@ application_hosts:
 
     # Global variables to run workloads.
     cluster: example
-    role: root
-    image_tag: <DOCKER_IMAGE_TAG>
+    role: ddarczuk
+    image_tag: 7f7604f09a370b17118a61aa4d0f605478395893
 
-    wrapper_kafka_brokers: 10.10.10.99
-    docker_registry: 10.10.10.99:80
-
-    # Allow to add additional labels to all newly created workloads.
-    additional_labels:
-      key: "value"
+    wrapper_kafka_brokers: 100.64.176.12
+    docker_registry: 100.64.176.12:80
 
     default_resources:
-      cpu: 1
-      ram: 1
-      disk: 1
+      cpu: 5
+      ram: 5
+      disk: 5
 
     # Per workload parameters.
     workloads:
 
       cassandra_ycsb:
         default:
-          count: 1
+          count: 3
           slo: 2500
-          jmx_port: 7199
+          jmx_port: 7150
           storage_port: 7100
           communication_port: 9042
           cassandra:
@@ -69,9 +76,9 @@ application_hosts:
 
       cassandra_stress:
         default:
-          count: 1
+          count: 3
           communication_port: 9142
-          jmx_port: 7299
+          jmx_port: 7250
           storage_port: 7200
           slo: 1000
           cassandra:
@@ -83,7 +90,7 @@ application_hosts:
         default:
           labels:
               foo: bar
-          count: 1
+          count: 3
           slo: 100000
           communication_port: 6789
           redis:
@@ -93,55 +100,27 @@ application_hosts:
 
       twemcache_rpc_perf:
         default:
-          count: 1
+          count: 3
           slo: 100000
           communication_port: 11211
           twemcache:
             threads: 1
             max_memory: 1234
           rpc_perf:
-            resources:
-              cpu: 0.5
-              ram: 2
-              disk: 2
+
 
       twemcache_mutilate:
         small:
-          count: 1
+          count: 3
           slo: 3200
           communication_port: 11311
           twemcache:
-            replica_count: 1
-            resources:
-              cpu: 1
-              ram: 1
-              disk: 1
           mutilate:
-            replica_count: 3
-            resources:
-              cpu: 1
-              ram: 1
-              disk: 1
-        big:
-          count: 1
-          slo: 3200
-          communication_port: 11411
-          twemcache:
-            replica_count: 1
-            resources:
-              cpu: 2
-              ram: 2
-              disk: 2
-          mutilate:
-            replica_count: 2
-            resources:
-              cpu: 2
-              ram: 2
-              disk: 2
+
 
       specjbb:
         default:
-          count: 1
+          count: 3
           slo: 26000000
           communication_port: 42000
           backend:
@@ -150,7 +129,7 @@ application_hosts:
 
       tensorflow_inference:
         default:
-          count: 1
+          count: 0
           slo: 2 # in seconds (maximum time to process a single image)
           resources:
             cpu: 1
@@ -159,12 +138,12 @@ application_hosts:
 
       tensorflow_train:
         default:
-          count: 1
+          count: 0
           slo: 0.5
 
       tensorflow_benchmark_train:
         default:
-          count: 1
+          count: 0
           slo: 0.03
           resources:
             cpu: 10
@@ -173,21 +152,9 @@ application_hosts:
 
       tensorflow_benchmark_prediction:
         default:
-          count: 1
+          count: 0
           slo: 0.03
           resources:
             cpu: 10
             ram: 50
             disk: 30
-
-      stress_ng:
-        default:
-          count: 1
-          timeout: 30
-          stressor: stream
-          number_workers: 2
-          resources:
-            cpu: 1
-            ram: 1
-            disk: 1
-

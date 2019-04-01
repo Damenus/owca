@@ -22,22 +22,22 @@ from common import *
 
 # Port that Cassnadra will bind to.
 cassandra_port = os.environ.get('communication_port', '9042')
+jmx_port = os.environ.get('jmx_port', '7199')
+storage_port = os.environ.get('storage_port', '7000')
 # ----------------------------------------------------------------------------------------------------
 
 volume = {"name": "shared-data"}
 
-prep_cmd = ["sh", "-c", """
-            set -x && \
-            cd /prep_config && \
-            cp /etc/cassandra/cassandra.yaml . && \
-            cp /etc/cassandra/cassandra-env.sh .  \
-            && sed -i 's/native_transport_port: 9042/native_transport_port: {cassandra_port}/' cassandra.yaml \
-            && export STORAGE_PORT=$(( ( RANDOM  % 10000 )  + 20000 )) \
-            && sed -i "s/storage_port: 7000/storage_port: $STORAGE_PORT/" cassandra.yaml \
-            && export JMX_PORT=$(( ( RANDOM  % 10000 )  + 20000 )) \
-            && sed -i "s/JMX_PORT=\"7199\"/JMX_PORT=\"$JMX_PORT\"/" cassandra-env.sh \
-            && cat cassandra.yaml
-            """.format(cassandra_port=cassandra_port)]
+prep_cmd = ["sh", "-c",
+"""
+set -x && \
+cd /prep_config && \
+cp /etc/cassandra/cassandra.yaml . && \
+cp /etc/cassandra/cassandra-env.sh .  \
+&& sed -i 's/native_transport_port: 9042/native_transport_port: {cassandra_port}/' cassandra.yaml \
+&& sed -i "s/storage_port: 7000/storage_port: {storage_port}/" cassandra.yaml \
+&& sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"{jmx_port}\"/' cassandra-env.sh
+""".format(cassandra_port=cassandra_port, storage_port=storage_port, jmx_port=jmx_port)]
 
 volume_prep_config = {
     "name": "shared-data",
@@ -54,9 +54,20 @@ initContainer = {
 initContainers.append(initContainer)
 volumeMounts.append(volume_prep_config)
 
-cmd = "cp /prep_config/cassandra.yaml /etc/cassandra && " \
-      "cp /prep_config/cassandra-env.sh /etc/cassandra && " \
-      "/docker-entrypoint.sh"
+# TODO: make this beautiful
+ram2 = int(os.getenv('ram', '1')) * 1024
+ram3 = int(float(ram2) / 4.0)
+
+ram2 = str(ram2) + 'M'
+ram3 = str(ram3) + 'M'
+
+#cmd = dedent(("""cp /prep_config/cassandra.yaml /etc/cassandra && \
+#cp /prep_config/cassandra-env.sh /etc/cassandra && \
+#MAX_HEAP_SIZE={ram} HEAP_NEWSIZE={ram2} /docker-entrypoint.sh""").format(ram=ram2, ram2=ram3)) # env CASSANDRA_CONFIG=/etc/cassandra /docker-entrypoint.sh
+# TODO: set correct MAX_HEAP_SIZE and HEAP_NEWSIZE
+cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra && "
+"cp /prep_config/cassandra-env.sh /etc/cassandra && "
+"MAX_HEAP_SIZE=\"2G\" HEAP_NEWSIZE=\"400M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh")
 command.append(cmd)
 
 json_format = json.dumps(pod)
