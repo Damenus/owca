@@ -1,5 +1,5 @@
 pipeline {
-    agent { label '100.64.176.16'}
+    agent any
     environment {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
     }
@@ -27,7 +27,6 @@ pipeline {
                             '''
                         }
                     }
-
                 }
                 stage("Build and push Tensorflow inference Docker image") {
                     steps {
@@ -42,7 +41,6 @@ pipeline {
                             '''
                         }
                     }
-
                 }
                 stage("Build and push Tensorflow Benchmark Docker image") {
                     steps {
@@ -54,7 +52,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push Redis Docker image") {
                     steps {
@@ -66,7 +63,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push stress-ng Docker image") {
                     steps {
@@ -78,7 +74,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push rpc-perf Docker image") {
                     steps {
@@ -90,7 +85,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push Twemcache Docker image") {
                     steps {
@@ -102,7 +96,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push YCSB Docker image") {
                     steps {
@@ -125,7 +118,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push mutilate Docker image") {
                     steps {
@@ -137,7 +129,6 @@ pipeline {
                         docker push ${IMAGE_NAME}
                         '''
                     }
-
                 }
                 stage("Build and push SpecJBB Docker image") {
                     steps {
