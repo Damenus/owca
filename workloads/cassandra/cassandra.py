@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import subprocess
 from common import *
 
 # ----------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ from common import *
 # Params which can be modified by exporting environment variables.
 ###
 
-# Port that Cassnadra will bind to.
+# Port that Cassandra will bind to.
 cassandra_port = os.environ.get('communication_port', '9042')
 jmx_port = os.environ.get('jmx_port', '7199')
 storage_port = os.environ.get('storage_port', '7000')
@@ -29,7 +30,7 @@ storage_port = os.environ.get('storage_port', '7000')
 volume = {"name": "shared-data"}
 
 prep_cmd = ["sh", "-c",
-"""
+            """
 set -x && \
 cd /prep_config && \
 cp /etc/cassandra/cassandra.yaml . && \
@@ -55,19 +56,13 @@ initContainers.append(initContainer)
 volumeMounts.append(volume_prep_config)
 
 # TODO: make this beautiful
-ram2 = int(os.getenv('ram', '1')) * 1024
-ram3 = int(float(ram2) / 4.0)
+max_heap_size = int(os.getenv('ram', '1')) * 1024
+heap_newsize= int(float(max_heap_size) / 5.0)
+max_heap_size = int(max_heap_size - max_heap_size / 4.0)
 
-ram2 = str(ram2) + 'M'
-ram3 = str(ram3) + 'M'
-
-#cmd = dedent(("""cp /prep_config/cassandra.yaml /etc/cassandra && \
-#cp /prep_config/cassandra-env.sh /etc/cassandra && \
-#MAX_HEAP_SIZE={ram} HEAP_NEWSIZE={ram2} /docker-entrypoint.sh""").format(ram=ram2, ram2=ram3)) # env CASSANDRA_CONFIG=/etc/cassandra /docker-entrypoint.sh
-# TODO: set correct MAX_HEAP_SIZE and HEAP_NEWSIZE
-cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra && "
-"cp /prep_config/cassandra-env.sh /etc/cassandra && "
-"MAX_HEAP_SIZE=\"2G\" HEAP_NEWSIZE=\"400M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh")
+cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra &&"
+"cp /prep_config/cassandra-env.sh /etc/cassandra && " 
+"MAX_HEAP_SIZE=\"{}M\" HEAP_NEWSIZE=\"{}M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh".format(max_heap_size, heap_newsize))
 command.append(cmd)
 
 json_format = json.dumps(pod)
