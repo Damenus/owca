@@ -49,7 +49,8 @@ application_hosts:
     # Global variables to run workloads.
     cluster: example
     role: ddarczuk
-    image_tag: 7f7604f09a370b17118a61aa4d0f605478395893
+    image_tag: 30ca7a36e3a4be0a121dd392c8289d5439af2c50
+    orchestrator: Kubernetes
 
     wrapper_kafka_brokers: 100.64.176.12
     docker_registry: 100.64.176.12:80
