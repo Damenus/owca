@@ -79,20 +79,6 @@ wrapper_labels = {
 }
 wrapper_labels.update(extra_labels)
 
-# For debug purposes.
-# print('job_uniq_id:', job_uniq_id)
-# print('job_name:', job_name)
-# print('workload_name:', workload_name)
-# print('application:', application)
-# print('load_generator:', load_generator)
-# print('application_host_ip:', application_host_ip)
-# print('load_generator_host_ip:', load_generator_host_ip)
-# print('own_ip:', own_ip)
-# print('slo:', slo)
-# print('cpu:', cpu)
-# print('ram:', ram)
-# print('disk:', disk)
-
 
 # Pre 0.20 way of adding metadata
 class AddMetadata:
@@ -142,29 +128,6 @@ containers = [
 metadata = {
     "name": job_name.replace('_', '-').replace('.', '-'),
     "labels": wrapper_labels
-}
-
-affinity = {
-    "nodeAffinity": {
-        "requiredDuringSchedulingIgnoredDuringExecution": {
-            "nodeSelectorTerms":
-                [
-                    {
-                        "matchExpressions":
-                            [
-                                {
-                                    "key": "own_ip",
-                                    "operator": "In",
-                                    "values":
-                                        [
-                                            own_ip
-                                        ]
-                                }
-                            ]
-                    }
-                ]
-        }
-    }
 }
 
 pod = {
