@@ -23,15 +23,8 @@ from common import application_host_ip, command, image_name, \
 # Params which can be modified by exporting environment variables.
 ###
 
-# Port that stressed application listens on.
-
-
 communication_port = os.environ.get('communication_port', 11211)
 # ----------------------------------------------------------------------------------------------------
-
-
-vloume = {"name": "shared-data"}
-
 
 cmdline_config = ["sh", "-c",
                   ("set -x && "
