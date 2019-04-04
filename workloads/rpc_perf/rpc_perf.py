@@ -14,8 +14,9 @@
 
 
 import os
-from common import application, application_host_ip, command, dedent, json, pod,\
-    wrapper_kafka_brokers, wrapper_log_level, wrapper_kafka_topic, wrapper_labels, slo
+from common import application, application_host_ip, command, dedent, json, \
+    pod, wrapper_kafka_brokers, wrapper_log_level, wrapper_kafka_topic, \
+    wrapper_labels, slo
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -25,18 +26,22 @@ from common import application, application_host_ip, command, dedent, json, pod,
 # Port that stressed application listens on.
 communication_port = os.environ.get('communication_port', 11211)
 
-# @TODO Variables rpcperf_rate|thread_count|period|amlitude|connections are not used
+# @TODO Variables rpcperf_rate|thread_count|period
+#   |amlitude|connections are not used
 #   in the code (their values are not injected into config files).
 # --
-# Number of requests per second to generate (default: 1000; if `rpcperf_amplitude` and
+# Number of requests per second to generate (default:
+# 1000; if `rpcperf_amplitude` and
 # `rpcperf_period` are set - maximum of a sine curve).
 # rpcperf_rate = os.environ.get('rpcperf_rate', '1000')
 # --
 # Number of threads used to generate traffic.
 # rpcperf_thread_count = os.environ.get('rpcperf_thread_count', '1')
 # --
-# rpcperf_period and rpcperf_amplitiude are used to generate non-constant number of QpS;
-# see: http://jwilson.coe.uga.edu/EMAT6680/Dunbar/Assignment1/sine_curves_KD.html
+# rpcperf_period and rpcperf_amplitiude are used to
+# generate non-constant number of QpS;
+# see:
+# http://jwilson.coe.uga.edu/EMAT6680/Dunbar/Assignment1/sine_curves_KD.html
 # rpcperf_period = os.environ.get('rpcperf_period', '100')
 # rpcperf_amplitiude = os.environ.get('rpcperf_amplitiude', '100')
 # --
@@ -52,7 +57,8 @@ if application == 'twemcache':
 elif application == 'redis':
     rpcperf_protocol = 'redis'
 else:
-    raise Exception("Not supported application type >>{application}<<.".format(application))
+    raise Exception("Not supported application type >>{application}<<.".format(
+                                                                application))
 
 # SLI and Load base metrics.
 sli_metric_name = "{application}_p99".format(application=application)
