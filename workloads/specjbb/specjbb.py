@@ -14,7 +14,10 @@
 
 import os
 import math
-from common import *
+from common import cpu, command, image_name, image_tag, \
+    initContainers, json, securityContext, pod, wrapper_kafka_brokers, \
+    wrapper_log_level, wrapper_kafka_topic, wrapper_labels, slo, volumeMounts
+
 
 # ----------------------------------------------------------------------------------------------------
 ###

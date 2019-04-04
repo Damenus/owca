@@ -14,7 +14,9 @@
 
 
 import os
-from common import *
+from common import application_host_ip, command, image_name, \
+    initContainers, json, securityContext, pod, volumeMounts
+
 
 # ----------------------------------------------------------------------------------------------------
 ###

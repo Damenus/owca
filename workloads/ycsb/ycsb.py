@@ -13,9 +13,11 @@
 # limitations under the License.
 
 import os
-from common import *
+from common import application_host_ip, command, image_name, image_tag, \
+    initContainers, json, securityContext, pod, wrapper_kafka_brokers, \
+    wrapper_log_level, wrapper_kafka_topic, wrapper_labels, slo
 
-# ----------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 ###
 # Params which can be modified by exporting environment variables.
 ###
@@ -37,14 +39,15 @@ ycsb_amplitude = os.environ.get('ycsb_amplitude', '100')
 # Defaults to: https://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html#MAX_VALUE
 ycsb_operation_count = os.environ.get('ycsb_operation_count', '2147483647')
 
-# ----------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 
 wait_for_cassandra_cmd = ["sh", "-c", """
           set -x
           until nc -vz {cassandra_address} {communication_port}; do
             echo "$(date) Waiting for cassandra to initialize itself."
             sleep 3
-          done""".format(cassandra_address=application_host_ip, communication_port=communication_port)]
+          done""".format(
+    cassandra_address=application_host_ip, communication_port=communication_port)]
 
 wait_for_cassandra_container = {
     "name": "ycsb-wait-for-cassandra",
@@ -56,7 +59,9 @@ initContainers.append(wait_for_cassandra_container)
 create_structure_cmd = ["sh", "-c", """
             set -x
             cqlsh --cqlversion 3.4.4 -e \
-                "create keyspace ycsb WITH REPLICATION = {{'class' : 'SimpleStrategy', 'replication_factor': 1 }};" \
+                "create keyspace ycsb WITH REPLICATION = {{
+                'class' : 'SimpleStrategy', 'replication_factor': 1
+                }};" \
                 {cassandra_address} {communication_port} || true
             cqlsh --cqlversion 3.4.4 -k ycsb -e \
                 "create table usertable (y_id varchar primary key, field0 varchar,
@@ -115,19 +120,19 @@ ycsb_cassandra_run_cmd = """
                 --peak_load {peak_load} --load_metric_name "cassandra_ops_per_sec" \
                 --slo {slo} --sli_metric_name "cassandra_read_p9999"
           """.format(
-            application_host_ip=application_host_ip,
-            communication_port=communication_port,
-            ycsb_target=ycsb_target,
-            ycsb_thread_count=ycsb_thread_count,
-            ycsb_period=ycsb_period,
-            ycsb_amplitude=ycsb_amplitude,
-            ycsb_operation_count=ycsb_operation_count,
-            kafka_brokers=wrapper_kafka_brokers,
-            kafka_topic=wrapper_kafka_topic,
-            log_level=wrapper_log_level,
-            labels=str(wrapper_labels),
-            peak_load=str(int(ycsb_target)+int(ycsb_amplitude)),
-            slo=slo)
+    application_host_ip=application_host_ip,
+    communication_port=communication_port,
+    ycsb_target=ycsb_target,
+    ycsb_thread_count=ycsb_thread_count,
+    ycsb_period=ycsb_period,
+    ycsb_amplitude=ycsb_amplitude,
+    ycsb_operation_count=ycsb_operation_count,
+    kafka_brokers=wrapper_kafka_brokers,
+    kafka_topic=wrapper_kafka_topic,
+    log_level=wrapper_log_level,
+    labels=str(wrapper_labels),
+    peak_load=str(int(ycsb_target) + int(ycsb_amplitude)),
+    slo=slo)
 
 command.append(ycsb_cassandra_run_cmd)
 

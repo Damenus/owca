@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import os
-from common import *
+from common import command, image_name, image_tag, initContainers, json, securityContext, \
+    volumeMounts, pod
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -54,10 +55,9 @@ initContainer = {
 initContainers.append(initContainer)
 volumeMounts.append(volume_prep_config)
 
-# TODO: make this beautiful
 max_heap_size = int(os.getenv('ram', '1')) * 1024
+max_heap_size = int(2.0/3.0 * max_heap_size)
 heap_newsize = int(float(max_heap_size) / 5.0)
-max_heap_size = int(max_heap_size - max_heap_size / 4.0)
 
 cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra &&"
        "cp /prep_config/cassandra-env.sh /etc/cassandra && "

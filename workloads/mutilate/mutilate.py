@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import os
-from common import *
+from common import application, application_host_ip, command, image_name, image_tag, \
+    initContainers, json, securityContext, pod, wrapper_kafka_brokers, \
+    wrapper_log_level, wrapper_kafka_topic, wrapper_labels, slo
 
 # ----------------------------------------------------------------------------------------------------
 ###

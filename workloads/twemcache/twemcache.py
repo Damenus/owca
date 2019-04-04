@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import os
-from common import *
+from common import command, json, pod
+
 
 # ----------------------------------------------------------------------------------------------------
 ###

@@ -14,7 +14,8 @@
 
 
 import os
-from common import *
+from common import application, application_host_ip, command, dedent, json, pod,\
+    wrapper_kafka_brokers, wrapper_log_level, wrapper_kafka_topic, wrapper_labels, slo
 
 # ----------------------------------------------------------------------------------------------------
 ###

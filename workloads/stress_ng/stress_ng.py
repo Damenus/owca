@@ -13,7 +13,9 @@
 # limitations under the License.
 
 import os
-from common import *
+from common import application, command, json, pod, wrapper_kafka_brokers, wrapper_log_level, \
+    wrapper_kafka_topic, wrapper_labels
+
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -25,7 +27,7 @@ stressor = os.environ.get('stressor') or 'stream'
 number_workers = int(os.environ.get('number_workers') or 1)
 # ----------------------------------------------------------------------------------------------------
 
-stress_ng_cmd="""""while true; do stress-ng --{}={} --timeout={} \
+stress_ng_cmd = """""while true; do stress-ng --{}={} --timeout={} \
 --metrics --metrics-brief -Y /dev/stdout;done""""".format(
     stressor, number_workers, timeout)
 
