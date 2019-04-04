@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import os
-from common import application_host_ip, command, image_name, image_tag, initContainers, \
-    json, securityContext, pod, wrapper_kafka_brokers, wrapper_log_level, \
-    wrapper_kafka_topic, wrapper_labels, slo
+from common import application_host_ip, command, image_name, image_tag, \
+    initContainers, json, securityContext, pod, wrapper_kafka_brokers, \
+    wrapper_log_level, wrapper_kafka_topic, wrapper_labels, slo
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -60,8 +60,10 @@ initContainers.append(cassandra_warmup_container)
 
 cassandra_stress_cmd = ['"while true; do cassandra-stress mixed duration=90s '
                         '-pop seq=1..%d -node %s -port native=%s -rate '
-                        'threads=%d; done"'.format(number_of_rows, application_host_ip,
-                                                   communication_port, threads)]
+                        'threads=%d; done"'.format(number_of_rows,
+                                                   application_host_ip,
+                                                   communication_port,
+                                                   threads)]
 cmd = """/usr/bin/cassandra_stress_wrapper.pex \
 --command '{cassandra_stress_cmd}' \
 --metric_name_prefix 'cassandra_'  \
