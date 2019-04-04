@@ -32,11 +32,14 @@ ycsb_target = os.environ.get('ycsb_target', '1000')
 # Number of YCSB threads.
 ycsb_thread_count = os.environ.get('ycsb_thread_count', '1')
 
-# ycsb_period and ycsb_amplitude are used to generate non-constant number of QpS;
-# see: http://jwilson.coe.uga.edu/EMAT6680/Dunbar/Assignment1/sine_curves_KD.html.
+# ycsb_period and ycsb_amplitude are used to
+# generate non-constant number of QpS;
+# see:
+# http://jwilson.coe.uga.edu/EMAT6680/Dunbar/Assignment1/sine_curves_KD.html.
 ycsb_period = os.environ.get('ycsb_period', '100')
 ycsb_amplitude = os.environ.get('ycsb_amplitude', '100')
-# Defaults to: https://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html#MAX_VALUE
+# Defaults to:
+# https://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html#MAX_VALUE
 ycsb_operation_count = os.environ.get('ycsb_operation_count', '2147483647')
 
 # --------------------------------------------------------------------------------------------------
@@ -47,7 +50,8 @@ wait_for_cassandra_cmd = ["sh", "-c", """
             echo "$(date) Waiting for cassandra to initialize itself."
             sleep 3
           done""".format(
-    cassandra_address=application_host_ip, communication_port=communication_port)]
+    cassandra_address=application_host_ip,
+    communication_port=communication_port)]
 
 wait_for_cassandra_container = {
     "name": "ycsb-wait-for-cassandra",
@@ -64,12 +68,14 @@ create_structure_cmd = ["sh", "-c", """
                 }};" \
                 {cassandra_address} {communication_port} || true
             cqlsh --cqlversion 3.4.4 -k ycsb -e \
-                "create table usertable (y_id varchar primary key, field0 varchar,
-                field1 varchar, field2 varchar, field3 varchar, field4 varchar,
-                field5 varchar, field6 varchar, field7 varchar, field8 varchar,
+                "create table usertable (y_id varchar primary key,
+                field0 varchar, field1 varchar, field2 varchar,
+                field3 varchar, field4 varchar, field5 varchar,
+                field6 varchar, field7 varchar, field8 varchar,
                 field9 varchar);" \
                 {cassandra_address} {communication_port} || true
-          """.format(cassandra_address=application_host_ip, communication_port=communication_port)]
+          """.format(cassandra_address=application_host_ip,
+                     communication_port=communication_port)]
 
 create_structure_container = {
     "name": "ycsb-cassandra-create-structure",
@@ -87,7 +93,8 @@ ycsb_cassandra_load_cmd = ["sh", "-c", """
                 -p port={communication_port} \
                 -p status.interval=1 \
                 -p threadcount=20
-          """.format(cassandra_host=application_host_ip, communication_port=communication_port)]
+          """.format(cassandra_host=application_host_ip,
+                     communication_port=communication_port)]
 
 ycsb_cassandra_load_container = {
     "name": "ycsb-cassandra-load",
@@ -117,7 +124,8 @@ ycsb_cassandra_run_cmd = """
                 --kafka_topic {kafka_topic} \
                 --log_level {log_level} \
                 --labels "{labels}" \
-                --peak_load {peak_load} --load_metric_name "cassandra_ops_per_sec" \
+                --peak_load {peak_load} \
+                --load_metric_name "cassandra_ops_per_sec" \
                 --slo {slo} --sli_metric_name "cassandra_read_p9999"
           """.format(
     application_host_ip=application_host_ip,
