@@ -17,9 +17,9 @@ import textwrap
 import os
 import json
 
-### Common environment variables for all workloads.
+# Common environment variables for all workloads.
 
-# Workload idenfitication
+# Workload identification
 workload_name = os.getenv('workload_name')
 workload_version_name = os.getenv('workload_version_name', 'default')
 replica_index = os.getenv('replica_index', 0)
@@ -42,7 +42,7 @@ load_generator_host_ip = os.getenv('load_generator_host_ip')
 own_ip = os.getenv('own_ip')
 
 # Performance related variables
-slo = os.getenv('slo', 'inf') # optional: default to inf
+slo = os.getenv('slo', 'inf')  # optional: default to inf
 
 # Docker image.
 image_tag = os.getenv('image_tag')
@@ -107,19 +107,7 @@ class AddMetadata:
 
 
 def dedent(s):
-    return textwrap.dedent(s).replace('\n',' ').replace('\'', '"')
-
-# WorkloadService = Service(
-#     constraints=dict(own_ip=own_ip),
-#     name=job_name,
-#     cluster=cluster,
-#     environment=environment,
-#     role=role,
-#     enable_hooks=True,
-#     container=Mesos(image=DockerImage(
-#         name=image_name, tag=image_tag,
-#     )),
-# )
+    return textwrap.dedent(s).replace('\n', ' ').replace('\'', '"')
 
 
 command = ["sh", "-c"]
@@ -141,7 +129,7 @@ volumeMounts = []
 
 containers = [
     {
-        "name": job_name.replace('_','-').replace('.','-'),
+        "name": job_name.replace('_', '-').replace('.', '-'),
         "image": image_name + ":" + image_tag,
         "resources": {"limits": limits},
         "securityContext": securityContext,
@@ -152,7 +140,7 @@ containers = [
 ]
 
 metadata = {
-    "name": job_name.replace('_','-').replace('.','-'),
+    "name": job_name.replace('_', '-').replace('.', '-'),
     "labels": wrapper_labels
 }
 
@@ -188,12 +176,8 @@ pod = {
         "hostNetwork": True,
         "initContainers": initContainers,
         "containers": containers,
-        #"affinity": affinity
         "nodeSelector": {
             "own_ip": own_ip
         }
     }
 }
-
-
-#hooks = [AddMetadata(wrapper_labels)]

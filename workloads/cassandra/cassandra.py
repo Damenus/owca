@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-import subprocess
 from common import *
 
 # ----------------------------------------------------------------------------------------------------
@@ -57,14 +56,15 @@ volumeMounts.append(volume_prep_config)
 
 # TODO: make this beautiful
 max_heap_size = int(os.getenv('ram', '1')) * 1024
-heap_newsize= int(float(max_heap_size) / 5.0)
+heap_newsize = int(float(max_heap_size) / 5.0)
 max_heap_size = int(max_heap_size - max_heap_size / 4.0)
 
 cmd = ("cp /prep_config/cassandra.yaml /etc/cassandra &&"
-"cp /prep_config/cassandra-env.sh /etc/cassandra && " 
-"MAX_HEAP_SIZE=\"{}M\" HEAP_NEWSIZE=\"{}M\" CASSANDRA_CONFIG=\"/etc/cassandra\" /docker-entrypoint.sh".format(max_heap_size, heap_newsize))
+       "cp /prep_config/cassandra-env.sh /etc/cassandra && "
+       "MAX_HEAP_SIZE=\"{}M\" HEAP_NEWSIZE=\"{}M\" "
+       "CASSANDRA_CONFIG=\"/etc/cassandra\" "
+       "/docker-entrypoint.sh".format(max_heap_size, heap_newsize))
 command.append(cmd)
 
 json_format = json.dumps(pod)
 print(json_format)
-
