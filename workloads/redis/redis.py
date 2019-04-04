@@ -29,19 +29,18 @@ communication_port = os.environ.get('communication_port', 11211)
 
 
 vloume = {"name": "shared-data"}
-#volumes.append(vloume)
 
 
 cmdline_config = ["sh", "-c",
-                  ("set -x && "               
+                  ("set -x && "
                    "cd /prep_config && "
-                   "cp /etc/redis.conf . && " \
-                   "sed -i \"s/port 6379/port {communication_port}/\" redis.conf && " \
-                   "sed -i \"s/bind 127.0.0.1/bind {application_host_ip}/\" redis.conf "\
-                        .format(
-                            communication_port=communication_port,
-                            application_host_ip=application_host_ip
-                        ))]
+                   "cp /etc/redis.conf . && "
+                   "sed -i \"s/port 6379/port {communication_port}/\" \
+                   redis.conf && "
+                   "sed -i \"s/bind 127.0.0.1/bind {application_host_ip}/\" \
+                   redis.conf ".format(communication_port=communication_port,
+                                       application_host_ip=application_host_ip
+                                       ))]
 
 volume_prep_config = {
     "name": "shared-data",
@@ -68,24 +67,3 @@ command.append(cmd)
 
 json_format = json.dumps(pod)
 print(json_format)
-
-
-# jobs = [
-#     WorkloadService(
-#         task=SequentialTask(
-#             name=job_name,
-#             resources=Resources(cpu=cpu, ram=ram, disk=disk),
-#             processes=[
-#                 Process(
-#                     name='prep_config',
-#                     cmdline=cmdline_config
-#                 ),
-#                 Process(
-#                     name='redis',
-#                     cmdline=cmdline
-#                     ),
-#             ],
-#         ),
-#     ),
-# ]
-

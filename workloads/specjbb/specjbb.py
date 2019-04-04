@@ -16,7 +16,7 @@ import os
 import math
 from common import *
 
-#----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
 ###
 # Params which can be modified by exporting environment variables.
 ###
@@ -38,7 +38,7 @@ qps = os.environ.get('qps', '1000')
 component_type = os.environ['specjbb_component_type']
 if component_type != 'controller' and component_type != 'injector' and component_type != 'backend':
     raise Exception('specjbb_component_type must one of: injector, controller or backend.')
-#----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
 
 
 # Variables which cannot be changed differently than just by editing this file.
@@ -54,10 +54,12 @@ threads_count = int(math.ceil(int(cpu)))
 # here we just create it on the fly running shell commands inside container.
 with open('specjbb/specjbb.config', 'r') as fconfig:
     config_content = "".join(fconfig.readlines())
-    config_content = config_content.format(qps=qps, controller_host_ip=controller_host_ip,
-                               controller_listen_port=communication_port,
-                               config_path=config_path, threads_count=threads_count)
-config_create_cmd = ["sh", "-c", """cat >{config_path} <<EOF 
+    config_content = config_content.format(
+        qps=qps,
+        controller_host_ip=controller_host_ip,
+        controller_listen_port=communication_port,
+        config_path=config_path, threads_count=threads_count)
+config_create_cmd = ["sh", "-c", """cat >{config_path} <<EOF
 {config_content}
 EOF
 cat {config_path}""".format(config_path=config_path,

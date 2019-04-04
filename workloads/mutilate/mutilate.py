@@ -41,7 +41,7 @@ mutilate_warmup_container = {
 }
 initContainers.append(mutilate_warmup_container)
 
-mutilate_cmd="""""while true; do /mutilate/mutilate -s {}:{} \
+mutilate_cmd = """""while true; do /mutilate/mutilate -s {}:{} \
 -Q {} --time={} --update=0.01 --threads=%d -C %d; done""""".format(
     application_host_ip, communication_port, qps, time, threads, connections)
 
