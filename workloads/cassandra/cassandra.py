@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import os
-from common import command, image_name, image_tag, initContainers, json, securityContext, \
-    volumeMounts, pod
+from common import command, image_name, image_tag, initContainers, json, \
+    securityContext, volumeMounts, pod
 
 # ----------------------------------------------------------------------------------------------------
 ###
@@ -35,10 +35,14 @@ set -x && \
 cd /prep_config && \
 cp /etc/cassandra/cassandra.yaml . && \
 cp /etc/cassandra/cassandra-env.sh .  \
-&& sed -i 's/native_transport_port: 9042/native_transport_port: {cassandra_port}/' cassandra.yaml \
+&& sed -i 's/native_transport_port: 9042/native_transport_port: \
+{cassandra_port}/' cassandra.yaml \
 && sed -i "s/storage_port: 7000/storage_port: {storage_port}/" cassandra.yaml \
 && sed -i 's/JMX_PORT=\"7199\"/JMX_PORT=\"{jmx_port}\"/' cassandra-env.sh
-""".format(cassandra_port=cassandra_port, storage_port=storage_port, jmx_port=jmx_port)]
+""".format(
+                cassandra_port=cassandra_port,
+                storage_port=storage_port,
+                jmx_port=jmx_port)]
 
 volume_prep_config = {
     "name": "shared-data",
