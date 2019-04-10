@@ -19,21 +19,6 @@ pipeline {
         booleanParam(name: 'BUILD_WORKLOADS', defaultValue: false, description: 'Build workloads')
     }
     stages{
-        stage('Example') {
-            steps {
-                echo "Hello ${params.PERSON}"
-
-                echo "Biography: ${params.BIOGRAPHY}"
-
-                echo "Toggle: ${params.TOGGLE}"
-
-                echo "Choice: ${params.CHOICE}"
-
-                echo "Password: ${params.PASSWORD}"
-
-                echo "BUILD_WORKLOADS: ${params.BUILD_WORKLOADS}"
-            }
-        }
         stage("Flake8 formatting scan") {
             steps {
                 sh '''
