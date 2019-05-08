@@ -11,9 +11,66 @@ spec:
   hostPID: true
   hostIPC: true
   hostNetwork: true
+  nodeSelector:
+    own_ip: 100.64.176.34
+
+  initContainers:
+    - name: init-owca
+      image: centos:7
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        privileged: true
+      command:
+        - cat
+        - /etc/owca/configmap.yaml
+#        - --output
+#        - /etc/owca/owca_config.yml
+
+#        - sh
+#        - -c
+#        - echo
+#        - 'runner: !DetectionRunner
+#            rdt_enabled: false
+#            node: !KubernetesNode
+#              # We support two options: cgroupfs, systemd.
+#              cgroup_driver: cgroupfs
+#
+#              # Fill needed PATH to key and certificate to access kubelet.
+#              client_private_key: "/etc/kubernetes/ssl/apiserver-kubelet-client.key" #"$PATH/apiserver-kubelet-client.key"
+#              client_cert: "/etc/kubernetes/ssl/apiserver-kubelet-client.crt" # "$PATH/apiserver-kubelet-client.crt"
+#
+#              # If the kubelete agent does not listen on localhost,
+#              #   the endpoint must be provided.
+#              kubelet_endpoint: "https://100.64.176.33:10250" # {{own_ip}}
+#
+#              # List of namespaces to monitor pods in.
+#              monitored_namespaces: ["default"]
+#
+#
+#            metrics_storage: !LogStorage
+#              overwrite: True
+#              output_filename: metrics.prom
+#            anomalies_storage: !LogStorage
+#              overwrite: True
+#              output_filename: anomalies.prom
+#
+#            detector: !ExampleDetector
+#
+#            extra_labels:
+#              env_uniq_id: "34"
+#              own_ip: "34"'
+#        - >
+#        - /etc/owca/owca_config.yml
+
+
+      volumeMounts:
+        - name: owcaconfig
+          mountPath: /etc/owca/
+
+
   containers:
     - name: owca
-      image: owca:0.2 #100.64.176.12:80/owca
+      image: 100.64.176.12:80/owca:2320616abf691dfe331836c467bb06a6c6da5526
       env:
         - name: LOG
           value: debug
@@ -76,7 +133,8 @@ spec:
         path: /etc/kubernetes/ssl/
     - name: owcaconfig
       hostPath:
-        path: /etc/owca/
+      configMap:
+        name: owca-config
     - name: logstorage
       hostPath:
         path: /var/log
