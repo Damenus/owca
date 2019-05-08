@@ -35,7 +35,8 @@ FROM centos:7
 
 ENV CONFIG=/etc/owca/owca_config.yml \
     EXTRA_COMPONENT=example.external_package:ExampleDetector \
-    LOG=info
+    LOG=info \
+    OWN_IP_TO_BE_REPLACED=OWN_IP_TO_BE_REPLACED
 
 RUN yum install -y epel-release
 RUN yum install -y python36
@@ -45,6 +46,7 @@ COPY --from=owca /owca/dist/owca.pex /usr/bin/
 #USER owca
 
 ENTRYPOINT \
+    sed 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP_TO_BE_REPLACED/g' /etc/owca/owca_config.yml
     python36 /usr/bin/owca.pex \
         --config $CONFIG \
         --register $EXTRA_COMPONENT \
