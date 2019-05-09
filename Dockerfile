@@ -35,7 +35,7 @@ FROM centos:7
 ENV CONFIG=/etc/wca/wca_config.yml \
     EXTRA_COMPONENT=example.external_package:ExampleDetector \
     LOG=info \
-    OWN_IP=0.0.0.0
+    OWN_IP=0.0.0.0 \
     ENV_UNIQ_ID=0
 
 RUN yum install -y epel-release
