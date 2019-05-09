@@ -24,7 +24,6 @@ RUN pip install pipenv
 
 WORKDIR /owca
 COPY . .
-#RUN git clone https://github.com/intel/owca.git
 
 RUN pipenv install --dev
 #--system --ignore-pipfile --deploy
@@ -46,7 +45,8 @@ COPY --from=owca /owca/dist/owca.pex /usr/bin/
 #USER owca
 
 ENTRYPOINT \
-    sed 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP_TO_BE_REPLACED/g' /etc/owca/owca_config.yml
+    sed 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP_TO_BE_REPLACED/g' /etc/owca/owca_config.yml \
+    && \
     python36 /usr/bin/owca.pex \
         --config $CONFIG \
         --register $EXTRA_COMPONENT \
