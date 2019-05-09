@@ -26,5 +26,5 @@ runner: !DetectionRunner
   detector: !ExampleDetector
 
   extra_labels:
-    env_uniq_id: "{{env_uniq_id}}"
-    own_ip: "{{own_ip}}"
+    env_uniq_id: $ENV_UNIQ_ID_TO_BE_REPLACED
+    own_ip: $OWN_IP_TO_BE_REPLACED

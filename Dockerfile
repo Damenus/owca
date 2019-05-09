@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-# Building owca.
-FROM centos:7 AS owca
+# Building wca.
+FROM centos:7 AS wca
 
 #RUN yum -y update
 RUN yum -y install epel-release
@@ -22,32 +22,34 @@ RUN yum -y install python36 python-pip which make git
 
 RUN pip install pipenv
 
-WORKDIR /owca
+WORKDIR /wca
 COPY . .
 
 RUN pipenv install --dev
 #--system --ignore-pipfile --deploy
-RUN pipenv run make owca_package
+RUN pipenv run make wca_package
 
-# Builing final container that consists of owca only.
+# Builing final container that consists of wca only.
 FROM centos:7
 
-ENV CONFIG=/etc/owca/owca_config.yml \
+ENV CONFIG=/etc/wca/wca_config.yml \
     EXTRA_COMPONENT=example.external_package:ExampleDetector \
     LOG=info \
-    OWN_IP_TO_BE_REPLACED=OWN_IP_TO_BE_REPLACED
+    OWN_IP=0.0.0.0
+    ENV_UNIQ_ID=0
 
 RUN yum install -y epel-release
 RUN yum install -y python36
 
-COPY --from=owca /owca/dist/owca.pex /usr/bin/
+COPY --from=wca /wca/dist/wca.pex /usr/bin/
 
-#USER owca
+#USER wca
 
 ENTRYPOINT \
-    sed 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP_TO_BE_REPLACED/g' /etc/owca/owca_config.yml \
+    sed -i -e 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP/g' -e 's/\$ENV_UNIQ_ID_TO_BE_REPLACED/$ENV_UNIQ_ID/g' \
+     /etc/wca/wca_config.yml \
     && \
-    python36 /usr/bin/owca.pex \
+    python36 /usr/bin/wca.pex \
         --config $CONFIG \
         --register $EXTRA_COMPONENT \
         --log $LOG \
