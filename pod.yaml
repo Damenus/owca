@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: owca
+  name: wca
   labels:
     app: myapp
   annotations:
@@ -15,16 +15,18 @@ spec:
     own_ip: 100.64.176.34
 
   initContainers:
-    - name: init-owca
+    - name: init-wca
       image: centos:7
       imagePullPolicy: IfNotPresent
       securityContext:
         privileged: true
       command:
-        - cat
-        - /etc/owca/configmap.yaml
+        - ls
+        - /etc/wca/
+#        - cat
+#        - /etc/wca/configmap.yaml
 #        - --output
-#        - /etc/owca/owca_config.yml
+#        - /etc/wca/wca_config.yml
 
 #        - sh
 #        - -c
@@ -60,20 +62,24 @@ spec:
 #              env_uniq_id: "34"
 #              own_ip: "34"'
 #        - >
-#        - /etc/owca/owca_config.yml
+#        - /etc/wca/wca_config.yml
 
 
       volumeMounts:
-        - name: owcaconfig
-          mountPath: /etc/owca/
+        - name: wcaconfig
+          mountPath: /etc/wca/
 
 
   containers:
-    - name: owca
-      image: 100.64.176.12:80/owca:2320616abf691dfe331836c467bb06a6c6da5526
+    - name: wca
+      image: 100.64.176.12:80/owca:bec7126941d6d21807b3ae1c54e1aaada24ebdbf
       env:
         - name: LOG
           value: debug
+        - name: OWN_IP
+          value: status.podIP
+        - name: ENV_UNIQ_ID
+          value: "1"
       resources:
 #        limits:
 #          memory: 200Mi
@@ -83,10 +89,10 @@ spec:
       volumeMounts:
         - name: kubeletcert
           mountPath: /etc/kubernetes/ssl/
-        - name: owcaconfig
-          mountPath: /etc/owca/
-        - name: varlibowca
-          mountPath: /var/lib/owca
+        - name: wcaconfig
+          mountPath: /etc/wca/
+        - name: varlibwca
+          mountPath: /var/lib/wca
         - name: logstorage
           mountPath: /var/log
         - name: cgroup
@@ -103,7 +109,7 @@ spec:
         - --collector.filesystem.ignored-mount-points
         - '"^/(sys|proc|dev|host|etc)($|/)"'
         - --collector.textfile.directory
-        - /var/lib/owca
+        - /var/lib/wca
       ports:
         - containerPort: 9100
           protocol: TCP
@@ -115,8 +121,8 @@ spec:
           cpu: 1
           memory: 1
       volumeMounts:
-        - name: varlibowca
-          mountPath: /var/lib/owca
+        - name: varlibwca
+          mountPath: /var/lib/wca
         - name: logstorage
           mountPath: /var/log
         - name: dev
@@ -131,16 +137,15 @@ spec:
     - name: kubeletcert
       hostPath:
         path: /etc/kubernetes/ssl/
-    - name: owcaconfig
-      hostPath:
+    - name: wcaconfig
       configMap:
-        name: owca-config
+        name: wca-config
     - name: logstorage
       hostPath:
         path: /var/log
-    - name: varlibowca
+    - name: varlibwca
       hostPath:
-        path: /var/lib/owca
+        path: /var/lib/wca
     # control cgroup
     - name: cgroup
       hostPath:

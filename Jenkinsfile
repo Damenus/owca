@@ -34,10 +34,10 @@ pipeline {
                 archiveArtifacts(artifacts: "dist/**")
             }
         }
-        stage("Build and push OWCA Docker image") {
+        stage("Build and push Workload Collocation Agent Docker image") {
             steps {
                 sh '''
-                IMAGE_NAME=${DOCKER_REPOSITORY_URL}/owca:${GIT_COMMIT}
+                IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca:${GIT_COMMIT}
                 IMAGE_DIR=${WORKSPACE}/
 
                 docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
