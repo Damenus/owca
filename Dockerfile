@@ -32,7 +32,7 @@ RUN pipenv run make wca_package
 # Builing final container that consists of wca only.
 FROM centos:7
 
-ENV CONFIG=/etc/wca/config.yml \
+ENV CONFIG=/etc/wca/wca_config.yml \
     EXTRA_COMPONENT=example.external_package:ExampleDetector \
     LOG=info \
     OWN_IP=0.0.0.0 \
@@ -47,10 +47,10 @@ COPY --from=wca /wca/dist/wca.pex /usr/bin/
 
 ENTRYPOINT \
     sed -e 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP/g' -e 's/\$ENV_UNIQ_ID_TO_BE_REPLACED/$ENV_UNIQ_ID/g' \
-     /etc/wca/wca_config.yml > /etc/wca/config.yml \
+        $CONFIG > /etc/wca/config.yml \
     && \
     python36 /usr/bin/wca.pex \
-        --config $CONFIG \
+        --config /etc/wca/config.yml \
         --register $EXTRA_COMPONENT \
         --log $LOG \
         -0 \

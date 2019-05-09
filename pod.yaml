@@ -21,12 +21,8 @@ spec:
       securityContext:
         privileged: true
       command:
-        - ls
-        - /etc/wca/
-#        - cat
-#        - /etc/wca/configmap.yaml
-#        - --output
-#        - /etc/wca/wca_config.yml
+        - cat
+        - /etc/wca/wca_config.yml
 
 #        - sh
 #        - -c
@@ -72,7 +68,9 @@ spec:
 
   containers:
     - name: wca
-      image: 100.64.176.12:80/owca:bec7126941d6d21807b3ae1c54e1aaada24ebdbf
+      image: 100.64.176.12:80/wca:df7e4d03742dfc0b28e16e3c09141a1e183d6564
+      securityContext:
+        privileged: true
       env:
         - name: LOG
           value: debug
