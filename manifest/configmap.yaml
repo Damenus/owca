@@ -15,7 +15,7 @@ data:
         cgroup_driver: cgroupfs
         client_private_key: "/etc/kubernetes/ssl/apiserver-kubelet-client.key"
         client_cert: "/etc/kubernetes/ssl/apiserver-kubelet-client.crt"
-        kubelet_endpoint: "https://100.64.176.34:10250"
+        kubelet_endpoint: "https:$OWN_IP_TO_BE_REPLACED:10250"
         monitored_namespaces: ["kubecon-demo"]
 
       # TODO: Create files metrics.prom and anomalies.prom
@@ -27,8 +27,8 @@ data:
         output_filename: /var/lib/owca/anomalies.prom
 
 
-      allocator: !ExampleDetector
+      detector: !ExampleDetector
 
       extra_labels:
-        env_uniq_id: '34'
+        env_uniq_id: $ENV_UNIQ_ID_TO_BE_REPLACED
         own_ip: $OWN_IP_TO_BE_REPLACED

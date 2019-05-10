@@ -68,7 +68,7 @@ spec:
 
   containers:
     - name: wca
-      image: 100.64.176.12:80/wca:df7e4d03742dfc0b28e16e3c09141a1e183d6564
+      image: 100.64.176.12:80/wca:47c61ba494ed104f54e2f87aae80d64a240cd254
       securityContext:
         privileged: true
       env:
@@ -78,6 +78,8 @@ spec:
           value: status.podIP
         - name: ENV_UNIQ_ID
           value: "1"
+        - name: CONFIG
+          value: /etc/owca/wca_config.yml
       resources:
 #        limits:
 #          memory: 200Mi
@@ -85,9 +87,12 @@ spec:
           cpu: 500m
           memory: 500Mi
       volumeMounts:
-        - name: kubeletcert
+        - name: kubelet-cert
           mountPath: /etc/kubernetes/ssl/
+          readOnly: true
         - name: wcaconfig
+          mountPath: /etc/owca/
+        - name: wcaconfig2
           mountPath: /etc/wca/
         - name: varlibwca
           mountPath: /var/lib/wca
@@ -132,15 +137,18 @@ spec:
         - name: rootfs
           mountPath: /rootfs
   volumes:
-    - name: kubeletcert
-      hostPath:
-        path: /etc/kubernetes/ssl/
+    - name: kubelet-cert
+      secret:
+        secretName: apiserver-kubelet-key-crt
     - name: wcaconfig
       configMap:
         name: wca-config
     - name: logstorage
       hostPath:
         path: /var/log
+    - name: wcaconfig2
+      hostPath:
+        path: /etc/wca/
     - name: varlibwca
       hostPath:
         path: /var/lib/wca

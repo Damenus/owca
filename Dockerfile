@@ -46,7 +46,7 @@ COPY --from=wca /wca/dist/wca.pex /usr/bin/
 #USER wca
 
 ENTRYPOINT \
-    sed -e 's/\$OWN_IP_TO_BE_REPLACED/$OWN_IP/g' -e 's/\$ENV_UNIQ_ID_TO_BE_REPLACED/$ENV_UNIQ_ID/g' \
+    sed -e "s/\$OWN_IP_TO_BE_REPLACED/$OWN_IP/g" -e "s/\$ENV_UNIQ_ID_TO_BE_REPLACED/$ENV_UNIQ_ID/g" \
         $CONFIG > /etc/wca/config.yml \
     && \
     python36 /usr/bin/wca.pex \
