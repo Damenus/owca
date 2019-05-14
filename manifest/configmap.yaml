@@ -4,15 +4,19 @@ metadata:
     name: wca-config
 data:
   wca_config.yml: |
+  # Example detection config
     runner: !DetectionRunner
       rdt_enabled: false
       node: !KubernetesNode
-        # We support two options: cgroupfs, systemd.
+        # We support two options: cgroupfs, systemd
         cgroup_driver: cgroupfs
 
-        client_private_key: "/etc/kubernetes/ssl/apiserver-kubelet-client.key"
-        client_cert: "/etc/kubernetes/ssl/apiserver-kubelet-client.crt"
+        # Fill needed PATH to key and certificate to access kubelet.
+        client_private_key: "/etc/kubernetes/ssl/apiserver-kubelet-client.key"  #"$PATH/apiserver-kubelet-client.key"
+        client_cert: "/etc/kubernetes/ssl/apiserver-kubelet-client.crt"         # "$PATH/apiserver-kubelet-client.crt"
 
+        # If the kubelete agent does not listen on localhost,
+        #   the endpoint must be provided.
         kubelet_endpoint: "https://$OWN_IP_TO_BE_REPLACED:10250"
 
         # List of namespaces to monitor pods in.

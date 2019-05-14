@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: wca
-#  namespace: wca
+  namespace: wca
 #  labels:
-#    name: owca-node-exporter
+#    name: wca
 spec:
   selector:
     matchLabels:
@@ -13,33 +13,8 @@ spec:
     metadata:
       labels:
         name: wca
-
-#    terminationGracePeriodSeconds: 10
     spec:
-#      tolerations:
-#      - key: node-role.kubernetes.io/master
-#        effect: NoSchedule
-
-#      initContainers:
-#        - command:
-#            - sh
-#            - -c
-#            - echo 0 > /proc/sys/kernel/perf_event_paranoid;
-#            - sysctl -w proc.sys.kernel.perf_event_paranoid=0;
-#            - chown -R owca:owca /sys/fs/resctrl/mon_groups
-#            # Create owca group to enable running OWCA as non-root
-#              #RUN groupadd owca
-#              # Create owca user to enable running OWCA as non-root
-#              #RUN adduser -p zxc owca
-#              #RUN usermod -aG wheel owca
-#
-#              # Changing ownership of mon_groups enables creating mon_groups by non-root user
-#            #RUN chown -R owca:owca /sys/fs/resctrl/mon_groups
-#          image: centos:7
-#          imagePullPolicy: IfNotPresent
-#          name: sysctl
-#          securityContext:
-#            privileged: true
+      terminationGracePeriodSeconds: 10
       hostPID: true
       hostIPC: true
       hostNetwork: true
@@ -60,8 +35,6 @@ spec:
           - name: CONFIG
             value: /etc/owca/wca_config.yml
         resources:
-      #       limits:
-      #         memory: 200Mi
           requests:
             cpu: 500m
             memory: 500Mi
@@ -70,8 +43,6 @@ spec:
             mountPath: /etc/kubernetes/ssl/
             readOnly: true
           - name: wcaconfig
-            mountPath: /etc/owca/
-          - name: wcaconfig2
             mountPath: /etc/wca/
           - name: varlibwca
             mountPath: /var/lib/wca
@@ -96,9 +67,6 @@ spec:
           - containerPort: 9100
             protocol: TCP
         resources:
-  #        limits:
-  #          cpu: 100m
-  #          memory: 100Mi
           requests:
             cpu: 1
             memory: 1
@@ -125,9 +93,6 @@ spec:
         - name: logstorage
           hostPath:
             path: /var/log
-        - name: wcaconfig2
-          hostPath:
-            path: /etc/wca/
         - name: varlibwca
           hostPath:
             path: /var/lib/wca
@@ -135,7 +100,7 @@ spec:
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup/
-        #      node_exporter
+        # node_exporter
         - name: proc
           hostPath:
             path: /proc
