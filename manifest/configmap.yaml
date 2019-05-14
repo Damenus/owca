@@ -1,31 +1,30 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-    name: owca-config
-    namespace: wca
+    name: wca-config
 data:
-  owca_config.yml: |
-
+  wca_config.yml: |
     runner: !DetectionRunner
-      action_delay: 5.0
-      rdt_enabled: true
-      enable_derived_metrics: True
+      rdt_enabled: false
       node: !KubernetesNode
         # We support two options: cgroupfs, systemd.
         cgroup_driver: cgroupfs
+
         client_private_key: "/etc/kubernetes/ssl/apiserver-kubelet-client.key"
         client_cert: "/etc/kubernetes/ssl/apiserver-kubelet-client.crt"
-        kubelet_endpoint: "https:$OWN_IP_TO_BE_REPLACED:10250"
-        monitored_namespaces: ["kubecon-demo"]
+
+        kubelet_endpoint: "https://$OWN_IP_TO_BE_REPLACED:10250"
+
+        # List of namespaces to monitor pods in.
+        monitored_namespaces: ["wca"]
 
       # TODO: Create files metrics.prom and anomalies.prom
       metrics_storage: !LogStorage
         overwrite: True
-        output_filename: /var/lib/owca/metrics.prom
+        output_filename: /var/lib/wca/metrics.prom
       anomalies_storage: !LogStorage
         overwrite: True
-        output_filename: /var/lib/owca/anomalies.prom
-
+        output_filename: /var/lib/wca/anomalies.prom
 
       detector: !ExampleDetector
 

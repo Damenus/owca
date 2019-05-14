@@ -68,16 +68,18 @@ spec:
 
   containers:
     - name: wca
-      image: 100.64.176.12:80/wca:47c61ba494ed104f54e2f87aae80d64a240cd254
+      image: 100.64.176.12:80/wca:dac1aab9e8bd8b454836a7dd51fc81d8ee1944d3
       securityContext:
         privileged: true
       env:
         - name: LOG
           value: debug
         - name: OWN_IP
-          value: status.podIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         - name: ENV_UNIQ_ID
-          value: "1"
+          value: "'1'"
         - name: CONFIG
           value: /etc/owca/wca_config.yml
       resources:
