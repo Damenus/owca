@@ -54,4 +54,5 @@ ENTRYPOINT \
         --register $EXTRA_COMPONENT \
         --log $LOG \
         -0 \
+        $WCA_EXTRA_PARAMS
     && /bin/bash
