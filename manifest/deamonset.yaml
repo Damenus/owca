@@ -3,8 +3,8 @@ kind: DaemonSet
 metadata:
   name: wca
   namespace: wca
-#  labels:
-#    name: wca
+  labels:
+    name: wca
 spec:
   selector:
     matchLabels:
@@ -20,7 +20,7 @@ spec:
       hostNetwork: true
       containers:
       - name: wca
-        image: 100.64.176.12:80/wca:dac1aab9e8bd8b454836a7dd51fc81d8ee1944d3
+        image: wca
         securityContext:
           privileged: true
         env:
@@ -39,14 +39,15 @@ spec:
             cpu: 500m
             memory: 500Mi
         volumeMounts:
-          - name: kubelet-cert
-            mountPath: /etc/kubernetes/ssl/
+
+          - name: kubelet-certs
+            mountPath: /etc/wca/certs/
             readOnly: true
-          - name: wcaconfig
+          - name: wca-config
             mountPath: /etc/wca/
-          - name: varlibwca
+          - name: var-libwca
             mountPath: /var/lib/wca
-          - name: logstorage
+          - name: log-storage
             mountPath: /var/log
           - name: cgroup
             mountPath: /sys/fs/cgroup/
@@ -71,9 +72,9 @@ spec:
             cpu: 1
             memory: 1
         volumeMounts:
-          - name: varlibwca
+          - name: var-libwca
             mountPath: /var/lib/wca
-          - name: logstorage
+          - name: log-storage
             mountPath: /var/log
           - name: dev
             mountPath: /host/dev
@@ -84,18 +85,16 @@ spec:
           - name: rootfs
             mountPath: /rootfs
       volumes:
-        - name: kubelet-cert
+        - name: kubelet-certs
           secret:
             secretName: apiserver-kubelet-key-crt
         - name: wcaconfig
           configMap:
             name: wca-config
-        - name: logstorage
-          hostPath:
-            path: /var/log
-        - name: varlibwca
-          hostPath:
-            path: /var/lib/wca
+        - name: log-storage
+          emptyDir: {}
+        - name: var-libwca
+          emptyDir: {}
         # control cgroup
         - name: cgroup
           hostPath:
