@@ -94,7 +94,7 @@ Assumptions:
 - ``/var/lib/wca`` directory exists
 - ``wca`` user and group already exists
  
-Please use following `template <../configs/wca.service>`_ as systemd ``/etc/systemd/system/wca.service`` unit file::
+Please use following `template <../configs/systemd-unit/wca.service>`_ as systemd ``/etc/systemd/system/wca.service`` unit file::
 
     [Unit]
     Description=Workload Collocation Agent
