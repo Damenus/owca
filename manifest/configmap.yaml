@@ -4,8 +4,9 @@ metadata:
     name: wca-config
 data:
   wca_config.yml: |
-  # Example detection config
+
     runner: !DetectionRunner
+      # Example detection config
       rdt_enabled: false
       node: !KubernetesNode
         # We support two options: cgroupfs, systemd

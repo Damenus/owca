@@ -16,7 +16,7 @@
 # Building wca.
 FROM centos:7 AS wca
 
-#RUN yum -y update
+RUN yum -y update
 RUN yum -y install epel-release
 RUN yum -y install python36 python-pip which make git
 
@@ -26,7 +26,6 @@ WORKDIR /wca
 COPY . .
 
 RUN pipenv install --dev
-#--system --ignore-pipfile --deploy
 RUN pipenv run make wca_package
 
 # Builing final container that consists of wca only.
@@ -43,16 +42,12 @@ RUN yum install -y python36
 
 COPY --from=wca /wca/dist/wca.pex /usr/bin/
 
-#USER wca
-
 ENTRYPOINT \
     sed -e "s/\$OWN_IP_TO_BE_REPLACED/$OWN_IP/g" -e "s/\$ENV_UNIQ_ID_TO_BE_REPLACED/$ENV_UNIQ_ID/g" \
-        $CONFIG > /etc/wca/config.yml \
-    && \
+        $CONFIG > /etc/wca/config.yml && \
     python36 /usr/bin/wca.pex \
         --config /etc/wca/config.yml \
         --register $EXTRA_COMPONENT \
         --log $LOG \
         -0 \
         $WCA_EXTRA_PARAMS
-    && /bin/bash

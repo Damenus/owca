@@ -25,7 +25,7 @@ spec:
           privileged: true
         env:
           - name: LOG
-            value: debug
+            value: info
           - name: OWN_IP
             valueFrom:
               fieldRef:
@@ -39,13 +39,12 @@ spec:
             cpu: 500m
             memory: 500Mi
         volumeMounts:
-
           - name: kubelet-certs
             mountPath: /etc/wca/certs/
             readOnly: true
           - name: wca-config
             mountPath: /etc/wca/
-          - name: var-libwca
+          - name: var-lib-wca
             mountPath: /var/lib/wca
           - name: log-storage
             mountPath: /var/log
@@ -72,8 +71,6 @@ spec:
             cpu: 1
             memory: 1
         volumeMounts:
-          - name: var-libwca
-            mountPath: /var/lib/wca
           - name: log-storage
             mountPath: /var/log
           - name: dev
@@ -85,21 +82,24 @@ spec:
           - name: rootfs
             mountPath: /rootfs
       volumes:
+        # Client private key and cert to communicate with kubelet
         - name: kubelet-certs
           secret:
             secretName: apiserver-kubelet-key-crt
+        # Config for wca
         - name: wcaconfig
           configMap:
             name: wca-config
+        # Volume to write wca log
         - name: log-storage
           emptyDir: {}
-        - name: var-libwca
+        - name: var-lib-wca
           emptyDir: {}
-        # control cgroup
+        # Path for owca to read cgroup
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup/
-        # node_exporter
+        # Paths for node_exporter to collect metrics
         - name: proc
           hostPath:
             path: /proc
