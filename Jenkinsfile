@@ -39,7 +39,8 @@ pipeline {
                 stage("Using tester") {
                   steps {
                     sh '''
-                      sudo dist/wca.pex -c ${pwd}configs/extra/tester_example.yaml -r wca.extra.tester:Tester -r wca.extra.tester:MetricCheck -r wca.extra.tester:FileCheck --log=debug --root
+                      PWD=$(pwd)
+                      sudo dist/wca.pex -c $PWD/configs/extra/tester_example.yaml -r wca.extra.tester:Tester -r wca.extra.tester:MetricCheck -r wca.extra.tester:FileCheck --log=debug --root
                     '''
                      }
                 }
