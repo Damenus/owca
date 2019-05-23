@@ -33,7 +33,7 @@ import ipaddress
 import logging
 import types
 import typing
-from os.path import exists, isabs, split  # direct target import for mocking purposes in test_main
+from os.path import exists, isabs  # direct target import for mocking purposes in test_main
 from ruamel import yaml
 from typing import Any
 from urllib.parse import urlparse
