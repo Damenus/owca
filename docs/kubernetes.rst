@@ -48,17 +48,27 @@ Please refer to `example configuration file for kubernetes <../configs/kubernete
         monitored_namespaces: List[str] = field(default_factory=lambda: ["default"])
 
 
-Run wca as daemonset on cluster
+Run wca as DaemonSet on cluster
 ===============================
 Reference configs are in `example configuration file for kubernetes <../manifest>`_.
 
 
-1. Add namespace wca
-Namespace can be crated by command 'kubectl create namespace wca' or
-running manifest 'kubectl apply -f manifest/namespace.yaml'
+1. Add namespace 'wca'
 
-2. wca required private key and certification
+Namespace can be crated by command ``kubectl create namespace wca`` or
+``kubectl apply -f manifest/namespace.yaml``
 
-3. wca required configuration file. 'kubectl apply -f manifest/configmap.yaml'
+2. Add private key and certificate to Secrets
 
-4. Run daemonset
+Workload Collocation Agent required private key and certificate to connect with kubelet.
+Example how add this files to Secrets:
+``sudo kubectl create secret generic kubelet-key-crt --from-file=./client.crt --from-file=./client.key --namespace=wca``
+
+3. Add configuration file to ConfigMap
+
+Workload Collocation Agent required configuration file. `Example Allocator as ConfigMap<../manifest/configmap.yaml>`_. To create the resource run
+``kubectl apply -f manifest/configmap.yaml``
+
+4. Run DaemonSet
+`Example definition DaemonSet<../manifest/daemonset.yaml>`_.
+Use command ``kubectl apply -f manifest/daemonset.yaml`` to create DaemonSet.

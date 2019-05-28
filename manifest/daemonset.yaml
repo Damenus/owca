@@ -20,9 +20,6 @@ metadata:
   namespace: wca
   labels:
     name: wca
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "9100"
 spec:
   selector:
     matchLabels:
@@ -31,6 +28,9 @@ spec:
     metadata:
       labels:
         name: wca
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
     spec:
       terminationGracePeriodSeconds: 10
       hostPID: true
@@ -55,6 +55,7 @@ spec:
           # Env CONFIG have to be this same path as for config from volume mounts wca-config
           - name: CONFIG
             value: /etc/wca/wca_config.yml
+
         resources:
           requests:
             cpu: 500m
@@ -67,8 +68,6 @@ spec:
             mountPath: /etc/wca/
           - name: var-lib-wca
             mountPath: /var/lib/wca
-          - name: log-storage
-            mountPath: /var/log
           - name: cgroup
             mountPath: /sys/fs/cgroup/
           - name: resctrl
@@ -97,8 +96,8 @@ spec:
             cpu: 1
             memory: 1
         volumeMounts:
-          - name: log-storage
-            mountPath: /var/log
+          - name: var-lib-wca
+            mountPath: /var/lib/wca
           - name: dev
             mountPath: /host/dev
           - name: proc
@@ -118,17 +117,19 @@ spec:
           configMap:
             name: wca-config
         # Volume to write wca log
-        - name: log-storage
-          emptyDir: {}
         - name: var-lib-wca
           emptyDir: {}
-        # Path for wca to read cgroup
+        # Path for wca to read cgroup, resctrl and dev-cpu
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup/
         - name: resctrl
           hostPath:
             path: /sys/fs/resctrl/
+        - name: dev-cpu
+          hostPath:
+            path: /dev/cpu
+
         # Paths for node_exporter to collect metrics
         - name: proc
           hostPath:

@@ -21,21 +21,16 @@ metadata:
 data:
   wca_config.yml: |
 
-    runner: !DetectionRunner
-      # Example detection config
-      rdt_enabled: false
+    runner: !AllocationRunner
+      action_delay: 5.0
+      rdt_enabled: true
+      enable_derived_metrics: True
       node: !KubernetesNode
-        # We support two options: cgroupfs, systemd
+        # We support two options: cgroupfs, systemd.
         cgroup_driver: cgroupfs
-
         client_private_key: "/etc/wca/certs/client.key"
         client_cert: "/etc/wca/certs/client.crt"
-
-        # If the kubelete agent does not listen on localhost,
-        #   the endpoint must be provided.
         kubelet_endpoint: "https://$OWN_IP_TO_BE_REPLACED:10250"
-
-        # List of namespaces to monitor pods in.
         monitored_namespaces: ["wca"]
 
       metrics_storage: !LogStorage
@@ -44,9 +39,18 @@ data:
       anomalies_storage: !LogStorage
         overwrite: True
         output_filename: /var/lib/wca/anomalies.prom
-
-      detector: !ExampleDetector
+      allocations_storage: !LogStorage
+        overwrite: True
+        output_filename: /var/lib/wca/allocations.prom
 
       extra_labels:
         env_uniq_id: $ENV_UNIQ_ID_TO_BE_REPLACED
         own_ip: $OWN_IP_TO_BE_REPLACED
+
+      allocator: !StaticAllocator
+        rules:
+        - name: Default rule for all tasks.
+          allocations:
+            cpu_quota: 1.
+            rdt:
+              name: ''
