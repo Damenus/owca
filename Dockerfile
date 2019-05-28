@@ -28,7 +28,7 @@ COPY . .
 RUN pipenv install --dev
 RUN pipenv run make wca_package
 
-# Builing final container that consists of wca only.
+# Building final container that consists of wca only.
 FROM centos:7
 
 ENV CONFIG=/etc/wca/wca_config.yml \

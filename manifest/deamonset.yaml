@@ -1,3 +1,18 @@
+# Copyright (c) 2018 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -5,6 +20,9 @@ metadata:
   namespace: wca
   labels:
     name: wca
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9100"
 spec:
   selector:
     matchLabels:
@@ -18,7 +36,9 @@ spec:
       hostPID: true
       hostIPC: true
       hostNetwork: true
+
       containers:
+
       - name: wca
         image: wca
         securityContext:
@@ -32,14 +52,15 @@ spec:
                 fieldPath: status.podIP
           - name: ENV_UNIQ_ID
             value: "'1'"
+          # Env CONFIG have to be this same path as for config from volume mounts wca-config
           - name: CONFIG
-            value: /etc/owca/wca_config.yml
+            value: /etc/wca/wca_config.yml
         resources:
           requests:
             cpu: 500m
             memory: 500Mi
         volumeMounts:
-          - name: kubelet-certs
+          - name: kubelet-key-crt
             mountPath: /etc/wca/certs/
             readOnly: true
           - name: wca-config
@@ -50,6 +71,11 @@ spec:
             mountPath: /var/log
           - name: cgroup
             mountPath: /sys/fs/cgroup/
+          - name: resctrl
+            mountPath: /sys/fs/resctrl/
+          - name: dev-cpu
+            mountPath: /dev/cpu
+
       - name: node-exporter
         image: prom/node-exporter@sha256:ffc3e0adf58771cb2097aa0b074a6fe68b4925ba75c2e1c41f41ae656eebee11
         securityContext:
@@ -81,13 +107,14 @@ spec:
             mountPath: /host/sys
           - name: rootfs
             mountPath: /rootfs
+
       volumes:
         # Client private key and cert to communicate with kubelet
-        - name: kubelet-certs
+        - name: kubelet-key-crt
           secret:
-            secretName: apiserver-kubelet-key-crt
+            secretName: kubelet-key-crt
         # Config for wca
-        - name: wcaconfig
+        - name: wca-config
           configMap:
             name: wca-config
         # Volume to write wca log
@@ -95,10 +122,13 @@ spec:
           emptyDir: {}
         - name: var-lib-wca
           emptyDir: {}
-        # Path for owca to read cgroup
+        # Path for wca to read cgroup
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup/
+        - name: resctrl
+          hostPath:
+            path: /sys/fs/resctrl/
         # Paths for node_exporter to collect metrics
         - name: proc
           hostPath:

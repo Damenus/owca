@@ -46,3 +46,19 @@ Please refer to `example configuration file for kubernetes <../configs/kubernete
 
         # List of namespaces to monitor pods in.
         monitored_namespaces: List[str] = field(default_factory=lambda: ["default"])
+
+
+Run wca as daemonset on cluster
+===============================
+Reference configs are in `example configuration file for kubernetes <../manifest>`_.
+
+
+1. Add namespace wca
+Namespace can be crated by command 'kubectl create namespace wca' or
+running manifest 'kubectl apply -f manifest/namespace.yaml'
+
+2. wca required private key and certification
+
+3. wca required configuration file. 'kubectl apply -f manifest/configmap.yaml'
+
+4. Run daemonset
