@@ -3,4 +3,4 @@ runner: !AllocationRunner
     tasks:
       - task1
   allocator: !StaticAllocator
-    config: /etc/configs/extra/static_allocator_config.yaml
+    config: configs/extra/static_allocator_config.yaml

@@ -98,7 +98,21 @@ def assure_min_numeric_value(value, min_value):
 
 def assure_absolute_path(value):
     if not isabs(value):
-        raise ValidationError('Absolute path is obligatory.')
+        raise ValidationError('`absolute` option is set to True meaning '
+                              'absolute path is obligatory. Use absolute '
+                              'path or turn off `absolute` option by '
+                              'setting it to False.')
+
+
+def assure_no_parent_directory_access(value):
+    split_value = split(value)
+    while split_value[0] and split_value[1]:
+        if '..' in split_value:
+            raise ValidationError('You are trying to access parent '
+                                  'directory by using \'..\' expression'
+                                  ' which is not allowed. Try using '
+                                  'absolute path instead.')
+        split_value = split(split_value[0])
 
 
 def assure_scheme_in_url(url, supported_schemes=('http', 'https')):
@@ -197,12 +211,14 @@ class _PathType(type):
         """Validates path input"""
         assure_base_types(value, [str])
         assure_max_str_length(value, cls.max_size)
-        assure_absolute_path(value)
+        assure_no_parent_directory_access(value)
+        if cls.absolute:
+            assure_absolute_path(value)
 
 
-def Path(max_size=400):
+def Path(absolute=False, max_size=400):
     return _PathType('Path', (_PathType, SemanticType),
-                     dict(absolute=True, max_size=max_size))
+                     dict(absolute=absolute, max_size=max_size))
 
 
 class _IpPort(type):
