@@ -8,6 +8,17 @@ pipeline {
         LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
     }
     stages {
+        stage('Build pex') {
+            stages {
+                stage("Prepare venv && build pex") {
+                    steps {
+                        sh('make venv')
+                        sh('make check')
+                        sh('make package')
+                    }
+                }
+            }
+        }
         stage('Kubernetes') {
             agent { label 'kubernetes' }
             environment {
@@ -18,6 +29,7 @@ pipeline {
             }
             steps {
                 print('Reconfiguring wca...')
+                print('CONFIG: ' + env.CONFIG)
                 copy_config(env.CONFIG)
                 replace_in_config()
                 sh'''
