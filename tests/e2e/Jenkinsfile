@@ -14,12 +14,31 @@ pipeline {
                 KUBERNETES_HOST='100.64.176.34'
                 CRT_PATH = '/etc/kubernetes/ssl/'
             }
+            steps {
+                print('Environment variables: ')
+                print(env.PLAYBOOK)
+                print(env.PROMETHEUS)
+                print(env.BUILD_COMMIT)
+                print(env.EXTRA_ANSIBLE_PARAMS)
+                print(env.INVENTORY)
+                print(env.KUBERNETES_HOST)
+                print(env.CRT_PATH)
+            }
         }
         stage('Mesos environment') {
             agent { label 'mesos' }
             environment {
                 INVENTORY='tests/e2e/demo_scenarios/common/inventory-mesos.yaml'
                 MESOS_MASTER_HOST='100.64.176.23'
+            }
+            steps {
+                print('Environment variables: ')
+                print(env.PLAYBOOK)
+                print(env.PROMETHEUS)
+                print(env.BUILD_COMMIT)
+                print(env.EXTRA_ANSIBLE_PARAMS)
+                print(env.INVENTORY)
+                print(env.MESOS_MASTER_HOST)
             }
         }
     }
