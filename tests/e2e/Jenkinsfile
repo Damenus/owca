@@ -37,6 +37,9 @@ pipeline {
                 MESOS_MASTER_HOST='100.64.176.23'
                 CONFIG = 'wca_config_mesos.yaml'
             }
+            steps {
+                print('Not done yet')
+            }
         }
     }
 }
