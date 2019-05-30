@@ -30,7 +30,7 @@ pipeline {
             steps {
                 print('Reconfiguring wca...')
                 print('CONFIG: ' + env.CONFIG)
-                copy_config env.CONFIG
+                copy_config(env.CONFIG)
                 replace_in_config()
                 sh'''
                 sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp /etc/wca/wca_config.yml
@@ -56,7 +56,7 @@ pipeline {
     }
 }
 
-def copy_config(String config) {
+def copy_config(config) {
     sh 'sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/common/${config} ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
 }
 
