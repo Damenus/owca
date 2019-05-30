@@ -8,7 +8,7 @@ pipeline {
         LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
     }
     stages {
-        stage('Kubernetes environment') {
+        stage('Start wca') {
             agent { label 'kubernetes' }
             environment {
                 INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml'
@@ -16,22 +16,12 @@ pipeline {
                 CRT_PATH = '/etc/kubernetes/ssl/'
                 CONFIG = 'wca_config_kubernetes.yaml'
             }
-            steps {
-                print('Environment variables for Kubernetes are set.')
-            }
-        }
-        stage('Mesos environment') {
             agent { label 'mesos' }
             environment {
                 INVENTORY='tests/e2e/demo_scenarios/common/inventory-mesos.yaml'
                 MESOS_MASTER_HOST='100.64.176.23'
                 CONFIG = 'wca_config_mesos.yaml'
             }
-            steps {
-                print('Environment variables for Mesos are set.')
-            }
-        }
-        stage('Start wca') {
             steps {
                 print('Reconfiguring wca...')
                 sh 'sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG} ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp'
