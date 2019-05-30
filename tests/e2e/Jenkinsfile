@@ -14,7 +14,7 @@ pipeline {
                     steps {
                         sh('make venv')
                         sh('make check')
-                        sh('make package')
+                        sh('make wca_package')
                     }
                 }
             }
