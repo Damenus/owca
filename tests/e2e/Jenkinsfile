@@ -15,14 +15,20 @@ pipeline {
                 CRT_PATH = '/etc/kubernetes/ssl/'
             }
             steps {
-                print('Environment variables: ')
-                print(env.PLAYBOOK)
-                print(env.PROMETHEUS)
-                print(env.BUILD_COMMIT)
-                print(env.EXTRA_ANSIBLE_PARAMS)
-                print(env.INVENTORY)
-                print(env.KUBERNETES_HOST)
-                print(env.CRT_PATH)
+                print('Environment variables: \n'
+                      'PLAYBOOK: {}\n'
+                      'PROMETHEUS: {}\n'
+                      'BUILD_COMMIT: {}\n'
+                      'EXTRA_ANSIBLE_PARAMS: {}\n'
+                      'INVENTORY: {}\n'
+                      'KUBERNETES_HOST: {}\n'
+                      'CRT_PATH: {}\n'.format(env.PLAYBOOK,
+                                              env.PROMETHEUS,
+                                              env.BUILD_COMMIT,
+                                              env.EXTRA_ANSIBLE_PARAMS,
+                                              env.INVENTORY,
+                                              env.KUBERNETES_HOST,
+                                              env.CRT_PATH))
             }
         }
         stage('Mesos environment') {
