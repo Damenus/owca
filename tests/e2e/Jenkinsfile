@@ -15,20 +15,7 @@ pipeline {
                 CRT_PATH = '/etc/kubernetes/ssl/'
             }
             steps {
-                print('Environment variables: \n'
-                      'PLAYBOOK: {}\n'
-                      'PROMETHEUS: {}\n'
-                      'BUILD_COMMIT: {}\n'
-                      'EXTRA_ANSIBLE_PARAMS: {}\n'
-                      'INVENTORY: {}\n'
-                      'KUBERNETES_HOST: {}\n'
-                      'CRT_PATH: {}\n'.format(env.PLAYBOOK,
-                                              env.PROMETHEUS,
-                                              env.BUILD_COMMIT,
-                                              env.EXTRA_ANSIBLE_PARAMS,
-                                              env.INVENTORY,
-                                              env.KUBERNETES_HOST,
-                                              env.CRT_PATH))
+                print('Environment variables for Kubernetes are set.')
             }
         }
         stage('Mesos environment') {
@@ -38,13 +25,7 @@ pipeline {
                 MESOS_MASTER_HOST='100.64.176.23'
             }
             steps {
-                print('Environment variables: ')
-                print(env.PLAYBOOK)
-                print(env.PROMETHEUS)
-                print(env.BUILD_COMMIT)
-                print(env.EXTRA_ANSIBLE_PARAMS)
-                print(env.INVENTORY)
-                print(env.MESOS_MASTER_HOST)
+                print('Environment variables for Mesos are set.')
             }
         }
     }
