@@ -20,4 +20,3 @@ runner: !DetectionRunner
     own_ip: "100.64.176.34"
     build_commit: "BUILD_COMMIT"
     build_number: "BUILD_NUMBER"
-    build_scenario: "BUILD_SCENARIO"
