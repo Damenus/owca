@@ -1,11 +1,13 @@
 pipeline {
     agent any
     environment {
-        PLAYBOOK='workloads/run_workloads.yaml'
-        PROMETHEUS='http://100.64.176.12:9090'
+        PLAYBOOK = 'workloads/run_workloads.yaml'
+        PROMETHEUS = 'http://100.64.176.12:9090'
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = ""
-        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
+        LABELS = "{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
+		TAGS = ""
+		RUN_WORKLOADS_SLEEP_TIME = 300
     }
     stages {
         stage('Build pex') {
@@ -32,6 +34,7 @@ pipeline {
                 copy_config(env.CONFIG)
                 replace_in_config()
                 start_wca()
+				run_workloads(env.TAGS)
             }
         }
 
@@ -47,6 +50,7 @@ pipeline {
                 copy_config(env.CONFIG)
                 replacce_in_config()
                 start_wca()
+				run_workloads(env.TAGS)
             }
         }
     }
@@ -80,4 +84,17 @@ def start_wca() {
     sh "systemctl restart wca"
     sleep 5
     sh "systemctl status wca"
+}
+
+def run_workloads(tags) {
+    dir('workloads') {
+        echo 'Start workloads'
+        sh "ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e /"${LABELS}/" ${WORKSPACE}/${PLAYBOOK}"
+    }
+}
+
+def stop_workloads() {
+   echo 'Stop all workloads...'
+   sh 'ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}'
+   sleep 5 
 }
