@@ -49,10 +49,10 @@ pipeline {
 
 def copy_file(src, dest, sudo=false) {
     if(sudo){
-        sh "sudo cp ${src} ${dest}"
+        sh """sudo cp ${src} ${dest}"""
     }
     else{
-        sh "cp ${src} ${dest}"
+        sh """cp ${src} ${dest}"""
     }
 }
 
