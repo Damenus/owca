@@ -31,8 +31,9 @@ pipeline {
             }
             steps {
                 print('Reconfiguring wca...')
-                copy_config(env.CONFIG)
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 replace_in_config()
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp", "/etc/wca/wca_config.yml")
                 start_wca()
 				run_workloads(env.TAGS)
             }
@@ -47,8 +48,9 @@ pipeline {
             }
             steps {
                 print('Reconfiguring wca...')
-                copy_config(env.CONFIG)
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 replacce_in_config()
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp", "/etc/wca/wca_config.yml")
                 start_wca()
 				run_workloads(env.TAGS)
             }
@@ -56,8 +58,8 @@ pipeline {
     }
 }
 
-def copy_config(config) {
-    sh "sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/common/${config} ${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp"
+def copy_file(src, dest) {
+    sh "sudo cp ${src} ${dest}"
 }
 
 def replace_in_config() {
@@ -71,13 +73,6 @@ def replace_in_config() {
                 ],
                 fileEncoding: 'UTF-8',
                 filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
-}
-
-def copy_ready_config() {
-    sh'''
-    sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp /etc/wca/wca_config.yml
-    sudo cp ${WORKSPACE}/dist/wca-prm.pex /usr/bin/wca.pex
-    '''
 }
 
 def start_wca() {
