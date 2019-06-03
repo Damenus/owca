@@ -21,7 +21,7 @@ pipeline {
             steps {
                 print('Reconfiguring wca...')
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
-                replace_in_config()
+                replace_in_config(cert=true)
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 start_wca()
 				//run_workloads(env.TAGS)
@@ -66,17 +66,31 @@ def copy_file(src, dest, sudo=false) {
     }
 }
 
-def replace_in_config() {
-    contentReplace(
-        configs: [
-            fileContentReplaceConfig(
-                configs: [
-                    fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
-                    fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
-                    fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)
-                ],
-                fileEncoding: 'UTF-8',
-                filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
+def replace_in_config(cert=false) {
+    if(cert) {
+        contentReplace(
+            configs: [
+                fileContentReplaceConfig(
+                    configs: [
+                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
+                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
+                        fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)
+                    ],
+                    fileEncoding: 'UTF-8',
+                    filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
+    }
+    else {
+        contentReplace(
+            configs: [
+                fileContentReplaceConfig(
+                    configs: [
+                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
+                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0)
+                    ],
+                    fileEncoding: 'UTF-8',
+                    filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
+    }
+
 }
 
 def start_wca() {
