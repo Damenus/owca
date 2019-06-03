@@ -49,10 +49,10 @@ pipeline {
 
 def copy_file(src, dest, sudo=false) {
     if(sudo){
-        sh """sudo cp ${src} ${dest}"""
+        sh "sudo cp ${src} ${dest}"
     }
     else{
-        sh """cp ${src} ${dest}"""
+        sh "cp ${src} ${dest}"
     }
 }
 
@@ -70,9 +70,9 @@ def replace_in_config() {
 }
 
 def start_wca() {
-    sh "systemctl restart wca"
+    sh " sudo systemctl restart wca"
     sleep 5
-    sh "systemctl status wca"
+    sh "sudo systemctl status wca"
 }
 
 def run_workloads(tags) {
