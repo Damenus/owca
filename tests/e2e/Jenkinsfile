@@ -15,14 +15,14 @@ pipeline {
             environment {
                 INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml'
                 KUBERNETES_HOST='100.64.176.34'
-                CRT_PATH = '/etc/kubernetes/ssl/'
+                CRT_PATH = '/etc/kubernetes/ssl'
                 CONFIG = 'wca_config_kubernetes.yaml'
             }
             steps {
                 print('Reconfiguring wca...')
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", true)
                 replace_in_config()
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp", "/etc/wca/wca_config.yml")
                 start_wca()
 				run_workloads(env.TAGS)
             }
