@@ -22,7 +22,7 @@ pipeline {
                 print('Reconfiguring wca...')
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", true)
                 replace_in_config()
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 start_wca()
 				run_workloads(env.TAGS)
             }
