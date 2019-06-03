@@ -57,7 +57,7 @@ pipeline {
 }
 
 def copy_config(config) {
-    sh "sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/common/${config} ${WORKSPACE}/prm/demo_scenarios/common/wca_config.yml.tmp"
+    sh "sudo cp ${WORKSPACE}/tests/e2e/demo_scenarios/common/${config} ${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp"
 }
 
 def replace_in_config() {
