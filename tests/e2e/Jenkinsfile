@@ -29,7 +29,6 @@ pipeline {
             post {
                 always {
                     stop_wca()
-                    remove_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 }
             }
         }
@@ -52,7 +51,6 @@ pipeline {
             post {
                 always {
                     stop_wca()
-                    remove_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 }
             }
         }
