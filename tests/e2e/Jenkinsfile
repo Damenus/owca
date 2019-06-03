@@ -21,7 +21,7 @@ pipeline {
             steps {
                 print('Reconfiguring wca...')
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
-                replace_in_config(cert=true)
+                replace_in_config(true)
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 start_wca()
 				//run_workloads(env.TAGS)
