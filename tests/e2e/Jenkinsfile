@@ -24,7 +24,10 @@ pipeline {
                 replace_in_config()
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 start_wca()
-				run_workloads(env.TAGS)
+				//run_workloads(env.TAGS)
+            }
+            post {
+                stop_wca()
             }
         }
 
@@ -41,7 +44,7 @@ pipeline {
                 replacce_in_config()
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml")
                 start_wca()
-				run_workloads(env.TAGS)
+				//run_workloads(env.TAGS)
             }
         }
     }
@@ -73,6 +76,10 @@ def start_wca() {
     sh " sudo systemctl restart wca"
     sleep 5
     sh "sudo systemctl status wca"
+}
+
+def stop_wca() {
+    sh " sudo systemctl stop wca"
 }
 
 def run_workloads(tags) {
