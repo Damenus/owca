@@ -10,17 +10,6 @@ pipeline {
 		RUN_WORKLOADS_SLEEP_TIME = 300
     }
     stages {
-        stage('Build pex') {
-            stages {
-                stage("Prepare venv && build pex") {
-                    steps {
-                        sh('make venv')
-                        sh('make check')
-                        sh('make wca_package')
-                    }
-                }
-            }
-        }
         stage('Kubernetes') {
             agent { label 'kubernetes' }
             environment {
@@ -31,7 +20,7 @@ pipeline {
             }
             steps {
                 print('Reconfiguring wca...')
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
+                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", true)
                 replace_in_config()
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/commom/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 start_wca()
