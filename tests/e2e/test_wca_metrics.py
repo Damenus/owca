@@ -85,4 +85,3 @@ def test_wca_metrics(workload_instance):
                                              tags, 1800, time())
     metrics = _fetch_metrics(prometheus_query)
     assert len(metrics) > 0
-
