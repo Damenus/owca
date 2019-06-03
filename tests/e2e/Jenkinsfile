@@ -18,7 +18,7 @@ pipeline {
                         dir('prm') {
                             sh('make venv')
                             sh('make check')
-                            sh('make package')
+                            sh('make wca_package')
                         }
                     }
                 }
@@ -37,7 +37,7 @@ pipeline {
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 replace_in_config(true)
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
-                copy_file("${WORKSPACE}/prm/dist/wca-prm.pex", "/usr/bin/wca.pex", true)
+                copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
                 start_wca()
 				//run_workloads(env.TAGS)
             }
@@ -60,6 +60,7 @@ pipeline {
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 replace_in_config()
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
                 start_wca()
 				//run_workloads(env.TAGS)
             }
