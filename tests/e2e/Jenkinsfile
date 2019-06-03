@@ -10,6 +10,20 @@ pipeline {
 		RUN_WORKLOADS_SLEEP_TIME = 300
     }
     stages {
+        stage('Build pex') {
+            when { expression { return params.BUILD_PEX } }
+            stages {
+                stage("Prepare venv && build pex") {
+                    steps {
+                        dir('prm') {
+                            sh('make venv')
+                            sh('make check')
+                            sh('make package')
+                        }
+                    }
+                }
+            }
+        }
         stage('Kubernetes') {
             agent { label 'kubernetes' }
             environment {
@@ -23,6 +37,7 @@ pipeline {
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
                 replace_in_config(true)
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                copy_file("${WORKSPACE}/prm/dist/wca-prm.pex", "/usr/bin/wca.pex", true)
                 start_wca()
 				//run_workloads(env.TAGS)
             }
