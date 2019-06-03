@@ -105,5 +105,5 @@ def stop_workloads() {
 }
 
 def remove_file(path) {
-    sh "rm ${path}"
+    sh "rm -f ${path}"
 }
