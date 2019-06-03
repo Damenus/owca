@@ -89,7 +89,7 @@ def start_wca() {
 def run_workloads(tags) {
     dir('workloads') {
         echo 'Start workloads'
-        sh "ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e /"${LABELS}/" ${WORKSPACE}/${PLAYBOOK}"
+        sh "ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e \"${LABELS}\" ${WORKSPACE}/${PLAYBOOK}"
     }
 }
 
