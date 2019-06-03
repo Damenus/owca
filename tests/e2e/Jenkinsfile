@@ -59,7 +59,7 @@ pipeline {
 }
 
 def copy_file(src, dest) {
-    sh "sudo cp ${src} ${dest}"
+    sh "cp ${src} ${dest}"
 }
 
 def replace_in_config() {
