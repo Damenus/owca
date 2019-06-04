@@ -27,12 +27,12 @@ pipeline {
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
                 start_wca()
-				run_workloads("${TAGS}")
+				run_workloads("${TAGS}", "${EXTRA_ANSIBLE_PARAMS}")
 				sleep RUN_WORKLOADS_SLEEP_TIME
             }
             post {
                 always {
-                    stop_workloads()
+                    stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
                     stop_wca()
                 }
             }
@@ -54,12 +54,12 @@ pipeline {
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
                 start_wca()
-				run_workloads("${TAGS}")
+				run_workloads("${TAGS}", "${EXTRA_ANSIBLE_PARAMS}")
 				sleep RUN_WORKLOADS_SLEEP_TIME
             }
             post {
                 always {
-                    stop_workloads()
+                    stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
                     stop_wca()
                 }
             }
@@ -112,14 +112,14 @@ def stop_wca() {
     sh "sudo systemctl stop wca"
 }
 
-def run_workloads(tags) {
+def run_workloads(tags, extra_params) {
     dir('workloads') {
         echo 'Start workloads'
-        sh "ansible-playbook ${EXTRA_ANSIBLE_PARAMS} -i ${WORKSPACE}/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e \"${LABELS}\" ${WORKSPACE}/${PLAYBOOK}"
+        sh "ansible-playbook ${extra_params} -i ${WORKSPACE}/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e \"${LABELS}\" ${WORKSPACE}/${PLAYBOOK}"
     }
 }
 
-def stop_workloads() {
+def stop_workloads(extra_params) {
    echo 'Stop all workloads...'
    sh "ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}"
    sleep 5 
