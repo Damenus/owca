@@ -5,7 +5,7 @@ pipeline {
         PROMETHEUS = 'http://100.64.176.12:9090'
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = " "
-        LABELS = """{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"""
+        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
 		TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress"
 		RUN_WORKLOADS_SLEEP_TIME = 300
     }
@@ -115,7 +115,7 @@ def stop_wca() {
 def run_workloads(tags, extra_params, labels) {
     dir('workloads') {
         echo 'Start workloads'
-        sh """ansible-playbook ${extra_params} -i ${WORKSPACE}/${INVENTORY} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e "${labels}" ${WORKSPACE}/${PLAYBOOK} -vvv"""
+        sh """ansible-playbook ${extra_params} -i ${WORKSPACE}/${INVENTORY} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK} -vvv"""
     }
 }
 
