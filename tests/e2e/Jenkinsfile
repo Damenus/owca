@@ -115,7 +115,7 @@ def stop_wca() {
 def run_workloads(tags, extra_params, labels) {
     dir('workloads') {
         echo 'Start workloads'
-        sh """ansible-playbook ${extra_params} -i ${WORKSPACE}/${INVENTORY} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e "${labels}" ${WORKSPACE}/${PLAYBOOK}"""
+        sh """ansible-playbook ${extra_params} -i ${WORKSPACE}/${INVENTORY} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml --tags=${tags} -e "${labels}" ${WORKSPACE}/${PLAYBOOK} -vvv"""
     }
 }
 
