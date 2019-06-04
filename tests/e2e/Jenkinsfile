@@ -121,7 +121,7 @@ def run_workloads(tags, extra_params) {
 
 def stop_workloads(extra_params) {
    echo 'Stop all workloads...'
-   sh "ansible-playbook  ${EXTRA_ANSIBLE_PARAMS}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}"
+   sh "ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}"
    sleep 5 
 }
 
