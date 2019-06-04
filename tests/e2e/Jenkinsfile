@@ -1,10 +1,10 @@
 pipeline {
     agent any
     environment {
-        PLAYBOOK = 'workloads/run_workloads.yaml'
+        PLAYBOOK = '${WORKSPACE}/workloads/run_workloads.yaml'
         PROMETHEUS = 'http://100.64.176.12:9090'
         BUILD_COMMIT = "${GIT_COMMIT}"
-        EXTRA_ANSIBLE_PARAMS = ""
+        EXTRA_ANSIBLE_PARAMS = " "
         LABELS = "{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
 		TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress"
 		RUN_WORKLOADS_SLEEP_TIME = 300
