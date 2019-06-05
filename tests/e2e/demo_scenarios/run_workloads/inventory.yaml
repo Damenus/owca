@@ -88,18 +88,41 @@ application_hosts:
               ram: 5
               disk: 5
 
-      twemcache_mutilate:
+      twemcache_rpc_perf:
         default:
           count: 1
-          slo: 3200
-          communication_port: 11311
+          slo: 100000
+          communication_port: 11211
           twemcache:
+            threads: 1
+            max_memory: 1234
             resources:
-              cpu: 3
-              ram: 5
-              disk: 5
-          mutilate:
+              cpu: 1
+              ram: 2
+              disk: 2
+          rpc_perf:
             resources:
-              cpu: 3
-              ram: 5
-              disk: 5
+              cpu: 1
+              ram: 2
+              disk: 2
+
+      specjbb:
+        default:
+          count: 1
+          slo: 26000000
+          communication_port: 42000
+          backend:
+          injector:
+          controller:
+
+      stress_ng:
+        default:
+          count: 1
+          timeout: 30
+          stressor: stream
+          number_workers: 2
+          resources:
+            cpu: 1
+            ram: 1
+            disk: 1
+
