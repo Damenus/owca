@@ -29,6 +29,7 @@ pipeline {
                 start_wca()
 				run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
 				sleep RUN_WORKLOADS_SLEEP_TIME
+				test_wca_metrics("test_wca_metrics_kubernetes")
             }
             post {
                 always {
@@ -56,6 +57,7 @@ pipeline {
                 start_wca()
 				run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
 				sleep RUN_WORKLOADS_SLEEP_TIME
+				test_wca_metrics("test_wca_metrics_mesos")
             }
             post {
                 always {
@@ -115,7 +117,7 @@ def stop_wca() {
 def run_workloads(extra_params, labels) {
     dir('workloads') {
         echo 'Start workloads'
-        sh '''ansible-playbook ${extra_params} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml -i ${WORKSPACE}/${INVENTORY} --tags=${TAGS} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK} -vvv'''
+        sh '''ansible-playbook ${extra_params} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml -i ${WORKSPACE}/${INVENTORY} --tags=${TAGS} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'''
     }
 }
 
@@ -127,4 +129,8 @@ def stop_workloads(extra_params) {
 
 def remove_file(path) {
     sh "sudo rm -f ${path}"
+}
+
+def test_wca_metrics(test_name) {
+    sh "PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::${test_name} --log-level=debug --log-cli-level=debug -v"
 }

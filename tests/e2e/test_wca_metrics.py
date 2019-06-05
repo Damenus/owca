@@ -66,8 +66,8 @@ def _fetch_metrics(url):
     return response.json()
 
 
-@pytest.mark.parametrize('workload_instance', [])
-def test_wca_metrics(workload_instance):
+@pytest.mark.parametrize('workload_instance, env_uniq_id', [])
+def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
     assert 'BUILD_COMMIT' in os.environ
@@ -78,7 +78,30 @@ def test_wca_metrics(workload_instance):
 
     tags = dict(build_number=build_number,
                 build_commit=build_commit,
-                workload_instance=workload_instance)
+                workload_instance=workload_instance,
+                env_uniq_id=env_uniq_id)
+
+    logging.info('build number = %r', build_number)
+    prometheus_query = _build_prometheus_url(prometheus,
+                                             tags, 1800, time())
+    metrics = _fetch_metrics(prometheus_query)
+    assert len(metrics) > 0
+
+
+@pytest.mark.parametrize('workload_instance, env_uniq_id', [])
+def test_wca_metrics_mesos(workload_instance, env_uniq_id):
+    assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
+    assert 'BUILD_NUMBER' in os.environ
+    assert 'BUILD_COMMIT' in os.environ
+
+    prometheus = os.environ['PROMETHEUS']
+    build_number = int(os.environ['BUILD_NUMBER'])
+    build_commit = os.environ['BUILD_COMMIT']
+
+    tags = dict(build_number=build_number,
+                build_commit=build_commit,
+                workload_instance=workload_instance,
+                env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
     prometheus_query = _build_prometheus_url(prometheus,

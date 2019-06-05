@@ -3,7 +3,7 @@ application_hosts:
     workloads:
       twemcache_mutilate:
         default:
-          count: 4
+          count: 1
           slo: 500
           communication_port: 11211
           twemcache:
@@ -28,7 +28,7 @@ application_hosts:
 
       redis_rpc_perf:
         default:
-          count: 4
+          count: 1
           slo: 10000
           communication_port: 6789
           redis:
@@ -47,7 +47,7 @@ application_hosts:
       cassandra_stress:
         default:
           labels: {'type': 'best_efforts'}
-          count: 4
+          count: 1
           communication_port: 9142
           jmx_port: 7299
           storage_port: 7100
@@ -56,14 +56,14 @@ application_hosts:
             image_name: cassandra
             image_tag: 3.11.3
             resources:
-              cpu: 30
-              ram: 50
-              disk: 50
+              cpu: 3
+              ram: 5
+              disk: 5
           cassandra_stress:
             env:
               threads: 30
               duration: 1200
             resources:
-              cpu: 30
-              ram: 20
-              disk: 50
+              cpu: 3
+              ram: 2
+              disk: 5
