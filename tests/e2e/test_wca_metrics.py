@@ -67,7 +67,6 @@ def _fetch_metrics(url):
 
 
 @pytest.mark.parametrize('workload_instance, env_uniq_id', [
-    (),
     ('34--cassandra-stress-default--cassandra--9142-0', '34'),
 ])
 def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
