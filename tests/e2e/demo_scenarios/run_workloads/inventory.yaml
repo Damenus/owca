@@ -112,8 +112,20 @@ application_hosts:
           slo: 26000000
           communication_port: 42000
           backend:
+            resources:
+              cpu: 1
+              ram: 2
+              disk: 2
           injector:
+            resources:
+              cpu: 1
+              ram: 2
+              disk: 2
           controller:
+            resources:
+              cpu: 1
+              ram: 2
+              disk: 2
 
       stress_ng:
         default:
