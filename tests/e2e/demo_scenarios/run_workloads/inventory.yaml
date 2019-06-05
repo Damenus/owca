@@ -2,7 +2,7 @@ application_hosts:
   vars:
     workloads:
       twemcache_mutilate:
-        small:
+        default:
           count: 4
           slo: 500
           communication_port: 11211
@@ -23,30 +23,6 @@ application_hosts:
               qps: 20000
             resources:
               cpu: 2
-              ram: 10
-              disk: 20
-        big:
-          count: 0
-          slo: 5000
-          communication_port: 11213
-          twemcache:
-            env:
-              worker_threads: 12
-              max_memory: 2048
-            resources:
-              cpu: 12
-              ram: 50
-              disk: 50
-          mutilate:
-            env:
-              time: 30
-              sli_percentile: 95
-              threads: 16
-              connections: 16
-              warmup_time: 30
-              qps: 100000
-            resources:
-              cpu: 16
               ram: 10
               disk: 20
 
