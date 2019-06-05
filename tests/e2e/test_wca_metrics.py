@@ -86,7 +86,7 @@ def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
-    prometheus_query = _build_prometheus_url(prometheus,
+    prometheus_query = _build_prometheus_url(prometheus, '',
                                              tags, 1800, time())
     metrics = _fetch_metrics(prometheus_query)
     assert len(metrics) > 0
