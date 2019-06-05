@@ -37,6 +37,33 @@ spec:
       hostIPC: true
       hostNetwork: true
 
+      initContainers:
+
+      - name: wca-set-config
+        image: busybox
+        env:
+          # Env CONFIG have to be this same path as for config from volume mounts wca-config
+          - name: CONFIG
+            value: /etc/wca/wca_config.yml
+          - name: OWN_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: ENV_UNIQ_ID
+            value: "'0'"
+        command: ['sh', '-c',
+                  'sed
+                  -e "s/\$OWN_IP_TO_BE_REPLACED/$OWN_IP/g"
+                  -e " s/\$ENV_UNIQ_ID_TO_BE_REPLACED/$ENV_UNIQ_ID/g"
+                  $CONFIG > /var/lib/wca/config.yml']
+        volumeMounts:
+          # Read only config
+          - name: wca-config
+            mountPath: /etc/wca/
+          # Directory with config and logs
+          - name: var-lib-wca
+            mountPath: /var/lib/wca/
+
       containers:
 
       - name: wca
@@ -46,28 +73,17 @@ spec:
         env:
           - name: LOG
             value: info
-          - name: OWN_IP
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
-          - name: ENV_UNIQ_ID
-            value: "'1'"
-          # Env CONFIG have to be this same path as for config from volume mounts wca-config
+          # Env CONFIG have to be this same path as for config created by init-pod wca-set-config
           - name: CONFIG
-            value: /etc/wca/wca_config.yml
-
-        resources:
-          requests:
-            cpu: 500m
-            memory: 500Mi
+            value: /var/lib/wca/config.yml
+          - name: EXTRA_COMPONENT
+            value: example.external_package:ExampleDetector
         volumeMounts:
           - name: kubelet-key-crt
             mountPath: /etc/wca/certs/
             readOnly: true
-          - name: wca-config
-            mountPath: /etc/wca/
           - name: var-lib-wca
-            mountPath: /var/lib/wca
+            mountPath: /var/lib/wca/
           - name: cgroup
             mountPath: /sys/fs/cgroup/
           - name: resctrl
@@ -91,10 +107,6 @@ spec:
         ports:
           - containerPort: 9100
             protocol: TCP
-        resources:
-          requests:
-            cpu: 1
-            memory: 1
         volumeMounts:
           - name: var-lib-wca
             mountPath: /var/lib/wca
