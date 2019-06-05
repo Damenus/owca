@@ -1,9 +1,3 @@
-# @Scenario LLC contention:
-# 3 redis instances;
-# 3 twemcached instances (one big instance with big workload, other two relatively small);
-# start cassandra service but no workload to train the model;
-# start the cassandra stressor to test the model for cache contention.
-
 application_hosts:
   vars:
     workloads:
