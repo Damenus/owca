@@ -13,7 +13,7 @@ pipeline {
         stage('Kubernetes') {
             agent { label 'kubernetes' }
             environment {
-                INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml'
+                INVENTORY="tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml"
                 KUBERNETES_HOST='100.64.176.34'
                 CRT_PATH = '/etc/kubernetes/ssl'
                 CONFIG = 'wca_config_kubernetes.yaml'
@@ -41,7 +41,7 @@ pipeline {
         stage('Mesos') {
             agent { label 'mesos' }
             environment {
-                INVENTORY='tests/e2e/demo_scenarios/common/inventory-mesos.yaml'
+                INVENTORY="tests/e2e/demo_scenarios/common/inventory-mesos.yaml"
                 MESOS_MASTER_HOST='100.64.176.23'
                 CONFIG = 'wca_config_mesos.yaml'
             }
