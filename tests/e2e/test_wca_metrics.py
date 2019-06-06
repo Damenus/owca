@@ -96,7 +96,9 @@ def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
     assert len(metrics) > 0
 
 
-@pytest.mark.parametrize('workload_instance, env_uniq_id', [])
+@pytest.mark.parametrize('workload_instance, env_uniq_id', [
+    ('stress_ng--default--14--0', '14'),
+])
 def test_wca_metrics_mesos(workload_instance, env_uniq_id):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
