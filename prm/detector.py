@@ -17,6 +17,4 @@
 
 
 class ContentionDetector:
-    COLLECT_MODE = 'collect'
-    DETECT_MODE = 'detect'
-    WL_META_FILE = 'workload.json'
+    pass
