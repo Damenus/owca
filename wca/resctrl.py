@@ -209,7 +209,8 @@ class ResGroup:
                     with open(_get_event_file(socket_dir, LLC_OCCUPANCY)) as llc_occupancy_file:
                         llc_occupancy += int(llc_occupancy_file.read())
         except FileNotFoundError:
-            log.warning("Could not read measurements - ignored!(side-effect of previous warning!)")
+            log.warning("Could not read measurements from rdt - ignored! "
+                        "rdt group was not found (race detected)")
             return {}
 
         measurements = {}
