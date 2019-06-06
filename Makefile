@@ -14,7 +14,7 @@ flake8:
 
 unit: 
 	@echo Running unit tests.
-	pipenv run env PYTHONPATH=. pytest --cov-report term-missing --cov=wca tests
+	pipenv run env PYTHONPATH=. pytest --cov-report term-missing --cov=wca tests --ignore=tests/e2e/test_wca_metrics.py
 
 junit: 
 	@echo Running unit tests.
