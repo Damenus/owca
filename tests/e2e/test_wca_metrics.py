@@ -73,7 +73,9 @@ def _fetch_metrics(url):
     ('cassandra_ycsb', '34'),
     ('specjbb', '34'),
     ('stress_ng', '34'),
-    ('twemcache_rpc_perf', '34')
+    ('twemcache_rpc_perf', '34'),
+    ('tensorflow_benchmark_prediction', '34'),
+    ('tensorflow_benchmark_train', '34')
 ])
 def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
