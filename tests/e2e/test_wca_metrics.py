@@ -105,9 +105,7 @@ def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
     ('specjbb', '14'),
     ('twemcache_mutilate', '14'),
     ('twemcache_rpc_perf', '14'),
-    ('redis_rpc_perf', '14'),
-    ('tensorflow_benchmark_prediction', '14'),
-    ('tensorflow_benchmark_train', '14')
+    ('redis_rpc_perf', '14')
 ])
 def test_wca_metrics_mesos(workload_name, env_uniq_id):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
