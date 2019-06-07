@@ -92,7 +92,7 @@ spec:
             mountPath: /dev/cpu
 
       - name: node-exporter
-        image: prom/node-exporter@sha256:ffc3e0adf58771cb2097aa0b074a6fe68b4925ba75c2e1c41f41ae656eebee11
+        image: prom/node-exporter
         securityContext:
           privileged: true
         args:
