@@ -92,7 +92,7 @@ application_hosts:
         default:
           count: 1
           slo: 100000
-          communication_port: 11211
+          communication_port: 11311
           twemcache:
             threads: 1
             max_memory: 1234
