@@ -138,3 +138,11 @@ application_hosts:
             ram: 1
             disk: 1
 
+      tensorflow_benchmark_prediction:
+        default:
+          count: 1
+          slo: 0.03
+          resources:
+            cpu: 10
+            ram: 50
+            disk: 30
