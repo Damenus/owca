@@ -16,7 +16,7 @@ pipeline {
                 KUBERNETES_HOST='100.64.176.34'
                 CRT_PATH = '/etc/kubernetes/ssl'
                 CONFIG = 'wca_config_kubernetes.yaml'
-                TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng"
+                TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng,tensorflow_benchmark_prediction,tensorflow_benchmark_train"
             }
             steps {
                 sh "make venv"
