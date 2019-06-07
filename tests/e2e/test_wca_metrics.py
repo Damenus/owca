@@ -94,7 +94,7 @@ def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
     prometheus_query = _build_prometheus_url(prometheus, '',
                                              tags, 1800, time())
     metrics = _fetch_metrics(prometheus_query)
-    assert len(metrics) > 0
+    assert len(metrics['data']['result']) > 0
 
 
 @pytest.mark.parametrize('workload_name, env_uniq_id', [
@@ -125,4 +125,4 @@ def test_wca_metrics_mesos(workload_name, env_uniq_id):
     prometheus_query = _build_prometheus_url(prometheus, '',
                                              tags, 1800, time())
     metrics = _fetch_metrics(prometheus_query)
-    assert len(metrics) > 0
+    assert len(metrics['data']['result']) > 0
