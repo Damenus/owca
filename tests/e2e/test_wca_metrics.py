@@ -66,16 +66,17 @@ def _fetch_metrics(url):
     return response.json()
 
 
-@pytest.mark.parametrize('workload_instance, env_uniq_id', [
-    ('cassandra_stress--default--34--9142', '34'),
-    ('redis_rpc_perf--default--34--6789', '34'),
-    ('twemcache_mutilate--default--34--11211', '34'),
-    ('cassandra_ycsb--default--34--9042', '34'),
-    ('specjbb--default--34--42000', '34'),
-    ('stress_ng--default--34--0', '34'),
-    ('twemcache_rpc_perf--default--34--11211', '34')
+@pytest.mark.parametrize('workload_name, env_uniq_id', [
+    ('cassandra_stress', '34'),
+    ('redis_rpc_perf', '34'),
+    ('twemcache_mutilate', '34'),
+    ('cassandra_ycsb', '34'),
+    ('specjbb', '34'),
+    ('stress_ng', '34'),
+    ('twemcache_rpc_perf', '34'),
+    ('tensorflow_benchmark_prediction', '34')
 ])
-def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
+def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
     assert 'BUILD_COMMIT' in os.environ
@@ -86,7 +87,7 @@ def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
 
     tags = dict(build_number=build_number,
                 build_commit=build_commit,
-                workload_instance=workload_instance,
+                workload_name=workload_name,
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
@@ -96,10 +97,17 @@ def test_wca_metrics_kubernetes(workload_instance, env_uniq_id):
     assert len(metrics) > 0
 
 
-@pytest.mark.parametrize('workload_instance, env_uniq_id', [
-    ('stress_ng--default--14--0', '14'),
+@pytest.mark.parametrize('workload_name, env_uniq_id', [
+    ('cassandra_stress', '14'),
+    ('stress_ng', '14'),
+    ('cassandra_ycsb', '14'),
+    ('specjbb', '14'),
+    ('twemcache_mutilate', '14'),
+    ('twemcache_rpc_perf', '14'),
+    ('redis_rpc_perf', '14'),
+    ('tensorflow_benchmark_prediction', '14')
 ])
-def test_wca_metrics_mesos(workload_instance, env_uniq_id):
+def test_wca_metrics_mesos(workload_name, env_uniq_id):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
     assert 'BUILD_COMMIT' in os.environ
@@ -110,7 +118,7 @@ def test_wca_metrics_mesos(workload_instance, env_uniq_id):
 
     tags = dict(build_number=build_number,
                 build_commit=build_commit,
-                workload_instance=workload_instance,
+                workload_name=workload_name,
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
