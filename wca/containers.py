@@ -282,12 +282,17 @@ class Container(ContainerInterface):
             perf_measurements = {}
 
         # RDT/resctrl measurements
-        if self._rdt_information and self._rdt_information.is_monitoring_enabled():
-            rdt_measurements = \
-                self._resgroup.get_measurements(
-                    self._name, self._rdt_information.rdt_mb_monitoring_enabled,
-                    self._rdt_information.rdt_cache_monitoring_enabled)
-        else:
+        try:
+            if self._rdt_information and self._rdt_information.is_monitoring_enabled():
+                rdt_measurements = \
+                    self._resgroup.get_measurements(
+                        self._name, self._rdt_information.rdt_mb_monitoring_enabled,
+                        self._rdt_information.rdt_cache_monitoring_enabled)
+            else:
+                rdt_measurements = {}
+        except FileNotFoundError:
+            log.warning("Could not read measurements from rdt - ignored! "
+                        "rdt group was not found (race detected)")
             rdt_measurements = {}
 
         return flatten_measurements([
