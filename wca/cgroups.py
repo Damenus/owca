@@ -53,9 +53,14 @@ class Cgroup:
         self.cgroup_fullpath = os.path.join(BASE_SUBSYSTEM_PATH, relative_cgroup_path)
 
     def get_measurements(self) -> Measurements:
-        with open(os.path.join(self.cgroup_fullpath, CPU_USAGE)) as \
-                cpu_usage_file:
-            cpu_usage = int(cpu_usage_file.read())
+        try:
+            with open(os.path.join(self.cgroup_fullpath, CPU_USAGE)) as \
+                    cpu_usage_file:
+                cpu_usage = int(cpu_usage_file.read())
+        except FileNotFoundError:
+            log.warning('Could not read measurements for container %s. ', self._cgroup_path)
+            # Returning empty measurements.
+            return {}
 
         return {MetricName.CPU_USAGE_PER_TASK: cpu_usage}
 
