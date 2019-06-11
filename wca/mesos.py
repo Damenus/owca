@@ -30,6 +30,9 @@ CGROUP_DEFAULT_SUBSYSTEM = 'cpu'
 
 log = logging.getLogger(__name__)
 
+class MesosCgroupNotFoundException(Exception):
+    """Raised when cannot find cgroup mesos path"""
+    pass
 
 @dataclass
 class MesosTask(Task):
@@ -64,7 +67,7 @@ def find_cgroup(pid):
             if CGROUP_DEFAULT_SUBSYSTEM in subsystems:
                 return path
         else:
-            raise Exception(f'Cannot find cgroup mesos path for {pid}')
+            raise MesosCgroupNotFoundException
 
 
 @dataclass
@@ -120,7 +123,13 @@ class MesosNode(Node):
                 continue
 
             executor_pid = last_status['container_status']['executor_pid']
-            cgroup_path = find_cgroup(executor_pid)
+
+            try:
+                cgroup_path = find_cgroup(executor_pid)
+            except MesosCgroupNotFoundException:
+                logging.warning(f'Cannot find pid/cgroup mesos path for {executor_pid}. '
+                                f'Ignoring task (inconsistent state returned from Mesos).')
+                continue
 
             labels = {label['key']: label['value'] for label in launched_task['labels']['labels']}
 
