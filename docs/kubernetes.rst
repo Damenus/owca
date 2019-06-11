@@ -55,25 +55,41 @@ Reference configs are in `example configuration file for kubernetes <../example/
 
 1. Add namespace 'wca'
 
-Namespace can be crated by command ``kubectl create namespace wca`` or
-``kubectl apply -f manifest/namespace.yaml``
+Namespace can be crated by command:
+
+.. code-block:: bash
+    kubectl create namespace wca
+
+or
+
+.. code-block:: bash
+    kubectl apply -f manifest/namespace.yaml
 
 2. Add private key and certificate to Secrets
 
 Workload Collocation Agent required private key and certificate to connect with kubelet.
 Example how add this files to Secrets:
-``sudo kubectl create secret generic kubelet-key-crt --from-file=./client.crt --from-file=./client.key --namespace=wca``
+
+.. code-block:: bash
+    sudo kubectl create secret generic kubelet-key-crt --from-file=./client.crt --from-file=./client.key --namespace=wca
 
 3. Add configuration file to ConfigMap
 
-Workload Collocation Agent required configuration file. `Example Allocator as ConfigMap <../manifest/configmap.yaml>`_. To create the resource run
-``kubectl apply -f manifest/configmap.yaml``
+Workload Collocation Agent required configuration file.
+`Example Allocator as ConfigMap <../manifest/configmap.yaml>`_. To create the resource run:
+
+.. code-block:: bash
+    kubectl apply -f manifest/configmap.yaml
 
 4. Build Docker image
 
-Build `Docker image<../Dockerfile>`_ and push to private repo. Then specifed inside the daemonset
-podspec `Example definition DaemonSet <../manifest/daemonset.yaml>`_.
+Build `Docker image <../Dockerfile>`_ and push to private repo. Then specify image inside
+the daemonset podspec to the pushed image.
+`Example definition DaemonSet <../manifest/daemonset.yaml>`_.
 
 5. Run DaemonSet
 
-Use command ``kubectl apply -f manifest/daemonset.yaml`` to create DaemonSet.
+Use command below to create DaemonSet:
+
+.. code-block:: bash
+    kubectl apply -f manifest/daemonset.yaml

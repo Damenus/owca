@@ -31,7 +31,7 @@ data:
         client_private_key: "/etc/wca/certs/client.key"
         client_cert: "/etc/wca/certs/client.crt"
         kubelet_endpoint: "https://$OWN_IP_TO_BE_REPLACED:10250"
-        monitored_namespaces: ["wca"]
+        monitored_namespaces: ["default"]
 
       metrics_storage: !LogStorage
         overwrite: True
