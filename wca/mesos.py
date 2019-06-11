@@ -30,9 +30,11 @@ CGROUP_DEFAULT_SUBSYSTEM = 'cpu'
 
 log = logging.getLogger(__name__)
 
+
 class MesosCgroupNotFoundException(Exception):
     """Raised when cannot find cgroup mesos path"""
     pass
+
 
 @dataclass
 class MesosTask(Task):
