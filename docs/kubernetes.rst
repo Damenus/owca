@@ -58,11 +58,13 @@ Reference configs are in `example configuration file for kubernetes <../example/
 Namespace can be crated by command:
 
 .. code-block:: bash
+
     kubectl create namespace wca
 
 or
 
 .. code-block:: bash
+
     kubectl apply -f manifest/namespace.yaml
 
 2. Add private key and certificate to Secrets
@@ -71,6 +73,7 @@ Workload Collocation Agent required private key and certificate to connect with 
 Example how add this files to Secrets:
 
 .. code-block:: bash
+
     sudo kubectl create secret generic kubelet-key-crt --from-file=./client.crt --from-file=./client.key --namespace=wca
 
 3. Add configuration file to ConfigMap
@@ -79,6 +82,7 @@ Workload Collocation Agent required configuration file.
 `Example Allocator as ConfigMap <../manifest/configmap.yaml>`_. To create the resource run:
 
 .. code-block:: bash
+
     kubectl apply -f manifest/configmap.yaml
 
 4. Build Docker image
@@ -92,4 +96,5 @@ the daemonset podspec to the pushed image.
 Use command below to create DaemonSet:
 
 .. code-block:: bash
+
     kubectl apply -f manifest/daemonset.yaml
