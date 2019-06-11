@@ -103,16 +103,10 @@ spec:
             mountPath: /dev/cpu
 
       - name: node-exporter
-        image: prom/node-exporter
+        image: prom/node-exporter:v0.18.1
         securityContext:
           privileged: true
         args:
-          - --collector.procfs
-          - /host/proc
-          - --collector.sysfs
-          - /host/sys
-          - --collector.filesystem.ignored-mount-points
-          - '"^/(sys|proc|dev|host|etc)($|/)"'
           - --collector.textfile.directory
           - /var/lib/wca
         ports:
