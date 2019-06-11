@@ -66,9 +66,14 @@ Example how add this files to Secrets:
 
 3. Add configuration file to ConfigMap
 
-Workload Collocation Agent required configuration file. `Example Allocator as ConfigMap<../manifest/configmap.yaml>`_. To create the resource run
+Workload Collocation Agent required configuration file. `Example Allocator as ConfigMap <../manifest/configmap.yaml>`_. To create the resource run
 ``kubectl apply -f manifest/configmap.yaml``
 
-4. Run DaemonSet
-`Example definition DaemonSet<../manifest/daemonset.yaml>`_.
+4. Build Docker image
+
+Build `Docker image<../Dockerfile>`_ and push to private repo. Then specifed inside the daemonset
+podspec `Example definition DaemonSet <../manifest/daemonset.yaml>`_.
+
+5. Run DaemonSet
+
 Use command ``kubectl apply -f manifest/daemonset.yaml`` to create DaemonSet.
