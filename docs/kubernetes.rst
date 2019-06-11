@@ -55,7 +55,7 @@ Reference configs are in `example configuration file for kubernetes <../example/
 
 1. Add namespace 'wca'
 
-Namespace can be crated by command:
+Namespace can be crated by following command:
 
 .. code-block:: bash
 
@@ -78,7 +78,7 @@ Example how add this files to Secrets:
 
 3. Add configuration file to ConfigMap
 
-Workload Collocation Agent required configuration file.
+Workload Collocation Agent requires configuration file.
 `Example Allocator as ConfigMap <../manifest/configmap.yaml>`_. To create the resource run:
 
 .. code-block:: bash
