@@ -48,9 +48,9 @@ application_hosts:
         default:
           labels: {'type': 'best_efforts'}
           count: 1
-          communication_port: 9142
-          jmx_port: 7299
-          storage_port: 7100
+          communication_port: 9143
+          jmx_port: 7300
+          storage_port: 7155
           slo: 5
           cassandra:
             image_name: cassandra
