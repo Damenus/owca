@@ -26,6 +26,8 @@ pipeline {
                 replace_in_config(true)
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
+                copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
+                copy_file("${WORKSPACE}/prm", "/var/lib/wca", true)
                 start_wca()
 				run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
 				sleep RUN_WORKLOADS_SLEEP_TIME
@@ -55,6 +57,8 @@ pipeline {
                 replace_in_config()
                 copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
                 copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
+                copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
+                copy_file("${WORKSPACE}/prm", "/var/lib/wca", true)
                 start_wca()
 				run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
 				sleep RUN_WORKLOADS_SLEEP_TIME
@@ -72,10 +76,10 @@ pipeline {
 
 def copy_file(src, dest, sudo=false) {
     if(sudo){
-        sh "sudo cp ${src} ${dest}"
+        sh "sudo cp -r ${src} ${dest}"
     }
     else{
-        sh "cp ${src} ${dest}"
+        sh "cp -r ${src} ${dest}"
     }
 }
 
