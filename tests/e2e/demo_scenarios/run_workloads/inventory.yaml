@@ -64,9 +64,9 @@ application_hosts:
               threads: 30
               duration: 1200
             resources:
-              cpu: 3
-              ram: 2
-              disk: 5
+              cpu: 5
+              ram: 10
+              disk: 10
 
       cassandra_ycsb:
         default:
