@@ -9,6 +9,6 @@ application_hosts:
     ansible_connection: local
     cluster: example
     role: root
-    image_tag: 015d981c815f18d891bf7856f5a5ade63ac6b1cd
+    image_tag: 6338bd873ff70f1bdb4fc5c57edeebf07ee92a86
     wrapper_kafka_brokers: 100.64.176.12
     docker_registry: 100.64.176.12:80

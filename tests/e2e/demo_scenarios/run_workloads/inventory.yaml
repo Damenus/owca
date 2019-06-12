@@ -62,7 +62,7 @@ application_hosts:
           cassandra_stress:
             env:
               threads: 30
-              duration: 1200
+              duration: 90
             resources:
               cpu: 5
               ram: 10
