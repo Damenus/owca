@@ -75,7 +75,7 @@ wrapper_labels = {
                                     workload_version_name,
                                     env_uniq_id, job_uniq_id]),
     'replica_index': replica_index,
-    'name': job_name,       # not to break compatibility
+    'name': job_name,       # not to break compability
     'job_name': job_name,   #
     'application': application,
     'load_generator': load_generator,
