@@ -80,6 +80,7 @@ pipeline {
             }
     }
 }
+}
 
 def copy_file(src, dest, sudo=false) {
     if(sudo){
@@ -115,6 +116,7 @@ def replace_in_config(cert=false) {
                     filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
     }
 }
+
 
 def start_wca() {
     sh "sudo systemctl restart wca"
