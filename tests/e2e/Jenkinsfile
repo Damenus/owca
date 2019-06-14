@@ -9,70 +9,75 @@ pipeline {
 		RUN_WORKLOADS_SLEEP_TIME = 300
     }
     stages {
-        stage('Kubernetes') {
-            agent { label 'kubernetes' }
-            environment {
-                INVENTORY="tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml"
-                KUBERNETES_HOST='100.64.176.34'
-                CRT_PATH = '/etc/kubernetes/ssl'
-                CONFIG = 'wca_config_kubernetes.yaml'
-                TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng,tensorflow_benchmark_prediction,tensorflow_benchmark_train"
-            }
-            steps {
-                sh "make venv"
-                sh "make wca_package"
-                print('Reconfiguring wca...')
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
-                replace_in_config(true)
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
-                copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
-                copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca.service", "/etc/systemd/system/wca.service", true)
-                sh "sudo systemctl daemon-reload"
-                start_wca()
-				run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
-				sleep RUN_WORKLOADS_SLEEP_TIME
-				test_wca_metrics("test_wca_metrics_kubernetes")
-            }
-            post {
-                always {
-                    stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
-                    stop_wca()
+        stage('Wca metrics check') {
+            failFast true
+            parallel {
+                stage('Kubernetes') {
+                    agent { label 'kubernetes' }
+                    environment {
+                        INVENTORY="tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml"
+                        KUBERNETES_HOST='100.64.176.34'
+                        CRT_PATH = '/etc/kubernetes/ssl'
+                        CONFIG = 'wca_config_kubernetes.yaml'
+                        TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng,tensorflow_benchmark_prediction,tensorflow_benchmark_train"
+                    }
+                    steps {
+                        sh "make venv"
+                        sh "make wca_package"
+                        print('Reconfiguring wca...')
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
+                        replace_in_config(true)
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                        copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
+                        copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca.service", "/etc/systemd/system/wca.service", true)
+                        sh "sudo systemctl daemon-reload"
+                        start_wca()
+                        run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
+                        sleep RUN_WORKLOADS_SLEEP_TIME
+                        test_wca_metrics("test_wca_metrics_kubernetes")
+                    }
+                    post {
+                        always {
+                            stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
+                            stop_wca()
+                            junit 'unit_results.xml'
+                        }
+                    }
+                }
+                stage('Mesos') {
+                    agent { label 'mesos' }
+                    environment {
+                        INVENTORY="tests/e2e/demo_scenarios/common/inventory-mesos.yaml"
+                        MESOS_MASTER_HOST='100.64.176.23'
+                        CONFIG = 'wca_config_mesos.yaml'
+                        TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng"
+                    }
+                    steps {
+                        sh "make venv"
+                        sh "make wca_package"
+                        print('Reconfiguring wca...')
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
+                        replace_in_config()
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                        copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
+                        copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca.service", "/etc/systemd/system/wca.service", true)
+                        sh "sudo systemctl daemon-reload"
+                        start_wca()
+                        run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
+                        sleep RUN_WORKLOADS_SLEEP_TIME
+                        test_wca_metrics("test_wca_metrics_mesos")
+                    }
+                    post {
+                        always {
+                            stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
+                            stop_wca()
+                            junit 'unit_results.xml'
+                        }
+                    }
                 }
             }
-        }
-
-        stage('Mesos') {
-            agent { label 'mesos' }
-            environment {
-                INVENTORY="tests/e2e/demo_scenarios/common/inventory-mesos.yaml"
-                MESOS_MASTER_HOST='100.64.176.23'
-                CONFIG = 'wca_config_mesos.yaml'
-                TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng"
-            }
-            steps {
-                sh "make venv"
-                sh "make wca_package"
-                print('Reconfiguring wca...')
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
-                replace_in_config()
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
-                copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
-                copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
-                copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca.service", "/etc/systemd/system/wca.service", true)
-                sh "sudo systemctl daemon-reload"
-                start_wca()
-				run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
-				sleep RUN_WORKLOADS_SLEEP_TIME
-				test_wca_metrics("test_wca_metrics_mesos")
-            }
-            post {
-                always {
-                    stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
-                    stop_wca()
-                }
-            }
-        }
     }
 }
 
