@@ -92,10 +92,10 @@ def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
-    slo_query = _build_prometheus_url(prometheus, 'slo',
+    sli_query = _build_prometheus_url(prometheus, 'sli',
                                       tags, 1800, time())
-    slo_metrics = _fetch_metrics(slo_query)
-    assert len(slo_metrics['data']['result']) > 0
+    sli_metrics = _fetch_metrics(sli_query)
+    assert len(sli_metrics['data']['result']) > 0
 
     cycles_query = _build_prometheus_url(prometheus, 'cycles',
                                                tags, 1800, time())
@@ -127,10 +127,10 @@ def test_wca_metrics_mesos(workload_name, env_uniq_id):
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
-    slo_query = _build_prometheus_url(prometheus, 'slo',
+    sli_query = _build_prometheus_url(prometheus, 'sli',
                                       tags, 1800, time())
-    slo_metrics = _fetch_metrics(slo_query)
-    assert len(slo_metrics['data']['result']) > 0
+    sli_metrics = _fetch_metrics(sli_query)
+    assert len(sli_metrics['data']['result']) > 0
 
     cycles_query = _build_prometheus_url(prometheus, 'cycles',
                                                tags, 1800, time())
