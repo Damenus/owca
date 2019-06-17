@@ -125,5 +125,5 @@ def test_wca_metrics_mesos(workload_name, env_uniq_id):
     prometheus_query = _build_prometheus_url(prometheus, '',
                                              tags, 1800, time())
     metrics = _fetch_metrics(prometheus_query)
-    assert len(metrics['data']['result'].get('sli')) > 0
-    assert len(metrics['data']['result'].get('instructions')) > 0
+    print(metrics)
+    assert len(metrics['data']['result']) > 0
