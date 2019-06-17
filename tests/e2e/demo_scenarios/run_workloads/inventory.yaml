@@ -19,7 +19,7 @@ application_hosts:
               sli_percentile: 95
               threads: 2
               connections: 1
-              warmup_time: 30
+              warmup_time: 20
               qps: 20000
             resources:
               cpu: 2
@@ -35,14 +35,14 @@ application_hosts:
             image_name: centos/redis
             image_tag: latest
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
           rpc_perf:
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
 
       cassandra_stress:
         default:
@@ -97,14 +97,14 @@ application_hosts:
             threads: 1
             max_memory: 1234
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
           rpc_perf:
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
 
       specjbb:
         default:
@@ -113,19 +113,19 @@ application_hosts:
           communication_port: 42000
           backend:
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
           injector:
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
           controller:
             resources:
-              cpu: 1
-              ram: 2
-              disk: 2
+              cpu: 2
+              ram: 5
+              disk: 5
 
       stress_ng:
         default:
@@ -134,9 +134,9 @@ application_hosts:
           stressor: stream
           number_workers: 2
           resources:
-            cpu: 1
-            ram: 1
-            disk: 1
+            cpu: 2
+            ram: 5
+            disk: 5
 
       tensorflow_benchmark_prediction:
         default:
