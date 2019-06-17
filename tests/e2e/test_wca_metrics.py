@@ -92,10 +92,15 @@ def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
-    prometheus_query = _build_prometheus_url(prometheus, '',
-                                             tags, 1800, time())
-    metrics = _fetch_metrics(prometheus_query)
-    assert len(metrics['data']['result']) > 0
+    sli_query = _build_prometheus_url(prometheus, 'sli',
+                                      tags, 1800, time())
+    sli_metrics = _fetch_metrics(sli_query)
+    assert len(sli_metrics['data']['result']) > 0
+
+    instructions_query = _build_prometheus_url(prometheus, 'instructions',
+                                               tags, 1800, time())
+    instructions_metrics = _fetch_metrics(instructions_query)
+    assert len(instructions_metrics['data']['result']) > 0
 
 
 @pytest.mark.parametrize('workload_name, env_uniq_id', [
@@ -122,8 +127,12 @@ def test_wca_metrics_mesos(workload_name, env_uniq_id):
                 env_uniq_id=env_uniq_id)
 
     logging.info('build number = %r', build_number)
-    prometheus_query = _build_prometheus_url(prometheus, '',
-                                             tags, 1800, time())
-    metrics = _fetch_metrics(prometheus_query)
-    print(metrics)
-    assert len(metrics['data']['result']) > 0
+    sli_query = _build_prometheus_url(prometheus, 'sli',
+                                      tags, 1800, time())
+    sli_metrics = _fetch_metrics(sli_query)
+    assert len(sli_metrics['data']['result']) > 0
+
+    instructions_query = _build_prometheus_url(prometheus, 'instructions',
+                                               tags, 1800, time())
+    instructions_metrics = _fetch_metrics(instructions_query)
+    assert len(instructions_metrics['data']['result']) > 0
