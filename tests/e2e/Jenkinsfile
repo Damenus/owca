@@ -6,7 +6,7 @@ pipeline {
         BUILD_COMMIT = "${GIT_COMMIT}"
         EXTRA_ANSIBLE_PARAMS = " "
         LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
-		RUN_WORKLOADS_SLEEP_TIME = 300
+		RUN_WORKLOADS_SLEEP_TIME = 180
     }
     stages {
         stage('Wca metrics check') {
