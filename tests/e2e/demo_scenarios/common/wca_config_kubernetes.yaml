@@ -2,10 +2,10 @@ runner: !DetectionRunner
   rdt_enabled: True
   node: !KubernetesNode
     ssl: !SSL
-      server_verify: True
+      server_verify: False
       client_key_path: "CRT_PATH/apiserver-kubelet-client.key"
       client_cert_path: "CRT_PATH/apiserver-kubelet-client.crt"
-    kubelet_endpoint: "https://127.0.0.1:10250"
+    kubelet_endpoint: "https://100.64.176.34:10250"
     monitored_namespaces: ["default"]
   action_delay: 10.
   metrics_storage: !KafkaStorage
