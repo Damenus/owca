@@ -22,6 +22,8 @@ and start main loop from Runner.
 import argparse
 import logging
 import os
+import pwd
+import stat
 
 from wca import components
 from wca import config
@@ -31,6 +33,45 @@ from wca.config import assure_type
 from wca.runners import Runner
 
 log = logging.getLogger('wca.main')
+
+
+def valid_config_file(config):
+    # Check configfile ACLs
+    # os.access(args.config, os.F_OK)
+    # os.stat(args.config)
+    # os.stat(args.config).st_mode
+    # stat.S_IMODE(os.stat('.').st_mode) # daje cyferki
+    # os.stat(args.config)
+    # os.getuid()
+    # pwd.getpwuid(os.getuid()).pw_name != 'wca' or 'root'
+
+    # name = pwd.getpwuid(os.stat(config).st_uid).pw_name
+    # if name != 'wca' and name != 'root':
+    #     log.error(
+    #         'Error: The config path \'%s\' is not valid. User \'%s\' is not owner config.'
+    #         % config, name)
+    #     exit(1)
+
+    user_uid = os.stat(config).st_uid
+    if user_uid != os.getuid() and user_uid != 0:
+        log.error(
+            'Error: The config \'%s\' is not valid. User is not owner config or is not root.'
+            % config)
+        exit(1)
+
+    mode = stat.S_IMODE(os.stat(config).st_mode)
+    if mode != 700 and mode != 600:
+        log.error(
+            'Error: The config \'%s\' is not valid. It has not correct proper ACLs. '
+            'Only user have to have ability read and write.'
+            % config)
+        exit(1)
+
+    if not os.path.isabs(config):
+        log.error(
+            'Error: The config path \'%s\' is not valid. The path must be absolute.'
+            % config)
+        exit(1)
 
 
 def main():
@@ -81,11 +122,7 @@ def main():
     # Register internal & external components.
     components.register_components(extra_components=args.components)
 
-    if not os.path.isabs(args.config):
-        log.error(
-            'Error: The config path \'%s\' is not valid. The path must be absolute.'
-            % args.config)
-        exit(1)
+    valid_config_file(args.config)
 
     # Initialize all necessary objects.
     try:
