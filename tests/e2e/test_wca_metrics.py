@@ -97,8 +97,7 @@ def test_wca_metrics_kubernetes(workload_name, env_uniq_id):
     sli_metrics = _fetch_metrics(sli_query)
     assert len(sli_metrics['data']['result']) > 0
 
-    cycles_query = _build_prometheus_url(prometheus, 'cycles',
-                                               tags, 1800, time())
+    cycles_query = _build_prometheus_url(prometheus, 'cycles', tags, 1800, time())
     cycles_metrics = _fetch_metrics(cycles_query)
     assert len(cycles_metrics['data']['result']) > 0
 
@@ -132,7 +131,6 @@ def test_wca_metrics_mesos(workload_name, env_uniq_id):
     sli_metrics = _fetch_metrics(sli_query)
     assert len(sli_metrics['data']['result']) > 0
 
-    cycles_query = _build_prometheus_url(prometheus, 'cycles',
-                                               tags, 1800, time())
+    cycles_query = _build_prometheus_url(prometheus, 'cycles', tags, 1800, time())
     cycles_metrics = _fetch_metrics(cycles_query)
     assert len(cycles_metrics['data']['result']) > 0
