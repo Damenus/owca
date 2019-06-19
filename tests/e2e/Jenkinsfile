@@ -1,0 +1,150 @@
+pipeline {
+    agent any
+    environment {
+        PLAYBOOK = 'workloads/run_workloads.yaml'
+        PROMETHEUS = 'http://100.64.176.12:9090'
+        BUILD_COMMIT = "${GIT_COMMIT}"
+        EXTRA_ANSIBLE_PARAMS = " "
+        LABELS="{additional_labels: {build_number: \"${BUILD_NUMBER}\", build_node_name: \"${NODE_NAME}\", build_commit: \"${GIT_COMMIT}\"}}"
+		RUN_WORKLOADS_SLEEP_TIME = 300
+    }
+    stages {
+        stage('Wca metrics check') {
+            failFast true
+            parallel {
+                stage('Kubernetes') {
+                    agent { label 'kubernetes' }
+                    environment {
+                        INVENTORY="tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml"
+                        KUBERNETES_HOST='100.64.176.34'
+                        CRT_PATH = '/etc/kubernetes/ssl'
+                        CONFIG = 'wca_config_kubernetes.yaml'
+                        TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng,tensorflow_benchmark_prediction,tensorflow_benchmark_train"
+                    }
+                    steps {
+                        sh "make venv"
+                        sh "make wca_package"
+                        print('Reconfiguring wca...')
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
+                        replace_in_config(true)
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                        copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
+                        copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca.service", "/etc/systemd/system/wca.service", true)
+                        sh "sudo systemctl daemon-reload"
+                        start_wca()
+                        run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
+                        sleep RUN_WORKLOADS_SLEEP_TIME
+                        test_wca_metrics("test_wca_metrics_kubernetes")
+                    }
+                    post {
+                        always {
+                            stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
+                            stop_wca()
+                            junit 'unit_results.xml'
+                        }
+                    }
+                }
+                stage('Mesos') {
+                    agent { label 'mesos' }
+                    environment {
+                        INVENTORY="tests/e2e/demo_scenarios/common/inventory-mesos.yaml"
+                        MESOS_MASTER_HOST='100.64.176.23'
+                        CONFIG = 'wca_config_mesos.yaml'
+                        TAGS = "twemcache_mutilate,redis_rpc_perf,cassandra_stress,cassandra_ycsb,twemcache_rpc_perf,specjbb,stress_ng"
+                    }
+                    steps {
+                        sh "make venv"
+                        sh "make wca_package"
+                        print('Reconfiguring wca...')
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/${CONFIG}", "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")
+                        replace_in_config()
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp", "/etc/wca/wca_config.yml", true)
+                        copy_file("${WORKSPACE}/dist/wca.pex", "/usr/bin/wca.pex", true)
+                        copy_file("${WORKSPACE}/example", "/var/lib/wca", true)
+                        copy_file("${WORKSPACE}/tests/e2e/demo_scenarios/common/wca.service", "/etc/systemd/system/wca.service", true)
+                        sh "sudo systemctl daemon-reload"
+                        start_wca()
+                        run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
+                        sleep RUN_WORKLOADS_SLEEP_TIME
+                        test_wca_metrics("test_wca_metrics_mesos")
+                    }
+                    post {
+                        always {
+                            stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
+                            stop_wca()
+                            junit 'unit_results.xml'
+                        }
+                    }
+                }
+            }
+    }
+}
+}
+
+def copy_file(src, dest, sudo=false) {
+    if(sudo){
+        sh "sudo cp -r ${src} ${dest}"
+    }
+    else{
+        sh "cp -r ${src} ${dest}"
+    }
+}
+
+def replace_in_config(cert=false) {
+    if(cert) {
+        contentReplace(
+            configs: [
+                fileContentReplaceConfig(
+                    configs: [
+                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
+                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0),
+                        fileContentReplaceItemConfig( search: 'CRT_PATH', replace: "${CRT_PATH}", matchCount: 0)
+                    ],
+                    fileEncoding: 'UTF-8',
+                    filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
+    }
+    else {
+        contentReplace(
+            configs: [
+                fileContentReplaceConfig(
+                    configs: [
+                        fileContentReplaceItemConfig( search: 'BUILD_COMMIT', replace: "${GIT_COMMIT}", matchCount: 0),
+                        fileContentReplaceItemConfig( search: 'BUILD_NUMBER', replace: "${BUILD_NUMBER}", matchCount: 0)
+                    ],
+                    fileEncoding: 'UTF-8',
+                    filePath: "${WORKSPACE}/tests/e2e/demo_scenarios/common/wca_config.yml.tmp")])
+    }
+}
+
+
+def start_wca() {
+    sh "sudo systemctl restart wca"
+    sleep 5
+    sh "sudo systemctl status wca"
+}
+
+def stop_wca() {
+    sh "sudo systemctl stop wca"
+}
+
+def run_workloads(extra_params, labels) {
+    dir('workloads') {
+        echo 'Start workloads'
+        sh '''ansible-playbook ${extra_params} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml -i ${WORKSPACE}/${INVENTORY} --tags=${TAGS} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'''
+    }
+}
+
+def stop_workloads(extra_params) {
+   echo 'Stop all workloads...'
+   sh "ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}"
+   sleep 5 
+}
+
+def remove_file(path) {
+    sh "sudo rm -f ${path}"
+}
+
+def test_wca_metrics(test_name) {
+    sh "PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::${test_name} --log-level=debug --log-cli-level=debug -v"
+}

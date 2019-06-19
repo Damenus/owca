@@ -48,7 +48,7 @@ pipeline {
         stage("Building Docker images and do tests in parallel") {
             parallel {
                 stage("Using tester") {
-                  steps {
+                    steps {
                     sh '''
 						sudo bash -c "
 							export PYTHONPATH="$(pwd):$(pwd)/tests/tester"
@@ -57,7 +57,7 @@ pipeline {
 								--log=debug --root
 						"
                     '''
-                     }
+                    }
                 }
                 stage("Build and push Tensorflow Benchmark Docker image") {
                     when {expression{return params.BUILD_IMAGES}}
