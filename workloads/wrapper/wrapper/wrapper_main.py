@@ -68,6 +68,8 @@ def main(parse: ParseFunc = default_parse):
     input = workload_process.stderr if args.stderr else workload_process.stdout
 
     labels = ast.literal_eval(args.labels)
+    log.debug("LABELS BEFORE EVAL \n \n {0} \n \n ".format(args.labels))
+    log.debug("LABELS AFTER EVAL \n \n {0} \n \n ".format(labels))
     parse = partial(parse, regexp=args.regexp, separator=args.separator, labels=labels,
                     input=input, metric_name_prefix=args.metric_name_prefix)
     append_service_level_metrics_func = partial(
