@@ -36,21 +36,6 @@ log = logging.getLogger('wca.main')
 
 
 def valid_config_file(config):
-    # Check configfile ACLs
-    # os.access(args.config, os.F_OK)
-    # os.stat(args.config)
-    # os.stat(args.config).st_mode
-    # stat.S_IMODE(os.stat('.').st_mode) # daje cyferki
-    # os.stat(args.config)
-    # os.getuid()
-    # pwd.getpwuid(os.getuid()).pw_name != 'wca' or 'root'
-
-    # name = pwd.getpwuid(os.stat(config).st_uid).pw_name
-    # if name != 'wca' and name != 'root':
-    #     log.error(
-    #         'Error: The config path \'%s\' is not valid. User \'%s\' is not owner config.'
-    #         % config, name)
-    #     exit(1)
 
     user_uid = os.stat(config).st_uid
     if user_uid != os.getuid() and user_uid != 0:
@@ -63,7 +48,7 @@ def valid_config_file(config):
     if mode != 700 and mode != 600:
         log.error(
             'Error: The config \'%s\' is not valid. It has not correct proper ACLs. '
-            'Only user have to have ability read and write.'
+            'Only user must be able to read and write.'
             % config)
         exit(1)
 
