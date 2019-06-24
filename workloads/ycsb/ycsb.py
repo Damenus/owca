@@ -150,5 +150,7 @@ ycsb_cassandra_run_cmd = ""
 
 # command.append(ycsb_cassandra_run_cmd)
 
+command.append("")
+
 json_format = json.dumps(pod)
 print(json_format)
