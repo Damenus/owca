@@ -103,50 +103,52 @@ ycsb_cassandra_load_container = {
     "command": ycsb_cassandra_load_cmd}
 initContainers.append(ycsb_cassandra_load_container)
 
-# ycsb_cassandra_run_cmd = """
-#             set -x
-#             cd /opt/ycsb
-#             ycsb_wrapper.pex \
-#                 --command \
-#                     "/opt/ycsb/bin/ycsb run cassandra2-cql -s \
-#                         -P workloads/workloada \
-#                         -p hosts={application_host_ip} \
-#                         -p port={communication_port} \
-#                         -target {ycsb_target} \
-#                         -p status.interval=1 \
-#                         -p threadcount={ycsb_thread_count} \
-#                         -p workload.peroid={ycsb_period} \
-#                         -p workload.amplitude={ycsb_amplitude} \
-#                         -p workload.phase=0 \
-#                         -p operationcount={ycsb_operation_count}" \
-#                 --metric_name_prefix 'cassandra_' \
-#                 --stderr 1 --kafka_brokers "{kafka_brokers}" \
-#                 --kafka_topic {kafka_topic} \
-#                 --log_level {log_level} \
-#                 --labels {labels} \
-#                 --labels2 {labels2} \
-#                 --labels3 {labels3} \
-#                 --peak_load {peak_load} \
-#                 --load_metric_name "cassandra_ops_per_sec" \
-#                 --slo {slo} --sli_metric_name "cassandra_read_p9999"
-#           """.format(
-#     application_host_ip=application_host_ip,
-#     communication_port=communication_port,
-#     ycsb_target=ycsb_target,
-#     ycsb_thread_count=ycsb_thread_count,
-#     ycsb_period=ycsb_period,
-#     ycsb_amplitude=ycsb_amplitude,
-#     ycsb_operation_count=ycsb_operation_count,
-#     kafka_brokers=wrapper_kafka_brokers,
-#     kafka_topic=wrapper_kafka_topic,
-#     log_level=wrapper_log_level,
-#     labels=wrapper_labels,
-#     labels2={'dd': 'dd'},
-#     labels3="{\"dd\":\"dd\"}",
-#     peak_load=str(int(ycsb_target) + int(ycsb_amplitude)),
-#     slo=slo)
+ycsb_cassandra_run_cmd = """
+            set -x
+            cd /opt/ycsb
+            ycsb_wrapper.pex \
+                --command \
+                    "/opt/ycsb/bin/ycsb run cassandra2-cql -s \
+                        -P workloads/workloada \
+                        -p hosts={application_host_ip} \
+                        -p port={communication_port} \
+                        -target {ycsb_target} \
+                        -p status.interval=1 \
+                        -p threadcount={ycsb_thread_count} \
+                        -p workload.peroid={ycsb_period} \
+                        -p workload.amplitude={ycsb_amplitude} \
+                        -p workload.phase=0 \
+                        -p operationcount={ycsb_operation_count}" \
+                --metric_name_prefix 'cassandra_' \
+                --stderr 1 --kafka_brokers "{kafka_brokers}" \
+                --kafka_topic {kafka_topic} \
+                --log_level {log_level} \
+                --labels {labels} \
+                --labels2 {labels2} \
+                --labels3 {labels3} \
+                --peak_load {peak_load} \
+                --load_metric_name "cassandra_ops_per_sec" \
+                --slo {slo} --sli_metric_name "cassandra_read_p9999"
+          """.format(
+    application_host_ip=application_host_ip,
+    communication_port=communication_port,
+    ycsb_target=ycsb_target,
+    ycsb_thread_count=ycsb_thread_count,
+    ycsb_period=ycsb_period,
+    ycsb_amplitude=ycsb_amplitude,
+    ycsb_operation_count=ycsb_operation_count,
+    kafka_brokers=wrapper_kafka_brokers,
+    kafka_topic=wrapper_kafka_topic,
+    log_level=wrapper_log_level,
+    labels=wrapper_labels,
+    labels2={'dd': 'dd'},
+    labels3="{\"dd\":\"dd\"}",
+    peak_load=str(int(ycsb_target) + int(ycsb_amplitude)),
+    slo=slo)
 
-#command.append(ycsb_cassandra_run_cmd)
+ycsb_cassandra_run_cmd = ""
+
+# command.append(ycsb_cassandra_run_cmd)
 
 json_format = json.dumps(pod)
 print(json_format)
