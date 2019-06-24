@@ -123,7 +123,7 @@ ycsb_cassandra_run_cmd = """
                 --stderr 1 --kafka_brokers "{kafka_brokers}" \
                 --kafka_topic {kafka_topic} \
                 --log_level {log_level} \
-                --labels "{labels}" \
+                --labels {labels} \
                 --peak_load {peak_load} \
                 --load_metric_name "cassandra_ops_per_sec" \
                 --slo {slo} --sli_metric_name "cassandra_read_p9999"
