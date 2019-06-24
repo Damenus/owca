@@ -123,9 +123,7 @@ ycsb_cassandra_run_cmd = """
                 --stderr 1 --kafka_brokers "{kafka_brokers}" \
                 --kafka_topic {kafka_topic} \
                 --log_level {log_level} \
-                --labels {labels} \
-                --labels2 {labels2} \
-                --labels3 {labels3} \
+                --labels '{labels}' \
                 --peak_load {peak_load} \
                 --load_metric_name "cassandra_ops_per_sec" \
                 --slo {slo} --sli_metric_name "cassandra_read_p9999"
@@ -140,17 +138,14 @@ ycsb_cassandra_run_cmd = """
     kafka_brokers=wrapper_kafka_brokers,
     kafka_topic=wrapper_kafka_topic,
     log_level=wrapper_log_level,
-    labels=wrapper_labels,
-    labels2={'dd': 'dd'},
-    labels3="{\"dd\":\"dd\"}",
+    # labels=json.loads(wrapper_labels),
+    labels=json.dumps(wrapper_labels),
     peak_load=str(int(ycsb_target) + int(ycsb_amplitude)),
     slo=slo)
 
-ycsb_cassandra_run_cmd = ""
-
-# command.append(ycsb_cassandra_run_cmd)
-
-command.append("")
+command.append(ycsb_cassandra_run_cmd)
 
 json_format = json.dumps(pod)
+#json_format = str(json_format).replace("$LABELS_JSON", json.dumps(wrapper_labels))
+
 print(json_format)
