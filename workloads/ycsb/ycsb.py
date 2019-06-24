@@ -124,7 +124,8 @@ ycsb_cassandra_run_cmd = """
                 --kafka_topic {kafka_topic} \
                 --log_level {log_level} \
                 --labels {labels} \
-                --ama {ama} \
+                --labels2 {labels2} \
+                --labels3 {labels3} \
                 --peak_load {peak_load} \
                 --load_metric_name "cassandra_ops_per_sec" \
                 --slo {slo} --sli_metric_name "cassandra_read_p9999"
@@ -139,8 +140,9 @@ ycsb_cassandra_run_cmd = """
     kafka_brokers=wrapper_kafka_brokers,
     kafka_topic=wrapper_kafka_topic,
     log_level=wrapper_log_level,
-    labels={'dd': 'dd'},
-    ama="{\"dd\":\"dd\"}",
+    labels=wrapper_labels,
+    labels2={'dd': 'dd'},
+    labels3="{\"dd\":\"dd\"}",
     peak_load=str(int(ycsb_target) + int(ycsb_amplitude)),
     slo=slo)
 
