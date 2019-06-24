@@ -138,14 +138,11 @@ ycsb_cassandra_run_cmd = """
     kafka_brokers=wrapper_kafka_brokers,
     kafka_topic=wrapper_kafka_topic,
     log_level=wrapper_log_level,
-    # labels=json.loads(wrapper_labels),
     labels=json.dumps(wrapper_labels),
     peak_load=str(int(ycsb_target) + int(ycsb_amplitude)),
     slo=slo)
 
 command.append(ycsb_cassandra_run_cmd)
-
 json_format = json.dumps(pod)
-#json_format = str(json_format).replace("$LABELS_JSON", json.dumps(wrapper_labels))
 
 print(json_format)
