@@ -72,6 +72,7 @@ def main(parse: ParseFunc = default_parse):
     log.debug("LABELS BEFORE EVAL \n \n {0} \n \n ".format(args.labels))
     labels = json.loads(args.labels)
     log.debug("LABELS AFTER EVAL \n \n {0} \n \n ".format(labels))
+    labels = ast.literal_eval(args.labels)
     parse = partial(parse, regexp=args.regexp, separator=args.separator, labels=labels,
                     input=input, metric_name_prefix=args.metric_name_prefix)
     append_service_level_metrics_func = partial(
