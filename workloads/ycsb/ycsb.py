@@ -143,6 +143,6 @@ ycsb_cassandra_run_cmd = """
     slo=slo)
 
 command.append(ycsb_cassandra_run_cmd)
-json_format = json.dumps(pod)
 
+json_format = json.dumps(pod)
 print(json_format)
