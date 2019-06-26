@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 
 from unittest.mock import Mock, mock_open, patch
 
@@ -66,7 +67,7 @@ def test_main_unknown_field(mock_valid_config_file, mock_exit, perf_counters, mo
 
 @patch('wca.main.log.error')
 @patch('wca.main.exit')
-@patch('os.stat', return_value=Mock(st_size=35, st_uid=0, st_mode=700))
+@patch('os.stat', return_value=Mock(st_size=35, st_uid=os.geteuid(), st_mode=700))
 def test_main_valid_config_file_not_absolute_path(os_stat, mock_exit, mock_log_error):
 
     main.valid_config_file('configs/see_yaml_config_variable_above.yaml')
@@ -90,7 +91,7 @@ def test_main_valid_config_file_wrong_user(os_stat, mock_exit, mock_log_error):
 
 @patch('wca.main.log.error')
 @patch('wca.main.exit')
-@patch('os.stat', return_value=Mock(st_size=35, st_uid=0, st_mode=777))
+@patch('os.stat', return_value=Mock(st_size=35, st_uid=os.geteuid(), st_mode=777))
 def test_main_valid_config_file_wrong_acl(os_stat, mock_exit, mock_log_error):
 
     main.valid_config_file('/etc/configs/see_yaml_config_variable_above.yaml')
