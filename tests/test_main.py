@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-from unittest import mock
+from unittest.mock import Mock, mock_open, patch
+
 
 from wca import main
 
@@ -22,16 +23,16 @@ runner: !DummyRunner
 '''
 
 
-@mock.patch('sys.argv', ['wca', '-c',
+@patch('sys.argv', ['wca', '-c',
                          '/etc/configs/see_yaml_config_variable_above.yaml',
                          '-r', 'tests.testing:DummyRunner', '-l', 'critical',
                          '--root'])
-@mock.patch('os.rmdir')
-@mock.patch('wca.config.exists', return_value=True)
-@mock.patch('wca.config.open', mock.mock_open(read_data=yaml_config))
-@mock.patch('wca.perf.PerfCounters')
-@mock.patch('wca.main.exit')
-@mock.patch('wca.main.valid_config_file')
+@patch('os.rmdir')
+@patch('wca.config.exists', return_value=True)
+@patch('wca.config.open', mock_open(read_data=yaml_config))
+@patch('wca.perf.PerfCounters')
+@patch('wca.main.exit')
+@patch('os.stat', return_value=Mock(st_size=35, st_uid=0, st_mode=700))
 def test_main(*mocks):
     main.main()
 
@@ -42,18 +43,18 @@ runner: !DummyRunner
 '''
 
 
-@mock.patch('wca.main.log.error')
-@mock.patch('sys.argv', ['wca', '-c',
+@patch('wca.main.log.error')
+@patch('sys.argv', ['wca', '-c',
                          '/etc/configs/see_yaml_config_variable_above.yaml',
                          '-r', 'tests.testing:DummyRunner', '-l', 'critical',
                          '--root'])
-@mock.patch('os.rmdir')
-@mock.patch('wca.config.exists', return_value=True)
-@mock.patch('wca.config.open', mock.mock_open(
+@patch('os.rmdir')
+@patch('wca.config.exists', return_value=True)
+@patch('wca.config.open', mock_open(
     read_data=yaml_config_unknown_field))
-@mock.patch('wca.perf.PerfCounters')
-@mock.patch('wca.main.exit')
-@mock.patch('wca.main.valid_config_file')
+@patch('wca.perf.PerfCounters')
+@patch('wca.main.exit')
+@patch('wca.main.valid_config_file')
 def test_main_unknown_field(mock_valid_config_file, mock_exit, perf_counters, mock_rmdir,
                             mock_argv, mock_log_error):
     main.main()
@@ -63,16 +64,10 @@ def test_main_unknown_field(mock_valid_config_file, mock_exit, perf_counters, mo
                                            '\'runner\'')
 
 
-@mock.patch('wca.main.log.error')
-@mock.patch('wca.main.exit')
-@mock.patch('os.stat')
+@patch('wca.main.log.error')
+@patch('wca.main.exit')
+@patch('os.stat', return_value=Mock(st_size=35, st_uid=0, st_mode=700))
 def test_main_valid_config_file_not_absolute_path(os_stat, mock_exit, mock_log_error):
-
-    stat = mock.Mock()
-    stat.st_size = 35
-    stat.st_uid = 0
-    stat.st_mode = 700
-    os_stat.return_value = stat
 
     main.valid_config_file('configs/see_yaml_config_variable_above.yaml')
 
@@ -81,16 +76,10 @@ def test_main_valid_config_file_not_absolute_path(os_stat, mock_exit, mock_log_e
         'The path must be absolute.')
 
 
-@mock.patch('wca.main.log.error')
-@mock.patch('wca.main.exit')
-@mock.patch('os.stat')
+@patch('wca.main.log.error')
+@patch('wca.main.exit')
+@patch('os.stat', return_value=Mock(st_size=35, st_uid=123123, st_mode=700))
 def test_main_valid_config_file_wrong_user(os_stat, mock_exit, mock_log_error):
-
-    stat = mock.Mock()
-    stat.st_size = 35
-    stat.st_uid = 123123
-    stat.st_mode = 700
-    os_stat.return_value = stat
 
     main.valid_config_file('/etc/configs/see_yaml_config_variable_above.yaml')
 
@@ -99,16 +88,10 @@ def test_main_valid_config_file_wrong_user(os_stat, mock_exit, mock_log_error):
         'User is not owner config or is not root.')
 
 
-@mock.patch('wca.main.log.error')
-@mock.patch('wca.main.exit')
-@mock.patch('os.stat')
+@patch('wca.main.log.error')
+@patch('wca.main.exit')
+@patch('os.stat', return_value=Mock(st_size=35, st_uid=0, st_mode=777))
 def test_main_valid_config_file_wrong_acl(os_stat, mock_exit, mock_log_error):
-
-    stat = mock.Mock()
-    stat.st_size = 35
-    stat.st_uid = 0
-    stat.st_mode = 777
-    os_stat.return_value = stat
 
     main.valid_config_file('/etc/configs/see_yaml_config_variable_above.yaml')
 
