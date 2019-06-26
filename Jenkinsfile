@@ -40,8 +40,9 @@ pipeline {
                   steps {
                     sh '''
 						sudo bash -c "
-							export PYTHONPATH="$(pwd):$(pwd)/tests/tester" \
-							sudo dist/wca.pex -c $(pwd)/tests/tester/configs/tester_example.yaml \
+						    sudo su
+							export PYTHONPATH="$(pwd):$(pwd)/tests/tester"
+							dist/wca.pex -c $(pwd)/tests/tester/configs/tester_example.yaml \
 								-r tester:Tester -r tester:MetricCheck -r tester:FileCheck \
 								--log=debug --root
 						"
