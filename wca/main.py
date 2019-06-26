@@ -39,15 +39,15 @@ def valid_config_file(config):
     user_uid = os.stat(config).st_uid
     if user_uid != os.getuid() and user_uid != 0:
         log.error(
-            'Error: The config \'%s\' is not valid. User is not owner config or is not root.'
+            'Error: The config \'%s\' is not valid. User is not owner of the config or is not root.'
             % config)
         exit(1)
 
     mode = stat.S_IMODE(os.stat(config).st_mode)
     if mode != 700 and mode != 600:
         log.error(
-            'Error: The config \'%s\' is not valid. It has not correct proper ACLs. '
-            'Only user must be able to read and write.'
+            'Error: The config \'%s\' is not valid. It does not have correct ACLs. '
+            'Only user should be able to read and write.'
             % config)
         exit(1)
 
