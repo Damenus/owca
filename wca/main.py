@@ -44,7 +44,7 @@ def valid_config_file(config):
         exit(1)
 
     mode = stat.S_IMODE(os.stat(config).st_mode)
-    if mode != 700 and mode != 600 and mode != 644:
+    if mode != 700 and mode != 744 and mode != 600 and mode != 644:
         log.error(
             'Error: The config \'%s\' is not valid. It does not have correct ACLs. '
             'Only owner should be able to read and write.'
