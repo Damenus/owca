@@ -22,7 +22,6 @@ and start main loop from Runner.
 import argparse
 import logging
 import os
-import pwd
 import stat
 
 from wca import components

@@ -24,9 +24,9 @@ runner: !DummyRunner
 
 
 @patch('sys.argv', ['wca', '-c',
-                         '/etc/configs/see_yaml_config_variable_above.yaml',
-                         '-r', 'tests.testing:DummyRunner', '-l', 'critical',
-                         '--root'])
+                    '/etc/configs/see_yaml_config_variable_above.yaml',
+                    '-r', 'tests.testing:DummyRunner', '-l', 'critical',
+                    '--root'])
 @patch('os.rmdir')
 @patch('wca.config.exists', return_value=True)
 @patch('wca.config.open', mock_open(read_data=yaml_config))
@@ -45,9 +45,9 @@ runner: !DummyRunner
 
 @patch('wca.main.log.error')
 @patch('sys.argv', ['wca', '-c',
-                         '/etc/configs/see_yaml_config_variable_above.yaml',
-                         '-r', 'tests.testing:DummyRunner', '-l', 'critical',
-                         '--root'])
+                    '/etc/configs/see_yaml_config_variable_above.yaml',
+                    '-r', 'tests.testing:DummyRunner', '-l', 'critical',
+                    '--root'])
 @patch('os.rmdir')
 @patch('wca.config.exists', return_value=True)
 @patch('wca.config.open', mock_open(
