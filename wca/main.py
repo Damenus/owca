@@ -37,7 +37,7 @@ log = logging.getLogger('wca.main')
 def valid_config_file(config):
 
     user_uid = os.stat(config).st_uid
-    if user_uid != os.getuid() and user_uid != 0:
+    if os.getuid() != user_uid and os.getuid() != 0:
         log.error(
             'Error: The config \'%s\' is not valid. User is not owner of the config or is not root.'
             % config)
