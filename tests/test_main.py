@@ -72,7 +72,7 @@ def test_main_valid_config_file_not_absolute_path(os_stat, mock_exit, mock_log_e
 
     main.valid_config_file('configs/see_yaml_config_variable_above.yaml')
 
-    mock_log_error.assert_called(
+    mock_log_error.assert_called_with(
         'Error: The config path \'configs/see_yaml_config_variable_above.yaml\' is not valid. '
         'The path must be absolute.')
 
@@ -84,7 +84,7 @@ def test_main_valid_config_file_wrong_user(os_stat, mock_exit, mock_log_error):
 
     main.valid_config_file('/etc/configs/see_yaml_config_variable_above.yaml')
 
-    mock_log_error.assert_called(
+    mock_log_error.assert_called_with(
         'Error: The config \'/etc/configs/see_yaml_config_variable_above.yaml\' is not valid. '
         'User is not owner of the config or is not root.')
 
@@ -96,6 +96,6 @@ def test_main_valid_config_file_wrong_acl(os_stat, mock_exit, mock_log_error):
 
     main.valid_config_file('/etc/configs/see_yaml_config_variable_above.yaml')
 
-    mock_log_error.assert_called(
+    mock_log_error.assert_called_with(
         'Error: The config \'/etc/configs/see_yaml_config_variable_above.yaml\' is not valid. '
         'It does not have correct ACLs. Only owner should be able to read and write.')
