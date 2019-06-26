@@ -14,7 +14,6 @@
 
 
 import argparse
-import ast
 import json
 import logging
 import subprocess
