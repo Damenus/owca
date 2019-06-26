@@ -93,7 +93,7 @@ def test_main_valid_config_file_wrong_user(os_stat, mock_exit, mock_log_error):
 @patch('wca.main.exit')
 @patch('os.stat', return_value=Mock(st_size=35, st_uid=os.geteuid(), st_mode=511))
 def test_main_valid_config_file_wrong_acl(os_stat, mock_exit, mock_log_error):
-    # All can read, write and exec
+    # st_mode=511 - All can read, write and exec
 
     main.valid_config_file('/etc/configs/see_yaml_config_variable_above.yaml')
 
