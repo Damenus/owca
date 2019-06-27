@@ -43,7 +43,8 @@ def valid_config_file(config):
         exit(1)
 
     file_owner_uid = os.stat(config).st_uid
-    if os.getuid() != file_owner_uid and os.getuid() != 0:
+    user_uid = os.getuid()
+    if user_uid != file_owner_uid and user_uid != 0:
         log.error(
             'Error: The config \'%s\' is not valid. User is not owner of the config or is not root.'
             % config)
