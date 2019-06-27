@@ -288,6 +288,8 @@ class AllocationRunner(MeasurementRunner):
 
         current_allocations = _get_tasks_allocations(containers)
 
+        # TODO: keep state
+
         # Allocator callback
         allocate_start = time.time()
         new_allocations, anomalies, extra_metrics = self._allocator.allocate(
