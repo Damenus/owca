@@ -13,13 +13,12 @@
 # limitations under the License.
 
 
-# Building HammerDB.
-FROM centos:7 AS hammerdb
+# Building mysql_tpm_gauge.
+FROM centos:7 AS mysql_tpm_gauge
 
-RUN yum update -y
-RUN yum install -y wget
+RUN yum -y update
+RUN yum -y install epel-release
+RUN yum -y install python36
 
-RUN wget -O /HammerDB-3.2.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.2/HammerDB-3.2-Linux.tar.gz/download
-RUN tar -zxvf HammerDB-3.2.tar.gz
-WORKDIR /HammerDB-3.2
-ENTRYPOINT ./hammerdbcli
+WORKDIR /mysql-tpm-gauge
+COPY . .

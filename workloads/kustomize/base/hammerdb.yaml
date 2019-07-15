@@ -23,9 +23,9 @@ spec:
         args:  ["mysql.yaml" ]
         securityContext:
           runAsUser: 0
-        env:
-        - name: COMMAND
-          valueFrom:
-            configMapKeyRef:
-              name: twemcache-command
-              key: COMMAND
+      - name: mysql-tpm-gauge
+        image: 100.64.176.12:80/wca/mysql-tpm-gauge:bc1b87e3894fd5deed1666e9d726202b1e38b7aa
+        command: [ "python3" ]
+        args:  ["mysql_tpm_gauge.py", "-s", "mysql" ]
+        securityContext:
+          runAsUser: 0
