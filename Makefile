@@ -51,6 +51,7 @@ wrapper_package:
 	pipenv run pex . -D workloads/wrapper -v -R component-licenses --cache-dir=.pex-build $(PEX_OPTIONS) -o dist/mutilate_wrapper.pex -m wrapper.parser_mutilate
 	pipenv run pex . -D workloads/wrapper -v -R component-licenses --cache-dir=.pex-build $(PEX_OPTIONS) -o dist/cassandra_stress_wrapper.pex -m wrapper.parser_cassandra_stress
 	pipenv run pex . -D workloads/wrapper -v -R component-licenses --cache-dir=.pex-build $(PEX_OPTIONS) -o dist/stress_ng_wrapper.pex -m wrapper.parser_stress_ng
+	pipenv run pex . -D workloads/wrapper -v -R component-licenses --cache-dir=.pex-build $(PEX_OPTIONS) -o dist/mysql_tpm_gauge_wrapper.pex -m wrapper.parser_mysql_tpm_gauge
 	./dist/wrapper.pex --help >/dev/null
 
 check: flake8 unit

@@ -22,3 +22,5 @@ RUN yum -y install python36
 
 WORKDIR /mysql-tpm-gauge
 COPY . .
+
+COPY /dist/mysql_tpm_gauge_wrapper.pex /usr/bin/

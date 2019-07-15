@@ -16,10 +16,10 @@ return
 }
 puts "SETTING CONFIGURATION"
 dbset db mysql
-diset connection mysql_host 127.0.0.1
+diset connection mysql_host mysql
 diset connection mysql_port 3306
-diset tpcc mysql_user a
-diset tpcc mysql_pass a
+diset tpcc mysql_user testuser
+diset tpcc mysql_pass testpassword
 diset tpcc mysql_driver timed
 diset tpcc my_rampup 2
 diset tpcc my_duration 5
