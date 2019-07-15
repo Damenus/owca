@@ -91,6 +91,18 @@ pipeline {
                     '''
                     }
                 }
+                stage("Build and push HammerDB Docker image") {
+                    when {expression{return params.BUILD_IMAGES}}
+                    steps {
+                    sh '''
+                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/mysql_tpm_gauge:${GIT_COMMIT}
+                    IMAGE_DIR=${WORKSPACE}/workloads/mysql_tpm_gauge
+                    cp -r dist ${IMAGE_DIR}
+                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+                    docker push ${IMAGE_NAME}
+                    '''
+                    }
+                }
                 stage("Build and push Redis Docker image") {
                     when {expression{return params.BUILD_IMAGES}}
                     steps {

@@ -13,7 +13,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
+  labels:
+    app: mysql
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mysql
@@ -24,6 +27,8 @@ spec:
       labels:
         app: mysql
     spec:
+      nodeSelector:
+        own_ip: 100.64.176.37
       containers:
       - image: mysql:5.6
         name: mysql
@@ -32,7 +37,7 @@ spec:
           value: password
         - name: MYSQL_USER
           value: testuser
-        - name: MYSQL_PASSWORDvalue:
+        - name: MYSQL_PASSWORDvalue
           value: testpassword
         ports:
         - containerPort: 3306

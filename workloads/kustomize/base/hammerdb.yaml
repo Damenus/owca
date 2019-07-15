@@ -16,18 +16,15 @@ spec:
     spec:
       nodeSelector:
         own_ip: 100.64.176.37
-      initContainers:
-      - name:
       containers:
       - name: hammerdb
-        image: 100.64.176.12:80/wca/hammerdb:4386405ee3e3db9b95231118510b9299460b2213
+        image: 100.64.176.12:80/wca/hammerdb:013646a7510e88a8a40f1e2cee4b631024ab6c97
         command: [ "source" ]
         args:  ["workload.yaml" ]
         securityContext:
           runAsUser: 0
-        vlo
       - name: mysql-tpm-gauge
-        image: 100.64.176.12:80/wca/mysql-tpm-gauge:4386405ee3e3db9b95231118510b9299460b2213
+        image: 100.64.176.12:80/wca/mysql_tpm_gauge:013646a7510e88a8a40f1e2cee4b631024ab6c97
         command: [ "/bin/sh" ]
         args:  ["-c", "$(COMMAND)" ]
         securityContext:

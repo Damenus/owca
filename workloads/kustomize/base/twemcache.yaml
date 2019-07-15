@@ -15,7 +15,7 @@ spec:
         app: twemcache
     spec:
       nodeSelector:
-        own_ip: 100.64.176.36
+        own_ip: 100.64.176.37
       containers:
       - name: twemcache
         image: 100.64.176.12:80/wca/twemcache:bc1b87e3894fd5deed1666e9d726202b1e38b7aa
