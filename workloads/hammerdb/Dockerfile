@@ -22,4 +22,4 @@ RUN yum install -y wget
 RUN wget -O /HammerDB-3.2.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.2/HammerDB-3.2-Linux.tar.gz/download
 RUN tar -zxvf HammerDB-3.2.tar.gz
 WORKDIR /HammerDB-3.2
-ENTRYPOINT ./hammerdbcli
+#ENTRYPOINT ./hammerdbcli
