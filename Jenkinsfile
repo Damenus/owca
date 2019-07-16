@@ -91,7 +91,7 @@ pipeline {
                     '''
                     }
                 }
-                stage("Build and push HammerDB Docker image") {
+                stage("Build and push mysql_tpm_gauge Docker image") {
                     when {expression{return params.BUILD_IMAGES}}
                     steps {
                     sh '''
