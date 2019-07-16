@@ -19,7 +19,7 @@ FROM centos:7 AS hammerdb
 RUN yum update -y
 RUN yum install -y wget
 
-RUN wget -O /HammerDB-3.2.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.2/HammerDB-3.2-Linux.tar.gz/download
-RUN tar -zxvf HammerDB-3.2.tar.gz
-WORKDIR /HammerDB-3.2
+RUN wget -O /HammerDB-3.1.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.1/HammerDB-3.1-Linux.tar.gz/download
+RUN tar -zxvf HammerDB-3.1.tar.gz
+WORKDIR /HammerDB-3.1
 #ENTRYPOINT ./hammerdbcli
