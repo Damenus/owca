@@ -35,4 +35,4 @@ RUN source ~/.bashrc
 RUN wget -O /HammerDB-3.1.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.1/HammerDB-3.1-Linux.tar.gz/download
 RUN tar -zxvf HammerDB-3.1.tar.gz
 WORKDIR /HammerDB-3.1
-#ENTRYPOINT ./hammerdbcli
+ENTRYPOINT echo -e '/etc/config/workload.tcl' | ./hammerdbcli
