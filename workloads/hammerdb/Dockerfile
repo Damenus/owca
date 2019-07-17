@@ -19,6 +19,19 @@ FROM centos:7 AS hammerdb
 RUN yum update -y
 RUN yum install -y wget
 
+RUN wget https://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/p/proj-4.8.0-4.el7.x86_64.rpm
+#rpm -Uvh proj-4.8.0-4.el7.x86_64.rpm
+RUN yum install -y proj-4.8.0-4.el7.x86_64.rpm
+
+RUN wget http://repo.mysql.com/mysql80-community-release-el7-3.noarch.rpm
+RUN rpm -ivh mysql80-community-release-el7-3.noarch.rpm
+
+RUN wget https://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql-community-libs-5.7.24-1.el7.x86_64.rpm
+RUN yum install -y mysql-community-libs-5.7.24-1.el7.x86_64.rpm
+
+RUN echo 'export LD_LIBRARY_PATH=/usr/lib64/mysql/' >> ~/.bashrc
+RUN source ~/.bashrc
+
 RUN wget -O /HammerDB-3.1.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.1/HammerDB-3.1-Linux.tar.gz/download
 RUN tar -zxvf HammerDB-3.1.tar.gz
 WORKDIR /HammerDB-3.1
