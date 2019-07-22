@@ -7,7 +7,7 @@ spec:
   - port: 3306
   selector:
     app: mysql
-  clusterIP: None
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,7 +28,7 @@ spec:
         app: mysql
     spec:
       nodeSelector:
-        own_ip: 100.64.176.37
+        own_ip: 100.64.176.38
       containers:
       - image: mysql:5.6
         name: mysql
