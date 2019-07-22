@@ -32,7 +32,7 @@ RUN yum install -y mysql-community-libs-5.7.24-1.el7.x86_64.rpm
 RUN echo 'export LD_LIBRARY_PATH=/usr/lib64/mysql/' >> ~/.bashrc
 RUN source ~/.bashrc
 
-RUN wget -O /HammerDB-3.1.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.1/HammerDB-3.1-Linux.tar.gz/download
-RUN tar -zxvf HammerDB-3.1.tar.gz
-WORKDIR /HammerDB-3.1
-ENTRYPOINT echo -e '/etc/config/workload.tcl' | ./hammerdbcli
+RUN wget -O /HammerDB-3.2.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.2/HammerDB-3.2-Linux.tar.gz/download
+RUN tar -zxvf HammerDB-3.2.tar.gz
+WORKDIR /HammerDB-3.2
+ENTRYPOINT ./hammerdbcli auto
