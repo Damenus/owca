@@ -34,13 +34,13 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
     """
     new_metrics = []
 
-    new_line = readline_with_check(input)
+    new_line = readline_with_check(input, EOF_line='end')
 
     if '.0' in new_line:
 
         new_metrics.append(Metric(metric_name_prefix + 'tpm', new_line,
-                                type=MetricType.GAUGE, labels=labels,
-                                help="TPM (transaction per minute) from mysql"))
+                                  type=MetricType.GAUGE, labels=labels,
+                                  help="TPM (transaction per minute) from mysql"))
 
     return new_metrics
 
