@@ -15,16 +15,33 @@ spec:
         app: hammerdb
     spec:
       nodeSelector:
-        own_ip: 100.64.176.37
+        own_ip: 100.64.176.38
+#      initContainers:
+#      - name: take-data-dir-ownership
+#        image: alpine:3.6
+#        # Give `grafana` user (id 472) permissions a mounted volume
+#        # https://github.com/grafana/grafana-docker/blob/master/Dockerfile
+#        command: [ "/bin/sh" ]
+#        args:  ["-c", "cp /etc/config/dd/hammerdb_command.sh /etc/dd/command.sh; chmod 777 /etc/dd/command.sh" ]
+#        volumeMounts:
+#          - name: hammerdb-script2
+#            mountPath: /etc/config/dd
+#          - name: ham
+#            mountPath: /etc/dd
       containers:
       - name: hammerdb
-        image: 100.64.176.12:80/wca/hammerdb:013646a7510e88a8a40f1e2cee4b631024ab6c97
-        command: [ "source" ]
-        args:  ["workload.yaml" ]
+        image: 100.64.176.12:80/wca/hammerdb:e1d2c587b125fb38dd705a8959c08f150372fe4e
+        command: [ "./hammerdbcli" ]
+        args:  ["auto", "/etc/config/workload.tcl" ]
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+          - name: changed-config-volume
+            mountPath: /etc/hammerdb/config
         securityContext:
           runAsUser: 0
       - name: mysql-tpm-gauge
-        image: 100.64.176.12:80/wca/mysql_tpm_gauge:013646a7510e88a8a40f1e2cee4b631024ab6c97
+        image: 100.64.176.12:80/wca/mysql_tpm_gauge:e1d2c587b125fb38dd705a8959c08f150372fe4e
         command: [ "/bin/sh" ]
         args:  ["-c", "$(COMMAND)" ]
         securityContext:
@@ -35,3 +52,9 @@ spec:
             configMapKeyRef:
               name: mysql-tpm-gauge-command
               key: COMMAND
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mysql-tpm-gauge-tcl-script
+      - name: changed-config-volume
+        emptyDir: {}
