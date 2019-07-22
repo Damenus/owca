@@ -113,6 +113,16 @@ METRICS_METADATA: Dict[MetricName, MetricMetadata] = {
             MetricType.COUNTER,
             'Cache references'
         ),
+    MetricName.SCALING_FACTOR_MAX:
+        MetricMetadata(
+            MetricType.GAUGE,
+            'Perf metric scaling factor, MAX value'
+        ),
+    MetricName.SCALING_FACTOR_AVG:
+        MetricMetadata(
+            MetricType.GAUGE,
+            'Perf metric scaling factor, average from all CPUs'
+        ),
     DerivedMetricName.IPC:
         MetricMetadata(
             MetricType.GAUGE,
@@ -255,3 +265,8 @@ class DerivedMetricsGenerator:
         self._prev_ts = now
 
         return measurements
+
+
+class MissingMeasurementException(Exception):
+    """when metric has not been collected with success"""
+    pass
