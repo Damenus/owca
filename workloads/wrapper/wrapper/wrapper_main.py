@@ -67,6 +67,7 @@ def main(parse: ParseFunc = default_parse):
                                         )
     input = workload_process.stderr if args.stderr else workload_process.stdout
 
+    # TODO: Check what happend if no labels
     labels = json.loads(args.labels)
     parse = partial(parse, regexp=args.regexp, separator=args.separator, labels=labels,
                     input=input, metric_name_prefix=args.metric_name_prefix)

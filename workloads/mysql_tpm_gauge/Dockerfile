@@ -23,6 +23,6 @@ RUN yum -y install python36 python-pip which make git
 RUN pip install mysql-connector-python
 
 WORKDIR /mysql-tpm-gauge
-COPY . .
 
+COPY mysql_tpm_gauge.py .
 COPY /dist/mysql_tpm_gauge_wrapper.pex /usr/bin/
