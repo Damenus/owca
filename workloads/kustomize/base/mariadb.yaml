@@ -37,7 +37,7 @@ metadata:
   labels:
     app: mysql
 spec:
-  replicas: 2
+  replicas: 1
   serviceName: mysql
   selector:
     matchLabels:
@@ -59,6 +59,8 @@ spec:
           value: testuser
         - name: MYSQL_PASSWORD
           value: testpassword
+        - name: MYSQL_DATABASE
+          value: tpcc
         ports:
         - containerPort: 3306
           name: mysql

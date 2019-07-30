@@ -26,6 +26,7 @@ RUN yum install -y proj-4.8.0-4.el7.x86_64.rpm
 RUN wget http://repo.mysql.com/mysql80-community-release-el7-3.noarch.rpm
 RUN rpm -ivh mysql80-community-release-el7-3.noarch.rpm
 
+# Required libmysqlclient.so.20 which is in old MySQL 5.7
 RUN wget https://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql-community-libs-5.7.24-1.el7.x86_64.rpm
 RUN yum install -y mysql-community-libs-5.7.24-1.el7.x86_64.rpm
 
@@ -34,5 +35,11 @@ RUN source ~/.bashrc
 
 RUN wget -O /HammerDB-3.2.tar.gz https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.2/HammerDB-3.2-Linux.tar.gz/download
 RUN tar -zxvf HammerDB-3.2.tar.gz
+
+RUN rm proj-4.8.0-4.el7.x86_64.rpm \
+    mysql80-community-release-el7-3.noarch.rpm \
+    mysql-community-libs-5.7.24-1.el7.x86_64.rpm \
+    HammerDB-3.2.tar.gz
+
 WORKDIR /HammerDB-3.2
 ENTRYPOINT ./hammerdbcli auto

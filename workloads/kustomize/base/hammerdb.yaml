@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: hammerdb
   labels:
     app: hammerdb
 spec:
-  replicas: 2
+  serviceName: mysql
+  replicas: 1
   selector:
     matchLabels:
       app: hammerdb
@@ -19,34 +20,42 @@ spec:
 
       initContainers:
       - name: change-config-workload
-        image: alpine:3.6
-        command: [ "/bin/sh" ]
-        args:  ["-c", "sleep 1" ]
+        image: busybox
+        command: [ "/bin/sh", "-c"]
+        args:
+          - "identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
+             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl"
         volumeMounts:
           - name: config-volume
             mountPath: /etc/config
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
+        env:
+          - name: podname
+            valueFrom: {fieldRef: {fieldPath: metadata.name}}
+
+      - name: wait-for-database-init
+        image: alpine:3.6
+        command: [ "/bin/sh", "-c" ]
+        args:
+          - identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
+        env:
+          - name: podname
+            valueFrom: {fieldRef: {fieldPath: metadata.name}}
 
       containers:
       - name: hammerdb
         image: 100.64.176.12:80/wca/hammerdb:e1d2c587b125fb38dd705a8959c08f150372fe4e
-        command: [ "./hammerdbcli" ]
-        args:  ["auto", "/etc/config/workload.tcl" ]
+        command: [ "./hammerdbcli", "auto" ]
+        args:  ["/etc/hammerdb/config/workload.tcl" ]
         volumeMounts:
-          - name: config-volume
-            mountPath: /etc/config
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
-        securityContext:
-          runAsUser: 0
 
       - name: mysql-tpm-gauge
-        image: 100.64.176.12:80/wca/mysql_tpm_gauge:eb8d688d27cf3034208926a2c01426b76ee4a210
-        command: [ "/bin/sh" ]
-        args:  ["-c", "$(COMMAND)" ]
-        securityContext:
-          runAsUser: 0
+        image: 100.64.176.12:80/wca/mysql_tpm_gauge:9f62e18158481ccd051ce66cbd09a0f2b6b52237
+        command: [ "/bin/bash", "-c" ]
+        args:  ["$(COMMAND)" ]
         env:
         - name: COMMAND
           valueFrom:

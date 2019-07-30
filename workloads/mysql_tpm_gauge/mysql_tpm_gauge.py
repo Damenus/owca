@@ -17,6 +17,7 @@ import argparse
 import time
 
 import mysql.connector
+from mysql.connector import errorcode
 
 
 def main():
@@ -45,12 +46,25 @@ def main():
 
     interval = int(args.interval)
 
-    mydb = mysql.connector.connect(
-      host=args.host,
-      user=args.user,
-      passwd=args.password,
-      database=args.database
-    )
+    while True:
+        try:
+            mydb = mysql.connector.connect(
+                host=args.host,
+                user=args.user,
+                passwd=args.password,
+                database=args.database
+            )
+
+            break  # Only triggered if successful connect to database
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print(err)
+        else:
+            mydb.close()
 
     cursor = mydb.cursor()
 
@@ -59,7 +73,6 @@ def main():
     before = int(result[0][1]) + int(result[1][1])
 
     while True:
-
         cursor.execute(command)
         result = cursor.fetchall()
 
