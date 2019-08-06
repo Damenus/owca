@@ -34,7 +34,7 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
     """
     new_metrics = []
 
-    new_line = readline_with_check(input)
+    new_line = readline_with_check(input, EOF_line='end')
 
     new_metrics.append(Metric(metric_name_prefix + 'tpm', new_line,
                               type=MetricType.GAUGE, labels=labels,
