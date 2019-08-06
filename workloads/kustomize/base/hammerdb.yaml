@@ -24,7 +24,8 @@ spec:
         command: [ "/bin/sh", "-c"]
         args:
           - "identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
-             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl"
+             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
+             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl"
         volumeMounts:
           - name: config-volume
             mountPath: /etc/config
@@ -36,36 +37,115 @@ spec:
 
       - name: wait-for-database-init
         image: alpine:3.6
-        command: [ "/bin/sh", "-c" ]
+        # mysqladmin -u testuser -h mysql-0.mysql -ptestpassword status
+        # Uptime: 963  Threads: 4  Questions: 1043  Slow queries: 0  Opens: 67  Flush tables: 1  Open tables: 60  Queries per second avg: 1.083
+        command: [ "/bin/sh", "-c", "sleep 20" ]
         args:
           - identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
         env:
           - name: podname
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
 
-      containers:
-      - name: hammerdb
-        image: 100.64.176.12:80/wca/hammerdb:e1d2c587b125fb38dd705a8959c08f150372fe4e
+      - name:  initialize-database-schema
+        image: 100.64.176.12:80/wca/hammerdb:da2bc9bcac5a79c7158553a950ca3670685ea25b
         command: [ "./hammerdbcli", "auto" ]
-        args:  ["/etc/hammerdb/config/workload.tcl" ]
+        args:  ["/etc/hammerdb/config/build_workload.tcl" ]
         volumeMounts:
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
 
+      containers:
+      - name: hammerdb
+        image: 100.64.176.12:80/wca/hammerdb:da2bc9bcac5a79c7158553a950ca3670685ea25b
+        command: [ "./hammerdbcli", "auto" ]
+        args:  ["/etc/hammerdb/config/workload.tcl" ]
+#        command: [ "/bin/bash", "-c", "sleep 3600"]
+        volumeMounts:
+          - name: changed-config-volume
+            mountPath: /etc/hammerdb/config
+
+        # python3 /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql
       - name: mysql-tpm-gauge
-        image: 100.64.176.12:80/wca/mysql_tpm_gauge:9f62e18158481ccd051ce66cbd09a0f2b6b52237
-        command: [ "/bin/bash", "-c" ]
-        args:  ["$(COMMAND)" ]
+        image: 100.64.176.12:80/wca/mysql_tpm_gauge:4aa1e34e60d25536e75d22b42a927894751f7b10
+        #command: [ "/bin/bash", "-c", "${COMMAND}" ]
+#        command: [ "python3", "/mysql-tpm-gauge/mysql_tpm_gauge.py", "--host", "mysql-0.mysql" ]
+        command:
+          - bash
+          - -c
+          - "mysql_tpm_gauge_wrapper.pex \
+          --command 'python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql' \
+          --log_level DEBUG \
+          --stderr 0 \
+          --labels '{\"workload\": \"hammerdb\"}' \
+          --metric_name_prefix 'sql_' \
+          --subprocess_shell \
+          --storage_output_filename=/var/log/wrapper/metrics.prom
+          "
+#        command:
+#          - bash
+#          - -c
+#          - python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql
         env:
         - name: COMMAND
           valueFrom:
             configMapKeyRef:
               name: mysql-tpm-gauge-command
               key: COMMAND
+        volumeMounts:
+          - name: var-log-wrapper
+            mountPath: /var/log/wrapper
+
+      - name: node-exporter
+        image: prom/node-exporter:v0.18.1
+        securityContext:
+          privileged: true
+        args:
+          - --collector.textfile.directory=/var/log/wrapper
+          - --web.disable-exporter-metrics
+          - --no-collector.arp
+          - --no-collector.bcache
+          - --no-collector.bonding
+          - --no-collector.conntrack
+          - --no-collector.cpu
+          - --no-collector.cpufreq
+          - --no-collector.diskstats
+          - --no-collector.edac
+          - --no-collector.entropy
+          - --no-collector.filefd
+          - --no-collector.filesystem
+          - --no-collector.hwmon
+          - --no-collector.infiniband
+          - --no-collector.ipvs
+          - --no-collector.loadavg
+          - --no-collector.mdadm
+          - --no-collector.meminfo
+          - --no-collector.netclass
+          - --no-collector.netdev
+          - --no-collector.netstat
+          - --no-collector.nfs
+          - --no-collector.nfsd
+          - --no-collector.pressure
+          - --no-collector.sockstat
+          - --no-collector.stat
+          - --no-collector.time
+          - --no-collector.timex
+          - --no-collector.uname
+          - --no-collector.vmstat
+          - --no-collector.xfs
+          - --no-collector.zfs
+          - --log.level=debug
+        ports:
+          - containerPort: 9100
+            protocol: TCP
+        volumeMounts:
+          - name: var-log-wrapper
+            mountPath: /var/log/wrapper
 
       volumes:
       - name: config-volume
         configMap:
           name: mysql-tpm-gauge-tcl-script
       - name: changed-config-volume
+        emptyDir: {}
+      - name: var-log-wrapper
         emptyDir: {}

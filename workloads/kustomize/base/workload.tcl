@@ -14,25 +14,18 @@ if {  [ vucomplete ] || $x eq $seconds } { set timerstop 1 }
     }
 return
 }
-
-puts "SETTING CONFIGURATION"
 dbset db mysql
 diset connection mysql_host MYSQL_HOST
 diset connection mysql_port 3306
-diset tpcc mysql_num_vu
 diset tpcc mysql_user testuser
 diset tpcc mysql_pass testpassword
 diset tpcc mysql_driver timed
-
+diset tpcc my_duration 1440
 print dict
-buildschema
 
-vuset logtotemp 1
 loadscript
-
+vuset vu 1
 vucreate
 vurun
-runtimer 60000
-vudestroy
-
-puts "TEST SEQUENCE COMPLETE"
+runtimer 600
+after 5000
