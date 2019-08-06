@@ -15,6 +15,9 @@ spec:
       labels:
         app: hammerdb
     spec:
+      securityContext:
+        fsGroup: 1000
+
       nodeSelector:
         own_ip: 100.64.176.38
 
@@ -59,38 +62,28 @@ spec:
         image: 100.64.176.12:80/wca/hammerdb:da2bc9bcac5a79c7158553a950ca3670685ea25b
         command: [ "./hammerdbcli", "auto" ]
         args:  ["/etc/hammerdb/config/workload.tcl" ]
-#        command: [ "/bin/bash", "-c", "sleep 3600"]
         volumeMounts:
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
 
         # python3 /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql
       - name: mysql-tpm-gauge
-        image: 100.64.176.12:80/wca/mysql_tpm_gauge:4aa1e34e60d25536e75d22b42a927894751f7b10
-        #command: [ "/bin/bash", "-c", "${COMMAND}" ]
-#        command: [ "python3", "/mysql-tpm-gauge/mysql_tpm_gauge.py", "--host", "mysql-0.mysql" ]
+        image: 100.64.176.12:80/wca/mysql_tpm_gauge:36f55e38a61fbcb57d3cab93b27a7e555dfaf7f2
         command:
           - bash
           - -c
-          - "mysql_tpm_gauge_wrapper.pex \
-          --command 'python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql' \
+          - "identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
+          mysql_tpm_gauge_wrapper.pex \
+          --command 'python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host ${identifier}' \
           --log_level DEBUG \
           --stderr 0 \
           --labels '{\"workload\": \"hammerdb\"}' \
           --metric_name_prefix 'sql_' \
-          --subprocess_shell \
           --storage_output_filename=/var/log/wrapper/metrics.prom
           "
-#        command:
-#          - bash
-#          - -c
-#          - python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql
         env:
-        - name: COMMAND
-          valueFrom:
-            configMapKeyRef:
-              name: mysql-tpm-gauge-command
-              key: COMMAND
+          - name: podname
+            valueFrom: {fieldRef: {fieldPath: metadata.name}}
         volumeMounts:
           - name: var-log-wrapper
             mountPath: /var/log/wrapper
