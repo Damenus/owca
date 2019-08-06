@@ -24,7 +24,7 @@ diset tpcc my_duration 5
 print dict
 
 loadscript
-vuset vu 1
+vuset vu WORKER_NUMBER
 vucreate
 vurun
 runtimer 600

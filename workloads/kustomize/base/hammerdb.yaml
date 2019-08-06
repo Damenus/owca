@@ -27,7 +27,7 @@ spec:
         command: [ "/bin/sh", "-c"]
         args:
           - "identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
-             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
+             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/;s/WORKER_NUMBER/$number_runners/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
              sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl"
         volumeMounts:
           - name: config-volume
@@ -37,6 +37,8 @@ spec:
         env:
           - name: podname
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
+          - name: number_runners
+            valueFrom: {configMapKeyRef: { name: hammerdb-parameters, key: number_runners }}
 
       - name: wait-for-database-init
         image: alpine:3.6
