@@ -17,7 +17,6 @@ import argparse
 import time
 
 import mysql.connector
-from mysql.connector import errorcode
 
 
 def main():
