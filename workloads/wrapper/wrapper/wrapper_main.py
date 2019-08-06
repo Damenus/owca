@@ -67,7 +67,7 @@ def main(parse: ParseFunc = default_parse):
                                         )
     input = workload_process.stderr if args.stderr else workload_process.stdout
 
-    # TODO: Check what happend if no labels
+    # TODO: Check what happend if no labels - ok
     labels = json.loads(args.labels)
     parse = partial(parse, regexp=args.regexp, separator=args.separator, labels=labels,
                     input=input, metric_name_prefix=args.metric_name_prefix)
@@ -82,7 +82,7 @@ def main(parse: ParseFunc = default_parse):
                                max_timeout_in_seconds=5.0,
                                topic=args.kafka_topic)
     else:
-        storage = LogStorage(args.storage_output_filename)
+        storage = LogStorage(args.storage_output_filename, overwrite=True, include_timestamp=True)
 
     t = threading.Thread(target=parse_loop, args=(parse, storage,
                                                   append_service_level_metrics_func))
