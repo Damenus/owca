@@ -204,6 +204,25 @@ pipeline {
             }
             //failFast true
             parallel {
+                stage('WCA DAEMONSET E2E for Kubernetes') {
+                    agent { label 'kubernetes' }
+                    environment {
+                        KUBERNETES_HOST='100.64.176.17'
+                        CRT_PATH = '/etc/kubernetes/ssl'
+                        CONFIG = 'wca_config_kubernetes.yaml'
+                        HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml'
+                        CERT='true'
+                        KUBECONFIG="${HOME}/admin.conf"
+                    }
+                    steps {
+                        wca_and_workloads_check()
+                    }
+                    post {
+                        always {
+                            clean()
+                        }
+                    }
+                }
                 stage('WCA E2E for Kubernetes') {
                     agent { label 'kubernetes' }
                     environment {
@@ -268,6 +287,28 @@ def wca_and_workloads_check() {
     run_workloads("${EXTRA_ANSIBLE_PARAMS}", "${LABELS}")
     sleep RUN_WORKLOADS_SLEEP_TIME
     test_wca_metrics()
+}
+
+def wca_daemonset_check() {
+    images_check()
+    // 0. set configs
+    // set taint on one node, check that wca is there no working, for that remove all pod from node
+    kubectl taint nodes node34 key1=value1:NoExecute
+    // apply testing wca
+    kubectl patch -f node.json -p '{"spec":{"template":{"spec":{"tolerations":
+    [{"key": "key1", "operator": "Equal", "value": "value1", "effect": "NoSchedule"}]}}}'
+    kubectl apply -k ./wca
+    // test
+    kubectl apply -k ./workload
+    kubectl scale --replicas=3 rs/foo OR -f foo.yaml
+    sleep RUN_WORKLOADS_SLEEP_TIME
+    test_wca_metrics()
+    // delete all
+    kubectl delete -k ./workload
+    kubectl delete -k ./wca
+    // delete taint
+    kubectl taint nodes node34 key1-
+
 }
 
 def images_check() {
@@ -358,7 +399,7 @@ def run_workloads(extra_params, labels) {
 def stop_workloads(extra_params) {
     print('Stopping all workloads...')
     sh "ansible-playbook  ${extra_params}  -i ${WORKSPACE}/${INVENTORY} --tags=clean_jobs ${WORKSPACE}/${PLAYBOOK}"
-    sleep 5 
+    sleep 5
 }
 
 def remove_file(path) {
