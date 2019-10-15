@@ -106,25 +106,30 @@ class KubernetesNode(Node):
 
     def _request_kubeapi(self):
         kubeapi_endpoint = "https://{}:{}".format(self.kubeapi_host, self.kubeapi_port)
-        full_url = urljoin(kubeapi_endpoint, "/api/v1/namespaces/default/pods")
-
         log.debug("Created kubeapi endpoint %s", kubeapi_endpoint)
 
-        with pathlib.Path(SERVICE_TOKEN_FILENAME).open() as f:
+        # self.ssl.client_token_path = SERVICE_TOKEN_FILENAME
+        # self.ssl.client_cert_path = SERVICE_CERT_FILENAME
+
+        with pathlib.Path(self.ssl.client_token_path).open() as f:
             service_token = f.read()
 
-        r = requests.get(
-            full_url,
-            headers={
-                "Authorization": "Bearer {}".format(service_token)
-            },
-            timeout=self.timeout,
-            verify=SERVICE_CERT_FILENAME
-        )
+        for namespace in self.monitored_namespaces:
+            full_url = urljoin(kubeapi_endpoint, "/api/v1/namespaces/{}/pods".format(namespace))
 
-        if not r.ok:
-            log.error('%i %s - %s', r.status_code, r.reason, r.raw)
-        r.raise_for_status()
+            r = requests.get(
+                full_url,
+                headers={
+                    "Authorization": "Bearer {}".format(service_token)
+                },
+                timeout=self.timeout,
+                verify=self.ssl.client_cert_path
+            )
+
+            if not r.ok:
+                log.error('An unexpected error occurred for namespace "%s": %i %s - %s',
+                          namespace, r.status_code, r.reason, r.raw)
+            r.raise_for_status()
 
         return r.json()
 

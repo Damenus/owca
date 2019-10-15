@@ -124,6 +124,7 @@ class SSL:
     server_verify: Union[bool, Path(absolute=True, mode=os.R_OK)] = True
     client_cert_path: Optional[Path(absolute=True, mode=os.R_OK)] = None
     client_key_path: Optional[Path(absolute=True, mode=os.R_OK)] = None
+    client_token_path: Optional[Path(absolute=True, mode=os.R_OK)] = None
 
     def __post_init__(self):
         if self.client_key_path and not self.client_cert_path:
