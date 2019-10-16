@@ -7,48 +7,48 @@ pipeline {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
     }
     stages{
-//         stage("Flake8 formatting scan") {
-//             steps {
-//                 sh '''
-//                   make venv flake8
-//                 '''
-//             }
-//         }
-//         stage("Run unit tests suite") {
-//             steps {
-//                 sh '''
-//                   make venv junit
-//                 '''
-//             }
-//             post {
-//                 always {
-//                     junit 'unit_results.xml'
-//                 }
-//             }
-//         }
-//         stage("Build WCA pex") {
-//             steps {
-//                 sh '''
-//                   make wca_package_in_docker
-//                 '''
-//             }
-//         }
-//         stage("Build pex files") {
-//             steps {
-//                 sh '''
-//                   make venv wrapper_package
-//                 '''
-//                 archiveArtifacts(artifacts: "dist/**")
-//             }
-//         }
-//         stage("Check code with bandit") {
-//              steps {
-//              sh '''
-//                make bandit bandit_pex
-//              '''
-//              archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
-//            }
-//         }
+        stage("Flake8 formatting scan") {
+            steps {
+                sh '''
+                  make venv flake8
+                '''
+            }
+        }
+        stage("Run unit tests suite") {
+            steps {
+                sh '''
+                  make venv junit
+                '''
+            }
+            post {
+                always {
+                    junit 'unit_results.xml'
+                }
+            }
+        }
+        stage("Build WCA pex") {
+            steps {
+                sh '''
+                  make wca_package_in_docker
+                '''
+            }
+        }
+        stage("Build pex files") {
+            steps {
+                sh '''
+                  make venv wrapper_package
+                '''
+                archiveArtifacts(artifacts: "dist/**")
+            }
+        }
+        stage("Check code with bandit") {
+             steps {
+             sh '''
+               make bandit bandit_pex
+             '''
+             archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
+           }
+        }
         stage("Build and push Workload Collocation Agent Docker image") {
             steps {
                 sh '''
