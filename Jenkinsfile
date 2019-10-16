@@ -293,7 +293,7 @@ def wca_daemonset_check() {
     images_check()
     // 0. set configs
     // set taint on one node, check that wca is there no working, for that remove all pod from node
-    kubectl taint nodes node32 key1=value1:NoExecute
+    sh "kubectl taint nodes node32 key1=value1:NoExecute"
     // apply testing wca
 //     kubectl patch -f node.json -p '{"spec":{"template":{"spec":{"tolerations":
 //     [{"key": "key1", "operator": "Equal", "value": "value1", "effect": "NoSchedule"}]}}}'
@@ -307,7 +307,7 @@ def wca_daemonset_check() {
 //     kubectl delete -k ./workload
 //     kubectl delete -k ./wca
     // delete taint
-    kubectl taint nodes node32 key1-
+    sh "kubectl taint nodes node32 key1-"
 
 }
 
