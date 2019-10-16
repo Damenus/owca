@@ -32,10 +32,8 @@ DEFAULT_EVENTS = (MetricName.INSTRUCTIONS, MetricName.CYCLES, MetricName.CACHE_M
 
 log = logging.getLogger(__name__)
 
-SERVICE_HOST_ENV_NAME = "KUBERNETES_SERVICE_HOST"
-SERVICE_PORT_ENV_NAME = "KUBERNETES_SERVICE_PORT"
 SERVICE_TOKEN_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/token"  # nosec
-SERVICE_CERT_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+SERVICE_CERT_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"  # nosec
 
 
 @dataclass
@@ -89,6 +87,7 @@ class KubernetesNode(Node):
         default_factory=lambda: CgroupDriverType(CgroupDriverType.CGROUPFS))
 
     ssl: Optional[SSL] = None
+    # Default Path is for Pods.
     client_token_path: Optional[Path(absolute=True, mode=os.R_OK)] = SERVICE_TOKEN_FILENAME
     server_cert_ca_path: Optional[Path(absolute=True, mode=os.R_OK)] = SERVICE_CERT_FILENAME
 
