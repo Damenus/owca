@@ -7,48 +7,48 @@ pipeline {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
     }
     stages{
-        stage("Flake8 formatting scan") {
-            steps {
-                sh '''
-                  make venv flake8
-                '''
-            }
-        }
-        stage("Run unit tests suite") {
-            steps {
-                sh '''
-                  make venv junit
-                '''
-            }
-            post {
-                always {
-                    junit 'unit_results.xml'
-                }
-            }
-        }
-        stage("Build WCA pex") {
-            steps {
-                sh '''
-                  make wca_package_in_docker
-                '''
-            }
-        }
-        stage("Build pex files") {
-            steps {
-                sh '''
-                  make venv wrapper_package
-                '''
-                archiveArtifacts(artifacts: "dist/**")
-            }
-        }
-        stage("Check code with bandit") {
-             steps {
-             sh '''
-               make bandit bandit_pex
-             '''
-             archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
-           }
-        }
+//         stage("Flake8 formatting scan") {
+//             steps {
+//                 sh '''
+//                   make venv flake8
+//                 '''
+//             }
+//         }
+//         stage("Run unit tests suite") {
+//             steps {
+//                 sh '''
+//                   make venv junit
+//                 '''
+//             }
+//             post {
+//                 always {
+//                     junit 'unit_results.xml'
+//                 }
+//             }
+//         }
+//         stage("Build WCA pex") {
+//             steps {
+//                 sh '''
+//                   make wca_package_in_docker
+//                 '''
+//             }
+//         }
+//         stage("Build pex files") {
+//             steps {
+//                 sh '''
+//                   make venv wrapper_package
+//                 '''
+//                 archiveArtifacts(artifacts: "dist/**")
+//             }
+//         }
+//         stage("Check code with bandit") {
+//              steps {
+//              sh '''
+//                make bandit bandit_pex
+//              '''
+//              archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
+//            }
+//         }
         stage("Build and push Workload Collocation Agent Docker image") {
             steps {
                 sh '''
@@ -60,130 +60,130 @@ pipeline {
                 '''
             }
         }
-        stage("Building Docker images and do tests in parallel") {
-            parallel {
-                 stage("Using tester") {
-                     steps {
-                         sh '''
-			   sudo make tester
-                     '''
-                     }
-                 }
-                stage("Build and push Redis Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/redis:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/redis
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push memtier_benchmark Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/memtier_benchmark:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/memtier_benchmark
-                    cp -r dist ${IMAGE_DIR}
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push stress-ng Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/stress_ng:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/stress_ng
-                    cp -r dist ${IMAGE_DIR}
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push rpc-perf Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/rpc_perf:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/rpc_perf
-                    cp -r dist ${IMAGE_DIR}
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push Twemcache Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/twemcache:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/twemcache
-                    cp -r dist ${IMAGE_DIR}
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push YCSB Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/ycsb:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/ycsb
-                    cp -r dist ${IMAGE_DIR}
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push Cassandra Stress Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                    sh '''
-                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/cassandra_stress:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/cassandra_stress
-                    cp -r dist ${IMAGE_DIR}
-                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                    docker push ${IMAGE_NAME}
-                    '''
-                    }
-                }
-                stage("Build and push SpecJBB Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                        withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
-                            sh '''
-                            IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
-                            IMAGE_DIR=${WORKSPACE}/workloads/specjbb
-                            cp ${SPECJBB_TAR} ${IMAGE_DIR}
-                            tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
-                            cp -r dist ${IMAGE_DIR}
-                            docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                            docker push ${IMAGE_NAME}
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            sh '''
-                            rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
-                            '''
-                        }
-                    }
-                }
-            }
-            post {
-                always {
-                    sh '''
-                    rm -f kaggle.json
-                    '''
-                }
-            }
-        }
+//         stage("Building Docker images and do tests in parallel") {
+//             parallel {
+//                  stage("Using tester") {
+//                      steps {
+//                       sh '''
+// 			          sudo make tester
+//                      '''
+//                      }
+//                  }
+//                 stage("Build and push Redis Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/redis:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/redis
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push memtier_benchmark Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/memtier_benchmark:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/memtier_benchmark
+//                     cp -r dist ${IMAGE_DIR}
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push stress-ng Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/stress_ng:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/stress_ng
+//                     cp -r dist ${IMAGE_DIR}
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push rpc-perf Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/rpc_perf:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/rpc_perf
+//                     cp -r dist ${IMAGE_DIR}
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push Twemcache Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/twemcache:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/twemcache
+//                     cp -r dist ${IMAGE_DIR}
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push YCSB Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/ycsb:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/ycsb
+//                     cp -r dist ${IMAGE_DIR}
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push Cassandra Stress Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                     sh '''
+//                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/cassandra_stress:${GIT_COMMIT}
+//                     IMAGE_DIR=${WORKSPACE}/workloads/cassandra_stress
+//                     cp -r dist ${IMAGE_DIR}
+//                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                     docker push ${IMAGE_NAME}
+//                     '''
+//                     }
+//                 }
+//                 stage("Build and push SpecJBB Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                         withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
+//                             sh '''
+//                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
+//                             IMAGE_DIR=${WORKSPACE}/workloads/specjbb
+//                             cp ${SPECJBB_TAR} ${IMAGE_DIR}
+//                             tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
+//                             cp -r dist ${IMAGE_DIR}
+//                             docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                             docker push ${IMAGE_NAME}
+//                             '''
+//                         }
+//                     }
+//                     post {
+//                         always {
+//                             sh '''
+//                             rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
+//                             '''
+//                         }
+//                     }
+//                 }
+//             }
+//             post {
+//                 always {
+//                     sh '''
+//                     rm -f kaggle.json
+//                     '''
+//                 }
+//             }
+//         }
         stage('WCA E2E tests') {
 			/* If commit message contains substring [e2e-skip] then this stage is omitted. */
             when {
@@ -215,7 +215,7 @@ pipeline {
                         KUBECONFIG="${HOME}/admin.conf"
                     }
                     steps {
-                        wca_and_workloads_check()
+                        wca_daemonset_check()
                     }
                     post {
                         always {
@@ -223,42 +223,42 @@ pipeline {
                         }
                     }
                 }
-                stage('WCA E2E for Kubernetes') {
-                    agent { label 'kubernetes' }
-                    environment {
-                        KUBERNETES_HOST='100.64.176.17'
-                        CRT_PATH = '/etc/kubernetes/ssl'
-                        CONFIG = 'wca_config_kubernetes.yaml'
-                        HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml'
-                        CERT='true'
-                        KUBECONFIG="${HOME}/admin.conf"
-                    }
-                    steps {
-                        wca_and_workloads_check()
-                    }
-                    post {
-                        always {
-                            clean()
-                        }
-                    }
-                }
-                stage('WCA E2E for Mesos') {
-                    agent { label 'mesos' }
-                    environment {
-                        MESOS_AGENT='100.64.176.14'
-                        CONFIG = 'wca_config_mesos.yaml'
-                        HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-mesos.yaml'
-                        CERT='false'
-                    }
-                    steps {
-                        wca_and_workloads_check()
-                    }
-                    post {
-                        always {
-                            clean()
-                        }
-                    }
-                }
+//                 stage('WCA E2E for Kubernetes') {
+//                     agent { label 'kubernetes' }
+//                     environment {
+//                         KUBERNETES_HOST='100.64.176.17'
+//                         CRT_PATH = '/etc/kubernetes/ssl'
+//                         CONFIG = 'wca_config_kubernetes.yaml'
+//                         HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes.yaml'
+//                         CERT='true'
+//                         KUBECONFIG="${HOME}/admin.conf"
+//                     }
+//                     steps {
+//                         wca_and_workloads_check()
+//                     }
+//                     post {
+//                         always {
+//                             clean()
+//                         }
+//                     }
+//                 }
+//                 stage('WCA E2E for Mesos') {
+//                     agent { label 'mesos' }
+//                     environment {
+//                         MESOS_AGENT='100.64.176.14'
+//                         CONFIG = 'wca_config_mesos.yaml'
+//                         HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-mesos.yaml'
+//                         CERT='false'
+//                     }
+//                     steps {
+//                         wca_and_workloads_check()
+//                     }
+//                     post {
+//                         always {
+//                             clean()
+//                         }
+//                     }
+//                 }
             }
         }
     }
