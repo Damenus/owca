@@ -44,3 +44,27 @@ kubectl create namespace wca
 ```shell
 kubectl apply -k .
 ```
+
+Optionally, you can use token to connect to Kube API Server 
+
+```
+SERVICE_ACCOUNT=wca
+
+# Get the serviceaccount token secret name
+SECRET=$(kubectl get serviceaccount ${SERVICE_ACCOUNT} -o json | jq -Mr '.secrets[].name | select(contains("token"))')
+
+# Extract the Bearer token from the Secret and decode
+kubectl get secret ${SECRET} -o json | jq -Mr '.data.token' | base64 -d > token
+
+# Extract ca.crt from the Secret and decode
+kubectl get secret ${SECRET} -o json | jq -Mr '.data["ca.crt"]' | base64 -d > ca.crt
+
+# Get the API Server location
+echo https://$(kubectl -n default get endpoints kubernetes --no-headers | awk '{ print $2 }') > server
+```
+
+```
+TOKEN=$(cat token)
+APISERVER=$(cat server)
+curl -s $APISERVER/openapi/v2  --header "Authorization: Bearer $TOKEN" --cacert ca.crt | less
+```
