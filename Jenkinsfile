@@ -207,7 +207,7 @@ pipeline {
                 stage('WCA Daemonset E2E for Kubernetes') {
                     agent { label 'kubernetes' }
                     environment {
-                        KUBERNETES_HOST='100.64.176.32'
+                        KUBERNETES_HOST='100.64.176.18'
                         CRT_PATH = '/etc/kubernetes/ssl'
                         CONFIG = 'wca_config_kubernetes_daemonset.yaml'
                         HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes-daemonset.yaml'
@@ -301,7 +301,7 @@ def wca_daemonset_check() {
 //     // test
 //     kubectl apply -k ./workload
 //     kubectl scale --replicas=1 rs/foo OR -f foo.yaml
-//     sleep RUN_WORKLOADS_SLEEP_TIME
+     sleep RUN_WORKLOADS_SLEEP_TIME
 //     test_wca_metrics()
 //     // delete all
 //     kubectl delete -k ./workload
