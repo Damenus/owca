@@ -87,7 +87,8 @@ class KubernetesNode(Node):
         default_factory=lambda: CgroupDriverType(CgroupDriverType.CGROUPFS))
 
     ssl: Optional[SSL] = None
-    # Default Path is for Pods.
+
+    # Default path is using by pods. You can override it to use wca outside pod.
     client_token_path: Optional[Path(absolute=True, mode=os.R_OK)] = SERVICE_TOKEN_FILENAME
     server_cert_ca_path: Optional[Path(absolute=True, mode=os.R_OK)] = SERVICE_CERT_FILENAME
 
