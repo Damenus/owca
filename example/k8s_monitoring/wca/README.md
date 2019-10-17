@@ -45,7 +45,8 @@ kubectl create namespace wca
 kubectl apply -k .
 ```
 
-Optionally, you can use token to connect to Kube API Server 
+Optionally, you can use token to connect to Kube API Server, while WCA is using outside pod.
+Save Bearer token and CA cert to enable connection. Set their path in wca configuration.  
 
 ```
 SERVICE_ACCOUNT=wca
@@ -63,6 +64,19 @@ kubectl get secret ${SECRET} -o json | jq -Mr '.data["ca.crt"]' | base64 -d > ca
 echo https://$(kubectl -n default get endpoints kubernetes --no-headers | awk '{ print $2 }') > server
 ```
 
+Example config wca
+
+```
+node: !KubernetesNode
+  client_token_path: "/home/ddarczuk/wca/cert/token"
+  server_cert_ca_path: "/home/ddarczuk/wca/cert/ca.crt"
+  kubeapi_host: "100.64.176.33"
+  kubeapi_port: "6443"
+  node_ip: "100.64.176.34"
+```
+
+
+Additionally, you can use above variables and use them to connect to Kube API Server.
 ```
 TOKEN=$(cat token)
 APISERVER=$(cat server)
