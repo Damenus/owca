@@ -207,7 +207,7 @@ pipeline {
                 stage('WCA Daemonset E2E for Kubernetes') {
                     agent { label 'kubernetes' }
                     environment {
-                        KUBERNETES_HOST='100.64.176.18'
+                        KUBERNETES_HOST='100.64.176.32'
                         CRT_PATH = '/etc/kubernetes/ssl'
                         CONFIG = 'wca_config_kubernetes_daemonset.yaml'
                         HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes-daemonset.yaml'
@@ -293,6 +293,7 @@ def wca_daemonset_check() {
     images_check()
     // 0. set configs
     // set taint on one node, check that wca is there no working, for that remove all pod from node
+    print('Reconfiguring wca...')
     sh "kubectl taint nodes node32 key1=value1:NoExecute"
     // apply testing wca
 //     kubectl patch -f node.json -p '{"spec":{"template":{"spec":{"tolerations":
@@ -301,12 +302,13 @@ def wca_daemonset_check() {
 //     // test
 //     kubectl apply -k ./workload
 //     kubectl scale --replicas=1 rs/foo OR -f foo.yaml
+     print('Sleep while workloads are running...')
      sleep RUN_WORKLOADS_SLEEP_TIME
 //     test_wca_metrics()
 //     // delete all
 //     kubectl delete -k ./workload
 //     kubectl delete -k ./wca
-    // delete taint
+    print('Deleting taint...')
     sh "kubectl taint nodes node32 key1-"
 
 }
