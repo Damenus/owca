@@ -60,15 +60,15 @@ pipeline {
                 '''
             }
         }
-//         stage("Building Docker images and do tests in parallel") {
-//             parallel {
-//                  stage("Using tester") {
-//                      steps {
-//                       sh '''
-// 			          sudo make tester
-//                      '''
-//                      }
-//                  }
+        stage("Building Docker images and do tests in parallel") {
+            parallel {
+                 stage("Using tester") {
+                     steps {
+                      sh '''
+			          sudo make tester
+                     '''
+                     }
+                 }
 //                 stage("Build and push Redis Docker image") {
 //                     when {expression{return params.BUILD_IMAGES}}
 //                     steps {
@@ -152,38 +152,38 @@ pipeline {
 //                     '''
 //                     }
 //                 }
-//                 stage("Build and push SpecJBB Docker image") {
-//                     when {expression{return params.BUILD_IMAGES}}
-//                     steps {
-//                         withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
-//                             sh '''
-//                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
-//                             IMAGE_DIR=${WORKSPACE}/workloads/specjbb
-//                             cp ${SPECJBB_TAR} ${IMAGE_DIR}
-//                             tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
-//                             cp -r dist ${IMAGE_DIR}
-//                             docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-//                             docker push ${IMAGE_NAME}
-//                             '''
-//                         }
-//                     }
-//                     post {
-//                         always {
-//                             sh '''
-//                             rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
-//                             '''
-//                         }
-//                     }
-//                 }
-//             }
-//             post {
-//                 always {
-//                     sh '''
-//                     rm -f kaggle.json
-//                     '''
-//                 }
-//             }
-//         }
+                stage("Build and push SpecJBB Docker image") {
+                    when {expression{return params.BUILD_IMAGES}}
+                    steps {
+                        withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
+                            sh '''
+                            IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
+                            IMAGE_DIR=${WORKSPACE}/workloads/specjbb
+                            cp ${SPECJBB_TAR} ${IMAGE_DIR}
+                            tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
+                            cp -r dist ${IMAGE_DIR}
+                            docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+                            docker push ${IMAGE_NAME}
+                            '''
+                        }
+                    }
+                    post {
+                        always {
+                            sh '''
+                            rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
+                            '''
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    sh '''
+                    rm -f kaggle.json
+                    '''
+                }
+            }
+        }
         stage('WCA E2E tests') {
 			/* If commit message contains substring [e2e-skip] then this stage is omitted. */
             when {
