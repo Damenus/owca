@@ -225,7 +225,7 @@ pipeline {
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
                         print('Starting workloads...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
-                        sh "kubectl scale --replicas=1 rs/foo OR -f foo.yaml"
+                        sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
                         test_wca_metrics()
