@@ -214,26 +214,26 @@ pipeline {
                         CERT='true'
                         KUBECONFIG="${HOME}/.kube/admin.conf"
 
+                        KUSTOMIZATION_MONITORING='example/k8s_monitoring/'
                         KUSTOMIZATION_WCA='example/k8s_monitoring/wca/'
                         KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
                     }
                     steps {
-                       // 0. set configs
+                        //0. set configs
 
                         print('Starting wca...')
-                        sh "pwd"
-                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
+                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
                         print('Starting workloads...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         print('Sleep while workloads are running...')
-                        sleep RUN_WORKLOADS_SLEEP_TIME
-                        test_wca_metrics()
+                        //sleep RUN_WORKLOADS_SLEEP_TIME
+                        //test_wca_metrics()
                     }
                     post {
                         always {
                             print('Cleaning workloads and wca...')
-                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
+                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
                         }
                     }
