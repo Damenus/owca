@@ -213,6 +213,9 @@ pipeline {
                         HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes-daemonset.yaml'
                         CERT='true'
                         KUBECONFIG="${HOME}/.kube/admin.conf"
+
+                        KUSTOMIZATION_WCA='example/k8s_monitoring/wca/'
+                        KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
                     }
                     steps {
                         wca_daemonset_check()
@@ -293,17 +296,17 @@ def wca_daemonset_check() {
     // 0. set configs
 
     print('Starting wca...')
-    sh "kubectl get nodes"
-//     kubectl apply -k ./wca
+    sh "pwd"
+    sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
     print('Starting workloads...')
-//     kubectl apply -k ./workload
+    sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 //     kubectl scale --replicas=1 rs/foo OR -f foo.yaml
     print('Sleep while workloads are running...')
     sleep RUN_WORKLOADS_SLEEP_TIME
     test_wca_metrics()
     print('Cleaning workloads and wca...')
-//     kubectl delete -k ./workload
-//     kubectl delete -k ./wca
+    sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
+    sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
 
 }
 
