@@ -218,13 +218,25 @@ pipeline {
                         KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
                     }
                     steps {
-                        wca_daemonset_check()
+                       // 0. set configs
+
+                        print('Starting wca...')
+                        sh "pwd"
+                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
+                        print('Starting workloads...')
+                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
+                        sh "kubectl scale --replicas=1 rs/foo OR -f foo.yaml"
+                        print('Sleep while workloads are running...')
+                        sleep RUN_WORKLOADS_SLEEP_TIME
+                        test_wca_metrics()
                     }
-//                     post {
-//                         always {
-//                              clean()
-//                         }
-//                     }
+                    post {
+                        always {
+                            print('Cleaning workloads and wca...')
+                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
+                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
+                        }
+                    }
                 }
 //                 stage('WCA E2E for Kubernetes') {
 //                     agent { label 'kubernetes' }
@@ -293,20 +305,6 @@ def wca_and_workloads_check() {
 }
 
 def wca_daemonset_check() {
-    // 0. set configs
-
-    print('Starting wca...')
-    sh "pwd"
-    sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
-    print('Starting workloads...')
-    sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
-//     kubectl scale --replicas=1 rs/foo OR -f foo.yaml
-    print('Sleep while workloads are running...')
-    sleep RUN_WORKLOADS_SLEEP_TIME
-    test_wca_metrics()
-    print('Cleaning workloads and wca...')
-    sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
-    sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
 
 }
 
