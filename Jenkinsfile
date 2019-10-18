@@ -7,25 +7,25 @@ pipeline {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
     }
     stages{
-        stage("Flake8 formatting scan") {
-            steps {
-                sh '''
-                  make venv flake8
-                '''
-            }
-        }
-        stage("Run unit tests suite") {
-            steps {
-                sh '''
-                  make venv junit
-                '''
-            }
-            post {
-                always {
-                    junit 'unit_results.xml'
-                }
-            }
-        }
+//         stage("Flake8 formatting scan") {
+//             steps {
+//                 sh '''
+//                   make venv flake8
+//                 '''
+//             }
+//         }
+//         stage("Run unit tests suite") {
+//             steps {
+//                 sh '''
+//                   make venv junit
+//                 '''
+//             }
+//             post {
+//                 always {
+//                     junit 'unit_results.xml'
+//                 }
+//             }
+//         }
         stage("Build WCA pex") {
             steps {
                 sh '''
@@ -41,14 +41,14 @@ pipeline {
                 archiveArtifacts(artifacts: "dist/**")
             }
         }
-        stage("Check code with bandit") {
-             steps {
-             sh '''
-               make bandit bandit_pex
-             '''
-             archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
-           }
-        }
+//         stage("Check code with bandit") {
+//              steps {
+//              sh '''
+//                make bandit bandit_pex
+//              '''
+//              archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
+//            }
+//         }
         stage("Build and push Workload Collocation Agent Docker image") {
             steps {
                 sh '''
@@ -205,7 +205,7 @@ pipeline {
             //failFast true
             parallel {
                 stage('WCA Daemonset E2E for Kubernetes') {
-                    agent { label 'kubernetes' }
+                    agent { label 'Daemonset' }
                     environment {
                         KUBERNETES_HOST='100.64.176.32'
                         CRT_PATH = '/etc/kubernetes/ssl'
@@ -292,24 +292,19 @@ def wca_and_workloads_check() {
 def wca_daemonset_check() {
     images_check()
     // 0. set configs
-    // set taint on one node, check that wca is there no working, for that remove all pod from node
-    print('Reconfiguring wca...')
-    sh "kubectl taint nodes node32 key1=value1:NoExecute"
-    // apply testing wca
-//     kubectl patch -f node.json -p '{"spec":{"template":{"spec":{"tolerations":
-//     [{"key": "key1", "operator": "Equal", "value": "value1", "effect": "NoSchedule"}]}}}'
+
+    print('Starting wca...')
+    sh "kubectl get nodes"
 //     kubectl apply -k ./wca
-//     // test
+    print('Starting workloads...')
 //     kubectl apply -k ./workload
 //     kubectl scale --replicas=1 rs/foo OR -f foo.yaml
-     print('Sleep while workloads are running...')
-     sleep RUN_WORKLOADS_SLEEP_TIME
-//     test_wca_metrics()
-//     // delete all
+    print('Sleep while workloads are running...')
+    sleep RUN_WORKLOADS_SLEEP_TIME
+    test_wca_metrics()
+    print('Cleaning workloads and wca...')
 //     kubectl delete -k ./workload
 //     kubectl delete -k ./wca
-    print('Deleting taint...')
-    sh "kubectl taint nodes node32 key1-"
 
 }
 
