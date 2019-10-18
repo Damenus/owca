@@ -152,37 +152,37 @@ pipeline {
 //                     '''
 //                     }
 //                 }
-                stage("Build and push SpecJBB Docker image") {
-                    when {expression{return params.BUILD_IMAGES}}
-                    steps {
-                        withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
-                            sh '''
-                            IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
-                            IMAGE_DIR=${WORKSPACE}/workloads/specjbb
-                            cp ${SPECJBB_TAR} ${IMAGE_DIR}
-                            tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
-                            cp -r dist ${IMAGE_DIR}
-                            docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
-                            docker push ${IMAGE_NAME}
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            sh '''
-                            rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
-                            '''
-                        }
-                    }
-                }
+//                 stage("Build and push SpecJBB Docker image") {
+//                     when {expression{return params.BUILD_IMAGES}}
+//                     steps {
+//                         withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
+//                             sh '''
+//                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
+//                             IMAGE_DIR=${WORKSPACE}/workloads/specjbb
+//                             cp ${SPECJBB_TAR} ${IMAGE_DIR}
+//                             tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
+//                             cp -r dist ${IMAGE_DIR}
+//                             docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+//                             docker push ${IMAGE_NAME}
+//                             '''
+//                         }
+//                     }
+//                     post {
+//                         always {
+//                             sh '''
+//                             rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
+//                             '''
+//                         }
+//                     }
+//                 }
             }
-            post {
-                always {
-                    sh '''
-                    rm -f kaggle.json
-                    '''
-                }
-            }
+//             post {
+//                 always {
+//                     sh '''
+//                     rm -f kaggle.json
+//                     '''
+//                 }
+//             }
         }
         stage('WCA E2E tests') {
 			/* If commit message contains substring [e2e-skip] then this stage is omitted. */
@@ -212,14 +212,14 @@ pipeline {
                         CONFIG = 'wca_config_kubernetes_daemonset.yaml'
                         HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes-daemonset.yaml'
                         CERT='true'
-                        KUBECONFIG="${HOME}/admin.conf"
+                        KUBECONFIG="${HOME}/.kube/admin.conf"
                     }
                     steps {
                         wca_daemonset_check()
                     }
                     post {
                         always {
-                            clean()
+//                             clean()
                         }
                     }
                 }
@@ -290,7 +290,6 @@ def wca_and_workloads_check() {
 }
 
 def wca_daemonset_check() {
-    images_check()
     // 0. set configs
 
     print('Starting wca...')
