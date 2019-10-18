@@ -222,6 +222,8 @@ pipeline {
                         //0. set configs
 
                         print('Starting wca...')
+                        sh "kubectl apply -f ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/prometheus.crd.yaml"
+                        sh "kubectl apply -f ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/servicemonitor.crd.yaml"
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
                         print('Starting workloads...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"

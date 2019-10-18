@@ -12,5 +12,3 @@ resources:
   - operator/service_account.yaml
   - operator/service.yaml
   - storage_class.yaml
-  - prometheus.crd.yaml
-  - servicemonitor.crd.yaml
