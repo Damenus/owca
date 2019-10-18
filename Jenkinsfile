@@ -217,11 +217,11 @@ pipeline {
                     steps {
                         wca_daemonset_check()
                     }
-                    post {
-                        always {
-//                             clean()
-                        }
-                    }
+//                     post {
+//                         always {
+//                              clean()
+//                         }
+//                     }
                 }
 //                 stage('WCA E2E for Kubernetes') {
 //                     agent { label 'kubernetes' }
