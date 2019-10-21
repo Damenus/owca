@@ -207,6 +207,7 @@ pipeline {
                 stage('WCA Daemonset E2E for Kubernetes') {
                     agent { label 'Daemonset' }
                     environment {
+                        PROMETHEUS = 'http://100.64.176.18:30900'
                         KUBERNETES_HOST='100.64.176.32'
                         CRT_PATH = '/etc/kubernetes/ssl'
                         CONFIG = 'wca_config_kubernetes_daemonset.yaml'
@@ -220,6 +221,8 @@ pipeline {
                     }
                     steps {
                         //0. set configs
+                        // change image tag, wca and all workloads
+                        replace_commit_kustomization()
 
                         print('Starting wca...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
@@ -227,12 +230,13 @@ pipeline {
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         print('Sleep while workloads are running...')
-                        //sleep RUN_WORKLOADS_SLEEP_TIME
+                        sleep RUN_WORKLOADS_SLEEP_TIME
                         //test_wca_metrics()
                     }
                     post {
                         always {
                             print('Cleaning workloads and wca...')
+                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
 //                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
                         }
@@ -306,6 +310,17 @@ def wca_and_workloads_check() {
 
 def wca_daemonset_check() {
 
+}
+
+def replace_commit_kustomization() {
+    contentReplace(
+        configs: [
+            fileContentReplaceConfig(
+                configs: [
+                    fileContentReplaceItemConfig( search: 'devel', replace: "${GIT_COMMIT}", matchCount: 0),
+                ],
+                fileEncoding: 'UTF-8',
+                filePath: "${WORKSPACE}/example/k8s_monitoring/wca/kustomization.yaml")])
 }
 
 def images_check() {

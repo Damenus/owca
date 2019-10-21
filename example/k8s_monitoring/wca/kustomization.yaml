@@ -6,13 +6,13 @@ namespace: wca
 images:
   - name: wca
     newName: 100.64.176.12:80/wca
-    newTag: 0ad4d81d8df52ec731b73d14361e8bd4e2f195c4
+    newTag: devel
 
 resources:
   - daemonset.yaml
   - service.yaml
   - service_account.yaml
-#  - service_monitor.yaml
+  - service_monitor.yaml
 
 configMapGenerator:
   - name: wca-config
