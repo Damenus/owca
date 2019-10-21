@@ -239,8 +239,8 @@ pipeline {
                     post {
                         always {
                             print('Cleaning workloads and wca...')
-                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
-                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
+                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} --wait=false"
+                            sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING} --wait=false"
 //                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
                         }
                     }

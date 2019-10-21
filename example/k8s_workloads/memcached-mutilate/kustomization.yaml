@@ -5,6 +5,6 @@ bases:
 
 commonLabels:
   fit: 2lm
-  intel: 123
+  intel: ddd
 
 
