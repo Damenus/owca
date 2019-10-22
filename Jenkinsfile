@@ -233,7 +233,7 @@ pipeline {
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
                         test_wca_metrics2()
-                         print('Starting workloads...')
+                        print('Starting workloads...')
 
                     }
                     post {
@@ -331,7 +331,7 @@ def add_labels_kustomization(workload) {
         configs: [
             fileContentReplaceConfig(
                 configs: [
-                    fileContentReplaceItemConfig( search: 'commonLabels', replace:
+                    fileContentReplaceItemConfig( search: 'commonLabels:', replace:
                     "commonLabels:\n" +
                         "  build_commit: ${GIT_COMMIT}\n" +
                         "  build_number: ${BUILD_NUMBER}\n" +
