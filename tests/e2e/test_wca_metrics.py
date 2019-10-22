@@ -115,6 +115,7 @@ def test_wca_metrics(workload_name):
 
 @pytest.mark.parametrize('workload_name', [
     'memcached-mutilate',
+    'sysbench-memory'
 ])
 def test_wca_metrics2(workload_name):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
