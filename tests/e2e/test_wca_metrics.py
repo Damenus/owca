@@ -98,14 +98,14 @@ def test_wca_metrics(workload_name):
                  build_number, build_commit, env_uniq_id)
 
     # Check SLI metrics for workloads
-    sli_query = _build_prometheus_url(prometheus, 'sli',
+    sli_query = _build_prometheus_url(prometheus, 'task__up',
                                       tags, 1800, time())
     sli_metrics = _fetch_metrics(sli_query)
     assert len(sli_metrics['data']['result']) > 0, \
         'queried prometheus for SLI metrics produced by workload ' \
         '{} and did not received any'.format(workload_name)
 
-    cycles_query = _build_prometheus_url(prometheus, 'cycles',
+    cycles_query = _build_prometheus_url(prometheus, 'task__cycles',
                                          tags, 1800, time())
     cycles_metrics = _fetch_metrics(cycles_query)
     assert len(cycles_metrics['data']['result']) > 0, \
