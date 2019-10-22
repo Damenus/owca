@@ -333,15 +333,19 @@ def add_labels_kustomization(workload) {
                 configs: [
                     fileContentReplaceItemConfig( search: 'commonLabels', replace:
                     "commonLabels:\n" +
-                        "\tbuild_commit: ${GIT_COMMIT}\n" +
-                        "\tbuild_number: ${BUILD_NUMBER}\n" +
-                        "\tnode_name: ${NODE_NAME}\n" +
-                        "\tworkload_name: ${workload}\n" +
-                        "\tenv_uniq_id: 31\n",
+                        "  build_commit: ${GIT_COMMIT}\n" +
+                        "  build_number: ${BUILD_NUMBER}\n" +
+                        "  node_name: ${NODE_NAME}\n" +
+                        "  workload_name: ${workload}\n" +
+                        "  env_uniq_id: 31\n",
                     matchCount: 0),
                 ],
                 fileEncoding: 'UTF-8',
                 filePath: "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")])
+}
+
+def test_wca_metrics() {
+    sh "PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics2 --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v"
 }
 
 def images_check() {
