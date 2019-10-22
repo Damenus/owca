@@ -232,7 +232,7 @@ pipeline {
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
-                        //test_wca_metrics()
+                        test_wca_metrics2()
                          print('Starting workloads...')
 
                     }
@@ -344,7 +344,7 @@ def add_labels_kustomization(workload) {
                 filePath: "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")])
 }
 
-def test_wca_metrics() {
+def test_wca_metrics2() {
     sh "PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics2 --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v"
 }
 
