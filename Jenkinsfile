@@ -227,13 +227,13 @@ pipeline {
                         print('Starting wca...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
                         print('Starting workloads...')
+                        add_labels_kustomization(memcached)
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
                         //test_wca_metrics()
                          print('Starting workloads...')
-//         sh '''ansible-playbook ${extra_params} -i ${WORKSPACE}/tests/e2e/demo_scenarios/run_workloads/inventory.yaml -i ${WORKSPACE}/${INVENTORY} --tags=${TAGS} -e "${LABELS}" ${WORKSPACE}/${PLAYBOOK}'''
 
                     }
                     post {
@@ -324,6 +324,24 @@ def replace_commit_kustomization() {
                 ],
                 fileEncoding: 'UTF-8',
                 filePath: "${WORKSPACE}/example/k8s_monitoring/wca/kustomization.yaml")])
+}
+
+def add_labels_kustomization(workload) {
+    contentReplace(
+        configs: [
+            fileContentReplaceConfig(
+                configs: [
+                    fileContentReplaceItemConfig( search: 'commonLabels', replace: "
+                    commonLabels:\n
+                        build_commit: ${GIT_COMMIT}\n
+                        build_number: ${BUILD_NUMBER}\n
+                        node_name: ${NODE_NAME}\n
+                        workload_name: ${workload}\n
+                        env_uniq_id: 31\n",
+                    matchCount: 0),
+                ],
+                fileEncoding: 'UTF-8',
+                filePath: "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")])
 }
 
 def images_check() {
