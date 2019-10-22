@@ -227,7 +227,7 @@ pipeline {
                         print('Starting wca...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
                         print('Starting workloads...')
-                        add_labels_kustomization(memcached)
+                        add_labels_kustomization("memcached-mutilate")
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         print('Sleep while workloads are running...')
