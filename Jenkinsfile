@@ -333,11 +333,11 @@ def add_labels_kustomization(workload) {
                 configs: [
                     fileContentReplaceItemConfig( search: 'commonLabels:', replace:
                     "commonLabels:\n" +
-                        "  build_commit: ${GIT_COMMIT}\n" +
-                        "  build_number: ${BUILD_NUMBER}\n" +
-                        "  node_name: ${NODE_NAME}\n" +
-                        "  workload_name: ${workload}\n" +
-                        "  env_uniq_id: 31\n",
+                        "  build_commit: '${GIT_COMMIT}'\n" +
+                        "  build_number: '${BUILD_NUMBER}'\n" +
+                        "  node_name: '${NODE_NAME}'\n" +
+                        "  workload_name: '${workload}'\n" +
+                        "  env_uniq_id: '31'\n",
                     matchCount: 0),
                 ],
                 fileEncoding: 'UTF-8',
