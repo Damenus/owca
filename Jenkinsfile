@@ -231,6 +231,7 @@ pipeline {
                         add_labels_kustomization("sysbench-memory")
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
+                        sh "kubectl scale --replicas=1 statefulset/mutilate-small"
                         sh "kubectl scale --replicas=1 statefulset/sysbench-memory-small"
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
@@ -339,7 +340,7 @@ def add_labels_kustomization(workload) {
                         "  build_number: '${BUILD_NUMBER}'\n" +
                         "  node_name: '${NODE_NAME}'\n" +
                         "  workload_name: '${workload}'\n" +
-                        "  env_uniq_id: '31'\n",
+                        "  env_uniq_id: '32'\n",
                     matchCount: 0),
                 ],
                 fileEncoding: 'UTF-8',
