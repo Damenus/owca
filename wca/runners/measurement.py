@@ -30,12 +30,11 @@ from wca.containers import ContainerManager, Container
 from wca.detectors import TasksMeasurements, TasksResources, TasksLabels, TaskResource
 from wca.logger import trace, get_logging_metrics, TRACE
 from wca.metrics import Metric, MetricType, MetricName, MissingMeasurementException, \
-    BaseGeneratorFactory, DefaultTaskDerivedMetricsGeneratorFactory, \
     export_metrics_from_measurements
 from wca.nodes import Task
 from wca.nodes import TaskSynchronizationException
-from wca.perf_pmu import UncorePerfCounters, _discover_pmu_uncore_imc_config, UNCORE_IMC_EVENTS, \
-    PMUNotAvailable, DefaultPlatformDerivedMetricsGeneratorsFactory
+from wca.perf_uncore import UncorePerfCounters, _discover_pmu_uncore_imc_config, \
+    UNCORE_IMC_EVENTS, PMUNotAvailable, UncoreDerivedMetricsGenerator
 from wca.platforms import CPUCodeName
 from wca.profiling import profiler
 from wca.runners import Runner
@@ -99,6 +98,8 @@ class MeasurementRunner(Runner):
             (defaults to 1 second)
         rdt_enabled: enables or disabled support for RDT monitoring
             (defaults to None(auto) based on platform capabilities)
+        gather_hw_mm_topology: gather hardware/memory topology based on lshw and ipmctl
+            (defaults to False)
         extra_labels: additional labels attached to every metrics
             (defaults to empty dict)
         event_names: perf counters to monitor
@@ -114,22 +115,21 @@ class MeasurementRunner(Runner):
             metrics_storage: storage.Storage = DEFAULT_STORAGE,
             action_delay: Numeric(0, 60) = 1.,  # [s]
             rdt_enabled: Optional[bool] = None,  # Defaults(None) - auto configuration.
+            gather_hw_mm_topology: Optional[bool] = False,
             extra_labels: Dict[Str, Str] = None,
             event_names: List[str] = DEFAULT_EVENTS,
             enable_derived_metrics: bool = False,
+            enable_perf_uncore: bool = True,
             task_label_generators: Dict[str, TaskLabelGenerator] = None,
             _allocation_configuration: Optional[AllocationConfiguration] = None,
             wss_reset_interval: int = 0,
-            task_derived_metrics_generators_factory: BaseGeneratorFactory =
-            DefaultTaskDerivedMetricsGeneratorFactory(),
-            platform_derived_metrics_generators_factory: BaseGeneratorFactory =
-            DefaultPlatformDerivedMetricsGeneratorsFactory(),
     ):
 
         self._node = node
         self._metrics_storage = metrics_storage
         self._action_delay = action_delay
         self._rdt_enabled = rdt_enabled
+        self._gather_hw_mm_topology = gather_hw_mm_topology
         # Disabled by default, to be overridden by subclasses.
         self._rdt_mb_control_required = False
         # Disabled by default, to overridden by subclasses.
@@ -144,6 +144,7 @@ class MeasurementRunner(Runner):
         log.info('Enabling %i perf events: %s', len(self._event_names),
                  ', '.join(self._event_names))
         self._enable_derived_metrics = enable_derived_metrics
+        self._enable_perf_uncore = enable_perf_uncore
 
         # Default value for task_labels_generator.
         if task_label_generators is None:
@@ -165,11 +166,9 @@ class MeasurementRunner(Runner):
             TaskLabelResourceGenerator('cpus')
 
         self._wss_reset_interval = wss_reset_interval
-        self._task_derived_metrics_generators_factory = task_derived_metrics_generators_factory
-        self._platform_derived_metrics_generators_factory = \
-            platform_derived_metrics_generators_factory
 
         self._uncore_pmu = None
+        self._write_to_cgroup = False
 
     @profiler.profile_duration(name='sleep')
     def _wait(self):
@@ -197,7 +196,7 @@ class MeasurementRunner(Runner):
             log.error('RDT explicitly enabled but not available - exiting!')
             return 1
 
-        use_cgroup = True  # WCA gather cgroup metrics by default.
+        use_cgroup = self._write_to_cgroup
         use_resctrl = self._rdt_enabled
         use_perf = len(self._event_names) > 0
 
@@ -229,31 +228,40 @@ class MeasurementRunner(Runner):
             event_names=self._event_names,
             enable_derived_metrics=self._enable_derived_metrics,
             wss_reset_interval=self._wss_reset_interval,
-            task_derived_metrics_generators_factory=self._task_derived_metrics_generators_factory
         )
 
-        self._init_uncore_pmu(self._enable_derived_metrics)
+        self._init_uncore_pmu(self._enable_derived_metrics, self._enable_perf_uncore)
 
         return None
 
-    def _init_uncore_pmu(self, enable_derived_metrics):
-        try:
-            cpus, pmu_events = _discover_pmu_uncore_imc_config(UNCORE_IMC_EVENTS)
-        except PMUNotAvailable:
-            self._uncore_pmu = None
-            self._uncore_get_measurements = lambda: {}
-            return
+    def _init_uncore_pmu(self, enable_derived_metrics, enable_perf_uncore):
+        self._uncore_pmu = None
+        self._uncore_get_measurements = lambda: {}
+        if enable_perf_uncore:
+            try:
+                cpus, pmu_events = _discover_pmu_uncore_imc_config(
+                    UNCORE_IMC_EVENTS)
+            except PMUNotAvailable as e:
+                self._uncore_pmu = None
+                self._uncore_get_measurements = lambda: {}
+                log.warning('Perf pmu metrics requested, but not available. '
+                            'Not collecting perf pmu metrics! '
+                            'error={}'.format(e))
+                return
 
-        self._uncore_pmu = UncorePerfCounters(
-            cpus=cpus,
-            pmu_events=pmu_events
-        )
-        if enable_derived_metrics:
-            self._uncore_derived_metrics = self._platform_derived_metrics_generators_factory.create(
-                self._uncore_pmu.get_measurements)
-            self._uncore_get_measurements = self._uncore_derived_metrics.get_measurements
-        else:
-            self._uncore_get_measurements = self._uncore_pmu.get_measurements
+            # Prepare uncore object
+            self._uncore_pmu = UncorePerfCounters(
+                cpus=cpus,
+                pmu_events=pmu_events
+            )
+
+            # Wrap with derived..
+            if enable_derived_metrics:
+                self._uncore_derived_metrics = UncoreDerivedMetricsGenerator(
+                    self._uncore_pmu.get_measurements)
+                self._uncore_get_measurements = self._uncore_derived_metrics.get_measurements
+            else:
+                self._uncore_get_measurements = self._uncore_pmu.get_measurements
 
     def _iterate(self):
         iteration_start = time.time()
@@ -279,7 +287,8 @@ class MeasurementRunner(Runner):
 
         # Platform information
         platform, platform_metrics, platform_labels = platforms.collect_platform_information(
-            self._rdt_enabled, extra_platform_measurements=extra_platform_measurements)
+            self._rdt_enabled, self._gather_hw_mm_topology,
+            extra_platform_measurements=extra_platform_measurements)
 
         # Common labels
         common_labels = dict(platform_labels, **self._extra_labels)

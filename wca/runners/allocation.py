@@ -177,6 +177,8 @@ class AllocationRunner(MeasurementRunner):
             (defaults to 1 second)
         rdt_enabled: enables or disabled support for RDT monitoring and allocation
             (defaults to None(auto) based on platform capabilities)
+        gather_hw_mm_topology: gather hardware/memory topology based on lshw and ipmctl
+            (defaults to False)
         rdt_mb_control_required: indicates that MB control is required,
             if the platform does not support this feature the WCA will exit
         rdt_cache_control_required: indicates tha L3 control is required,
@@ -203,6 +205,7 @@ class AllocationRunner(MeasurementRunner):
             allocations_storage: storage.Storage = DEFAULT_STORAGE,
             action_delay: Numeric(0, 60) = 1.,  # [s]
             rdt_enabled: Optional[bool] = None,  # Defaults(None) - auto configuration.
+            gather_hw_mm_topology: Optional[bool] = False,
             rdt_mb_control_required: bool = False,
             rdt_cache_control_required: bool = False,
             extra_labels: Dict[Str, Str] = None,
@@ -210,15 +213,17 @@ class AllocationRunner(MeasurementRunner):
             remove_all_resctrl_groups: bool = False,
             event_names: Optional[List[str]] = DEFAULT_EVENTS,
             enable_derived_metrics: bool = False,
+            enable_perf_uncore: bool = True,
             task_label_generators: Dict[str, TaskLabelGenerator] = None,
             wss_reset_interval: int = 0,
     ):
 
         self._allocation_configuration = allocation_configuration or AllocationConfiguration()
 
-        super().__init__(node, metrics_storage, action_delay, rdt_enabled,
+        super().__init__(node, metrics_storage, action_delay, rdt_enabled, gather_hw_mm_topology,
                          extra_labels, _allocation_configuration=self._allocation_configuration,
                          event_names=event_names, enable_derived_metrics=enable_derived_metrics,
+                         enable_perf_uncore=enable_perf_uncore,
                          task_label_generators=task_label_generators,
                          wss_reset_interval=wss_reset_interval)
 
@@ -237,6 +242,9 @@ class AllocationRunner(MeasurementRunner):
         self._allocations_errors = 0
 
         self._remove_all_resctrl_groups = remove_all_resctrl_groups
+
+        # Allocator need permission for writing to cgroups.
+        self._write_to_cgroup = True
 
     def _initialize_rdt(self) -> bool:
         platform, _, _ = platforms.collect_platform_information()

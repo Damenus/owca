@@ -13,7 +13,7 @@
 # limitations under the License.
 import logging
 import time
-from typing import Dict, Union, List, Tuple, Callable, Optional
+from typing import Dict, Union, List, Tuple, Callable
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -44,6 +44,7 @@ class MetricName(str, Enum):
     MEM_LIMIT_PER_TASK = 'memory_limit_per_task_bytes'
     MEM_SOFT_LIMIT_PER_TASK = 'memory_soft_limit_per_task_bytes'
     MEM_NUMA_STAT_PER_TASK = 'memory_numa_stat'
+    MEM_PAGE_FAULTS = 'memory_stat_page_faults'
 
     # NUMA for whole platform
     MEM_NUMA_FREE = 'memory_numa_free'
@@ -188,6 +189,11 @@ METRICS_METADATA: Dict[MetricName, MetricMetadata] = {
         MetricMetadata(
             MetricType.GAUGE,
             'NUMA Stat TODO!',  # TODO: fix me!
+        ),
+    MetricName.MEM_PAGE_FAULTS:
+        MetricMetadata(
+            MetricType.COUNTER,
+            'Page faults',  # TODO: fix me!
         ),
     MetricName.MEM_NUMA_FREE:
         MetricMetadata(
@@ -401,44 +407,6 @@ class DefaultDerivedMetricsGenerator(BaseDerivedMetricsGenerator):
 class BaseGeneratorFactory:
     def create(self, get_measurements):
         raise NotImplementedError
-
-
-def _derive_unbound(extra_metrics, measurements, delta, available, time_delta):
-    for extra_metric_name, code in extra_metrics.items():
-        context = dict(measurements)
-        context.update(dict(
-            delta=delta,
-            time_delta=time_delta,
-            available=available,
-        ))
-        try:
-            measurements[extra_metric_name] = eval(code, context, {})  # nosec TODO: replace eval
-        except ZeroDivisionError:
-            pass
-        except NameError as e:
-            log.warning('symbol %r unknown, metric %r ignored!', e.args, extra_metric_name)
-
-
-class EvalBasedMetricsGenerator(BaseDerivedMetricsGenerator):
-
-    def __init__(self, get_measurements, extra_metrics):
-        super().__init__(get_measurements)
-        self.extra_metrics = extra_metrics
-
-    def _derive(self, measurements, delta, available, time_delta):
-        return _derive_unbound(self.extra_metrics, measurements, delta, available, time_delta)
-
-
-@dataclass
-class DefaultTaskDerivedMetricsGeneratorFactory(BaseGeneratorFactory):
-    extra_metrics: Optional[Dict[str, str]] = None
-
-    def create(self, get_measurements):
-        derived_generator = DefaultDerivedMetricsGenerator(get_measurements)
-        if self.extra_metrics:
-            return EvalBasedMetricsGenerator(derived_generator.get_measurements, self.extra_metrics)
-        else:
-            return derived_generator
 
 
 class MissingMeasurementException(Exception):

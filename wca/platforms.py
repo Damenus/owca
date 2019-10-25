@@ -158,6 +158,8 @@ class Platform:
     # NUMA info
     # mapping from numa node id to CPU (to support SNC), based on /sys/devices/system/numa
     node_cpus: Dict[int, Set[int]]
+    # Distance based on /sys/devices/system/node/node*/distance
+    node_distances: Dict[int, List[int]]
 
     # [unix timestamp] Recorded timestamp of finishing data gathering (as returned from time.time)
     timestamp: float
@@ -166,16 +168,24 @@ class Platform:
 
     measurements: Measurements
 
+    static_information: Optional[Dict]
 
-# cached data about platform static information
+
+class MissingPlatformStaticInformation(Exception):
+    pass
+
+
 _platform_static_information = {}
 
 
-def get_platform_static_information():
+def get_platform_static_information(strict_mode: bool):
+    """"""
     # RETURN MEMORY DIMM DETAILS based on lshw
     global _platform_static_information
-    if 'initialized' not in _platform_static_information:
-        # TODO: PoC to be replaced with ACPI/HMAT table parsing if possible
+    # TODO: PoC to be replaced with ACPI/HMAT table parsing if possible
+    if 'initialized' in _platform_static_information and \
+       _platform_static_information['initialized']:
+
         try:
             # nosec: B603. We deliberately use 'subprocess'. There is a permanent input.
             ipmctl_output = subprocess.check_output(  # nosec
@@ -187,6 +197,8 @@ def get_platform_static_information():
             _platform_static_information['memorymode_size'] = int(memorymode_size)
         except FileNotFoundError:
             log.warning('ipmctl unavailable, cannot read memory mode size')
+            if strict_mode:
+                raise MissingPlatformStaticInformation
 
         try:
             # nosec: B603. We deliberately use 'subprocess'. There is a permanent input.
@@ -220,11 +232,16 @@ def get_platform_static_information():
             _platform_static_information['nvm_dimm_size'] = int(nvm_dimm_size)
         except FileNotFoundError:
             log.warning('lshw unavailable, cannot read memory topology size!')
+            if strict_mode:
+                raise MissingPlatformStaticInformation
+
         except JSONDecodeError:
             log.warning('lshw unavailable (incorrect version or missing data), '
                         'cannot parse output, cannot read memory topology size!')
+            if strict_mode:
+                raise MissingPlatformStaticInformation
 
-    _platform_static_information['initialized'] = True
+        _platform_static_information['initialized'] = True
 
     return _platform_static_information
 
@@ -245,36 +262,34 @@ def create_metrics(platform: Platform) -> List[Metric]:
                type=MetricType.GAUGE, help=""),
     ])
 
-    platform_static_information = get_platform_static_information()
-
     # PMEM HW info r
-    if 'ram_dimm_count' in platform_static_information:
+    if 'ram_dimm_count' in platform.static_information:
         platform_metrics.extend([
             # RAM
             Metric(name=PLATFORM_PREFIX + 'dimm_count',
-                   value=platform_static_information['ram_dimm_count'],
+                   value=platform.static_information['ram_dimm_count'],
                    labels={'type': 'ram'},
                    type=MetricType.GAUGE, help=""),
             Metric(name=PLATFORM_PREFIX + 'dimm_total_size_bytes',
-                   value=platform_static_information['ram_dimm_size'],
+                   value=platform.static_information['ram_dimm_size'],
                    labels={'type': 'ram'},
                    type=MetricType.GAUGE, help=""),
             # NVM
             Metric(name=PLATFORM_PREFIX + 'dimm_count',
-                   value=platform_static_information['nvm_dimm_count'],
+                   value=platform.static_information['nvm_dimm_count'],
                    labels={'type': 'nvm'},
                    type=MetricType.GAUGE, help=""),
             Metric(name=PLATFORM_PREFIX + 'dimm_total_size_bytes',
-                   value=platform_static_information['nvm_dimm_size'],
+                   value=platform.static_information['nvm_dimm_size'],
                    labels={'type': 'nvm'},
                    type=MetricType.GAUGE, help=""),
         ])
 
     # PMEM HW configuration
-    if 'memorymode_size' in platform_static_information:
+    if 'memorymode_size' in platform.static_information:
         platform_metrics.extend([
             Metric(name=PLATFORM_PREFIX + 'memory_mode_size_bytes',
-                   value=platform_static_information['memorymode_size'],
+                   value=platform.static_information['memorymode_size'],
                    type=MetricType.GAUGE, help=""),
         ])
 
@@ -374,7 +389,7 @@ def parse_node_cpus() -> Dict[NodeId, Set[int]]:
     """
     Parses /sys/devices/system/node/node*/cpulist"
     Read CPU to NUMA node mapping based on /sys/devices/system/node
-    :return: mapping from numa_node -> list of cpus (as List of int)
+    :return: mapping from numa_node -> list of cpus (as List[Set] of int)
     """
     node_cpus = {}
     for nodedir in os.listdir(BASE_SYSFS_NODES_PATH):
@@ -384,6 +399,40 @@ def parse_node_cpus() -> Dict[NodeId, Set[int]]:
             with open(cpu_list_filename) as cpu_list_file:
                 node_cpus[node_id] = decode_listformat(cpu_list_file.read())
     return node_cpus
+
+
+VMSTAT_METRICS = ["numa_pages_migrated", "pgmigrate_success", "pgmigrate_fail"]
+
+
+def parse_proc_vmstat() -> Measurements:
+    """
+    """
+    d = {}
+    with open('/proc/vmstat') as f:
+        for line in f:
+            for metric in VMSTAT_METRICS:
+                if line.startswith(metric):
+                    d['vmstat_'+metric] = int(line.split()[1])
+    return d
+
+
+def parse_node_distances() -> Dict[int, Dict[int, int]]:
+    """
+    Parses "/sys/devices/system/node/node*/distance"
+    Read distance to NUMA node mapping based on /sys/devices/system/node
+    :return: mapping from numa_node -> dict of distances (as dict with int key and value)
+    """
+    node_distances = {}
+
+    for nodedir in os.listdir(BASE_SYSFS_NODES_PATH):
+        if nodedir.startswith('node'):
+            node_id = int(nodedir[4:])
+            distance_filename = os.path.join(BASE_SYSFS_NODES_PATH, nodedir, 'distance')
+            with open(distance_filename) as distance_file:
+                distances = distance_file.readline()
+                node_distances[node_id] = {i: int(val) for i, val in enumerate(distances.split())}
+
+    return node_distances
 
 
 def parse_proc_stat(proc_stat_output) -> Dict[CpuId, int]:
@@ -521,6 +570,7 @@ def _collect_rdt_information() -> RDTInformation:
 
 @profiler.profile_duration(name='collect_platform_information')
 def collect_platform_information(rdt_enabled: bool = True,
+                                 gather_hw_mm_topology: bool = False,
                                  extra_platform_measurements: Optional[Measurements] = None) -> (
         Platform, List[Metric], Dict[str, str]):
     """Returns Platform information, metrics and common labels.
@@ -561,6 +611,15 @@ def collect_platform_information(rdt_enabled: bool = True,
                                  if extra_platform_measurements is not None
                                  else {})
 
+    if gather_hw_mm_topology is None:
+        platform_static_information = get_platform_static_information(strict_mode=False)
+    elif gather_hw_mm_topology:
+        platform_static_information = get_platform_static_information(strict_mode=True)
+    else:
+        platform_static_information = {}
+
+    platform_measurements.update(parse_proc_vmstat())
+
     platform = Platform(
         sockets=no_of_sockets,
         cores=nr_of_cores,
@@ -573,7 +632,9 @@ def collect_platform_information(rdt_enabled: bool = True,
         timestamp=time.time(),
         rdt_information=rdt_information,
         node_cpus=parse_node_cpus(),
+        node_distances=parse_node_distances(),
         measurements=platform_measurements,
+        static_information=platform_static_information,
     )
     assert len(platform_measurements[MetricName.CPU_USAGE_PER_CPU]) == platform.cpus, \
         "Inconsistency in cpu data returned by kernel"
