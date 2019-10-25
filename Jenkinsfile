@@ -230,9 +230,15 @@ pipeline {
                         add_labels_kustomization("memcached-mutilate")
                         add_labels_kustomization("sysbench-memory")
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
+
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         sh "kubectl scale --replicas=1 statefulset/mutilate-small"
+
+                        sh "kubectl scale --replicas=1 statefulset/redis-small"
+                        sh "kubectl scale --replicas=1 statefulset/memtier-small"
+
                         sh "kubectl scale --replicas=1 statefulset/sysbench-memory-small"
+
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
                         test_wca_metrics2()
