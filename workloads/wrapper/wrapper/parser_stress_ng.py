@@ -135,11 +135,13 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
                    help="Summary bogo ops/s usr+sys time"))
 
     info = re.search(r'stress-ng: info: {2}\[(?P<id>\d*)\]+ ' +
-                     r'Time (?P<time>\d*), counter=(?P<counter>\d*)', new_line)
+                     r'Time (?P<time>\d*), counter=(?P<counter>\d*), diff (?P<diff>\d*)', new_line)
 
     if info is not None:
+        time = info['time']
         id_proc = info['id']
         counter = int(info['counter'])
+        diff = int(info['diff'])
 
         labels.update({"id_proc_stress_ng": id_proc})
 
@@ -147,6 +149,12 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
             Metric(metric_name_prefix + 'bogo_ops_counter', counter,
                    type=MetricType.COUNTER, labels=labels,
                    help="Counter bogo ops per proc stress-ng, updated per 1 sec"))
+
+        labels.update({"stress_ng_time": time})
+        new_metrics.append(
+            Metric(metric_name_prefix + 'bogo_ops_gauge', diff,
+                   type=MetricType.GAUGE, labels=labels,
+                   help="Gauge bogo ops per proc stress-ng, updated per 1 sec"))
 
     return new_metrics
 
