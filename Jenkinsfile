@@ -7,25 +7,25 @@ pipeline {
         DOCKER_REPOSITORY_URL = credentials('DOCKER_REPOSITORY_URL')
     }
     stages{
-//         stage("Flake8 formatting scan") {
-//             steps {
-//                 sh '''
-//                   make venv flake8
-//                 '''
-//             }
-//         }
-//         stage("Run unit tests suite") {
-//             steps {
-//                 sh '''
-//                   make venv junit
-//                 '''
-//             }
-//             post {
-//                 always {
-//                     junit 'unit_results.xml'
-//                 }
-//             }
-//         }
+        stage("Flake8 formatting scan") {
+            steps {
+                sh '''
+                  make venv flake8
+                '''
+            }
+        }
+        stage("Run unit tests suite") {
+            steps {
+                sh '''
+                  make venv junit
+                '''
+            }
+            post {
+                always {
+                    junit 'unit_results.xml'
+                }
+            }
+        }
         stage("Build WCA pex") {
             steps {
                 sh '''
@@ -41,14 +41,14 @@ pipeline {
                 archiveArtifacts(artifacts: "dist/**")
             }
         }
-//         stage("Check code with bandit") {
-//              steps {
-//              sh '''
-//                make bandit bandit_pex
-//              '''
-//              archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
-//            }
-//         }
+        stage("Check code with bandit") {
+             steps {
+             sh '''
+               make bandit bandit_pex
+             '''
+             archiveArtifacts(artifacts: "wca-bandit.html, wca-pex-bandit.html")
+           }
+        }
         stage("Build and push Workload Collocation Agent Docker image") {
             steps {
                 sh '''
@@ -216,7 +216,6 @@ pipeline {
                         KUBECONFIG="${HOME}/.kube/admin.conf"
 
                         KUSTOMIZATION_MONITORING='example/k8s_monitoring/'
-                        KUSTOMIZATION_WCA='example/k8s_monitoring/wca/'
                         KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
                     }
                     steps {
@@ -261,7 +260,6 @@ pipeline {
                             print('Cleaning workloads and wca...')
                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} --wait=false"
                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING} --wait=false"
-//                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WCA}"
                         }
                     }
                 }
