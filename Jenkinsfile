@@ -232,8 +232,9 @@ pipeline {
                         add_labels_kustomization("stress")
                         add_labels_kustomization("sysbench-memory")
 
+
 //                         add_image_kustomization("memcached-mutilate")
-//                         add_image_kustomization("redis-memtier")
+                        add_image_kustomization("redis-memtier", "memtier_benchmark")
                         add_image_kustomization("stress", "stress_ng")
 //                        add_image_kustomization("sysbench-memory")
 
