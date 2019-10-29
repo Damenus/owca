@@ -219,40 +219,29 @@ pipeline {
                         KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
                     }
                     steps {
-                        //0. set configs
-                        // change image tag, wca and all workloads
                         replace_commit_kustomization()
-
-                        print('Starting wca...')
-                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
-                        print('Starting workloads...')
                         add_labels_kustomization("memcached-mutilate")
                         add_labels_kustomization("redis-memtier")
                         add_labels_kustomization("stress")
                         add_labels_kustomization("sysbench-memory")
-
-
-//                         add_image_kustomization("memcached-mutilate")
                         add_image_kustomization("redis-memtier", "memtier_benchmark")
                         add_image_kustomization("stress", "stress_ng")
-//                        add_image_kustomization("sysbench-memory")
 
+                        print('Starting wca...')
+                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
+                        print('Starting workloads...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
-
                         sh "kubectl scale --replicas=1 statefulset/stress-stream-small"
-
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         sh "kubectl scale --replicas=1 statefulset/mutilate-small"
-
                         sh "kubectl scale --replicas=1 statefulset/redis-small"
                         sh "kubectl scale --replicas=1 statefulset/memtier-small"
-
                         sh "kubectl scale --replicas=1 statefulset/sysbench-memory-small"
 
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
+print('Starting workloads...')
                         test_wca_metrics2()
-                        print('Starting workloads...')
 
                     }
                     post {
@@ -330,8 +319,6 @@ def wca_and_workloads_check() {
 }
 
 def add_image_kustomization(workload, workload_image) {
-    // Need extra approve in Jenkins to use java.io.File java.lang.String
-//     File file = new File("${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")
     file = "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml"
     testing_image = "images:\n" +
     "  - name: ${workload_image}\n" +
