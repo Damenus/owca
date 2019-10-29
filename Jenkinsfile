@@ -331,12 +331,14 @@ def wca_and_workloads_check() {
 }
 
 def add_image_kustomization(workload, workload_image) {
-    File file = new File("${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")
+    // Need extra approve in Jenkins to use java.io.File java.lang.String
+//     File file = new File("${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")
+    file = "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml"
     testing_image = "images:" +
     "  - name: ${workload_image}\n" +
     "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
     "    newTag: ${GIT_COMMIT}\n"
-    file.append(testing_image)
+    sh "echo ${testing_image} > ${file}"
 }
 
 def replace_commit_kustomization() {
