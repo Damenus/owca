@@ -186,11 +186,11 @@ pipeline {
         }
         stage('WCA E2E tests') {
 			/* If commit message contains substring [e2e-skip] then this stage is omitted. */
-            when {
-                expression {
-                    return if_perform_e2e()
-                }
-            }
+//             when {
+//                 expression {
+//                     return if_perform_e2e()
+//                 }
+//             }
             environment {
                 /* For E2E tests. */
                 PLAYBOOK = 'workloads/run_workloads.yaml'
