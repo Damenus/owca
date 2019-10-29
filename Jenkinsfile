@@ -231,6 +231,8 @@ pipeline {
                         add_labels_kustomization("sysbench-memory")
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 
+                        sh "kubectl scale --replicas=1 statefulset/stress-stream-small"
+
                         sh "kubectl scale --replicas=1 statefulset/memcached-small"
                         sh "kubectl scale --replicas=1 statefulset/mutilate-small"
 
