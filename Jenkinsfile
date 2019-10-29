@@ -228,7 +228,15 @@ pipeline {
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
                         print('Starting workloads...')
                         add_labels_kustomization("memcached-mutilate")
+                        add_labels_kustomization("redis-memtier")
+                        add_labels_kustomization("stress")
                         add_labels_kustomization("sysbench-memory")
+
+//                         add_image_kustomization("memcached-mutilate")
+//                         add_image_kustomization("redis-memtier")
+                        add_image_kustomization("stress", "stress_ng")
+//                        add_image_kustomization("sysbench-memory")
+
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 
                         sh "kubectl scale --replicas=1 statefulset/stress-stream-small"
@@ -322,8 +330,13 @@ def wca_and_workloads_check() {
     test_wca_metrics()
 }
 
-def wca_daemonset_check() {
-
+def add_image_kustomization(workload, workload_image) {
+    File file = new File("${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")
+    testing_image = "images:" +
+    "  - name: ${workload_image}\n" +
+    "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
+    "    newTag: ${GIT_COMMIT}\n"
+    file.append(testing_image)
 }
 
 def replace_commit_kustomization() {
