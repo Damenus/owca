@@ -64,8 +64,8 @@ pipeline {
             parallel {
                  stage("Using tester") {
                      steps {
-                      sh '''
-			          sudo make tester
+                     sh '''
+			         sudo make tester
                      '''
                      }
                  }
@@ -209,12 +209,7 @@ pipeline {
                     environment {
                         PROMETHEUS = 'http://100.64.176.18:30900'
                         KUBERNETES_HOST='100.64.176.32'
-                        CRT_PATH = '/etc/kubernetes/ssl'
-                        CONFIG = 'wca_config_kubernetes_daemonset.yaml'
-                        HOST_INVENTORY='tests/e2e/demo_scenarios/common/inventory-kubernetes-daemonset.yaml'
-                        CERT='true'
                         KUBECONFIG="${HOME}/.kube/admin.conf"
-
                         KUSTOMIZATION_MONITORING='example/k8s_monitoring/'
                         KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
                     }
@@ -224,8 +219,8 @@ pipeline {
                         add_labels_kustomization("redis-memtier")
                         add_labels_kustomization("stress")
                         add_labels_kustomization("sysbench-memory")
-                        add_image_kustomization("redis-memtier", "memtier_benchmark")
-                        add_image_kustomization("stress", "stress_ng")
+                        set_docker_image("redis-memtier", "memtier_benchmark")
+                        set_docker_image("stress", "stress_ng")
 
                         print('Starting wca...')
                         sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
@@ -240,9 +235,8 @@ pipeline {
 
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
-print('Starting workloads...')
+                        print('Starting workloads...')
                         test_wca_metrics2()
-
                     }
                     post {
                         always {
@@ -318,7 +312,7 @@ def wca_and_workloads_check() {
     test_wca_metrics()
 }
 
-def add_image_kustomization(workload, workload_image) {
+def set_docker_image(workload, workload_image) {
     file = "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml"
     testing_image = "images:\n" +
     "  - name: ${workload_image}\n" +
@@ -356,8 +350,8 @@ def add_labels_kustomization(workload) {
                 filePath: "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")])
 }
 
-def test_wca_metrics2() {
-    sh "PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics2 --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v"
+def test_wca_metrics_kustomization() {
+    sh "PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics_kustomization --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v"
 }
 
 def images_check() {
