@@ -81,7 +81,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/redis:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/redis
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/redis
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
                     '''
@@ -92,7 +92,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/memtier_benchmark:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/memtier_benchmark
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/memtier_benchmark
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
@@ -104,7 +104,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/stress_ng:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/stress_ng
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/stress_ng
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
@@ -116,7 +116,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/rpc_perf:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/rpc_perf
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/rpc_perf
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
@@ -128,7 +128,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/twemcache:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/twemcache
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/twemcache
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
@@ -140,7 +140,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/ycsb:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/ycsb
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/ycsb
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
@@ -152,7 +152,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/cassandra_stress:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/cassandra_stress
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/cassandra_stress
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
@@ -165,7 +165,7 @@ pipeline {
                         withCredentials([file(credentialsId: 'specjbb', variable: 'SPECJBB_TAR')]) {
                             sh '''
                             IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/specjbb:${GIT_COMMIT}
-                            IMAGE_DIR=${WORKSPACE}/workloads/specjbb
+                            IMAGE_DIR=${WORKSPACE}/examples/workloads/specjbb
                             cp ${SPECJBB_TAR} ${IMAGE_DIR}
                             tar -xC ${IMAGE_DIR} -f ${IMAGE_DIR}/specjbb.tar.bz2
                             cp -r dist ${IMAGE_DIR}
@@ -177,7 +177,7 @@ pipeline {
                     post {
                         always {
                             sh '''
-                            rm -rf ${WORKSPACE}/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/workloads/specjbb/specjbb ${WORKSPACE}/workloads/specjbb/dist
+                            rm -rf ${WORKSPACE}/examples/workloads/specjbb/specjbb.tar.bz2 ${WORKSPACE}/examples/workloads/specjbb/specjbb ${WORKSPACE}/examples/workloads/specjbb/dist
                             '''
                         }
                     }
@@ -200,7 +200,7 @@ pipeline {
             }
             environment {
                 /* For E2E tests. */
-                PLAYBOOK = 'workloads/run_workloads.yaml'
+                PLAYBOOK = 'examples/workloads/run_workloads.yaml'
                 PROMETHEUS = 'http://100.64.176.12:9090'
                 BUILD_COMMIT="${GIT_COMMIT}"
                 EXTRA_ANSIBLE_PARAMS = " "
