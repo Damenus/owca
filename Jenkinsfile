@@ -217,8 +217,8 @@ pipeline {
                         PROMETHEUS = 'http://100.64.176.18:30900'
                         KUBERNETES_HOST='100.64.176.32'
                         KUBECONFIG="${HOME}/.kube/admin.conf"
-                        KUSTOMIZATION_MONITORING='example/k8s_monitoring/'
-                        KUSTOMIZATION_WORKLOAD='example/k8s_workloads/'
+                        KUSTOMIZATION_MONITORING='examples/kubernetes/monitoring/'
+                        KUSTOMIZATION_WORKLOAD='examples/kubernetes/workloads/'
                     }
                     steps {
                         replace_commit_kustomization()
@@ -320,7 +320,7 @@ def wca_and_workloads_check() {
 }
 
 def set_docker_image(workload, workload_image) {
-    file = "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml"
+    file = "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml"
     testing_image = "images:\n" +
     "  - name: ${workload_image}\n" +
     "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
@@ -336,7 +336,7 @@ def replace_commit_kustomization() {
                     fileContentReplaceItemConfig( search: 'devel', replace: "${GIT_COMMIT}", matchCount: 0),
                 ],
                 fileEncoding: 'UTF-8',
-                filePath: "${WORKSPACE}/example/k8s_monitoring/wca/kustomization.yaml")])
+                filePath: "${WORKSPACE}/examples/kubernetes/monitoring/wca/kustomization.yaml")])
 }
 
 def add_labels_kustomization(workload) {
@@ -354,7 +354,7 @@ def add_labels_kustomization(workload) {
                     matchCount: 0),
                 ],
                 fileEncoding: 'UTF-8',
-                filePath: "${WORKSPACE}/example/k8s_workloads/${workload}/kustomization.yaml")])
+                filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
 }
 
 def test_wca_metrics_kustomization() {
