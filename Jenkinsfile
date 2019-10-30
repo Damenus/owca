@@ -236,7 +236,7 @@ pipeline {
                         print('Sleep while workloads are running...')
                         sleep RUN_WORKLOADS_SLEEP_TIME
                         print('Starting workloads...')
-                        test_wca_metrics2()
+                        test_wca_metrics_kustomization()
                     }
                     post {
                         always {
