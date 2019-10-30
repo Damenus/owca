@@ -92,7 +92,7 @@ wca_docker_devel:
 	sudo docker build --network host --target devel -f Dockerfile -t $(REPO)$(WCA_IMAGE):$(WCA_TAG) .
 	@echo WCA image name is: ${REPO}$(WCA_IMAGE):$(WCA_TAG)
 	@echo Push: sudo docker push ${REPO}$(WCA_IMAGE):$(WCA_TAG)
-	@echo Run: sudo docker run --privileged -ti --rm ${REPO}$(WCA_IMAGE):$(WCA_TAG) -0 -c /wca/configs/extra/static_measurements.yaml
+	@echo Run: sudo docker run --privileged -ti --rm ${REPO}$(WCA_IMAGE):$(WCA_TAG) -0 -c /wca/examples/configs/extra/static_measurements.yaml
 
 
 wca_package:
