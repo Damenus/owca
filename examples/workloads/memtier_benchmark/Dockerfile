@@ -12,30 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ubuntu:18.04 as builder
-RUN apt-get update
-RUN \
-  DEBIAN_FRONTEND=noninteractive \
-  apt-get install -y \
-    build-essential autoconf automake libpcre3-dev libevent-dev \
-    pkg-config zlib1g-dev git libboost-all-dev cmake flex libssl-dev
-RUN git clone https://github.com/RedisLabs/memtier_benchmark.git
-WORKDIR /memtier_benchmark
-RUN autoreconf -ivf && ./configure && make && make install
+FROM centos:7 as builder
+RUN yum update -y
+RUN yum install -y wget && \
+    yum install -y libtool libevent libevent-devel openssl-devel && \
+    yum install -y autoconf automake make gcc-c++ && \
+    yum install -y pcre-devel zlib-devel libmemcached-devel
 
-FROM ubuntu:18.04
-LABEL Description="memtier_benchmark"
+RUN wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz && \
+    tar xfz libevent-2.0.21-stable.tar.gz && \
+    pushd libevent-2.0.21-stable && \
+    ./configure && \
+    make && \
+    make install && \
+    popd && \
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}
+
+RUN wget https://github.com/RedisLabs/memtier_benchmark/archive/1.2.17.tar.gz && \
+    tar xfz 1.2.17.tar.gz && \
+    cd ./memtier_benchmark-1.2.17 && \
+    autoreconf -ivf && \
+    ./configure && \
+    make && \
+    make install
+
+FROM centos:7
+RUN yum update -y
+RUN yum install -y wget && \
+    yum install -y libtool libevent libevent-devel openssl-devel && \
+    yum install -y autoconf automake make gcc-c++ && \
+    yum install -y epel-release && \
+    yum makecache && \
+    yum install -y python36 python3-distutils
+
+RUN wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz && \
+    tar xfz libevent-2.0.21-stable.tar.gz && \
+    pushd libevent-2.0.21-stable && \
+    ./configure && \
+    make && \
+    make install && \
+    popd && \
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}
+
+RUN useradd -M memtier
+
 COPY --from=builder /usr/local/bin/memtier_benchmark /usr/local/bin/memtier_benchmark
-RUN \
-  apt-get update && \
-  DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends \
-      libevent-dev python3.6 python3-distutils\
-  && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/
-
 COPY /dist/memtier_benchmark_wrapper.pex /usr/bin/
 
 ENTRYPOINT ["memtier_benchmark"]
-
