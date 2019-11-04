@@ -176,7 +176,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/mutilate:${GIT_COMMIT}
-                    IMAGE_DIR=${WORKSPACE}/workloads/mutilate
+                    IMAGE_DIR=${WORKSPACE}/examples/workloads/mutilate
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                     docker push ${IMAGE_NAME}
