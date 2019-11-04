@@ -171,6 +171,18 @@ pipeline {
                     '''
                     }
                 }
+                stage("Build and push mutilate Docker image") {
+                    when {expression{return params.BUILD_IMAGES}}
+                    steps {
+                    sh '''
+                    IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/mutilate:${GIT_COMMIT}
+                    IMAGE_DIR=${WORKSPACE}/workloads/mutilate
+                    cp -r dist ${IMAGE_DIR}
+                    docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+                    docker push ${IMAGE_NAME}
+                    '''
+                    }
+                }
                 stage("Build and push SpecJBB Docker image") {
                     when {expression{return params.BUILD_IMAGES}}
                     steps {
@@ -317,6 +329,7 @@ def kustomize_wca_and_workloads_check() {
     kustomize_add_labels("stress")
     kustomize_add_labels("sysbench-memory")
 
+    kustomize_set_docker_image("memcached-mutilate", "mutilate")
     kustomize_set_docker_image("redis-memtier", "memtier_benchmark")
     kustomize_set_docker_image("stress", "stress_ng")
     kustomize_set_docker_image("sysbench-memory", "sysbench")
