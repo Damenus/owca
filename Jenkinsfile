@@ -339,7 +339,7 @@ def kustomize_wca_and_workloads_check() {
 
 def kustomize_set_docker_image(workload, workload_image) {
     file = "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml"
-    testing_image = "images:\n" +
+    testing_image = "\nimages:\n" +
     "  - name: ${workload_image}\n" +
     "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
     "    newTag: ${GIT_COMMIT}\n"
