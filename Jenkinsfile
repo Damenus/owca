@@ -304,6 +304,7 @@ def kustomize_wca_and_workloads_check() {
     kustomize_add_labels("redis-memtier")
     kustomize_add_labels("stress")
     kustomize_add_labels("sysbench-memory")
+
     kustomize_set_docker_image("redis-memtier", "memtier_benchmark")
     kustomize_set_docker_image("stress", "stress_ng")
 
@@ -313,7 +314,7 @@ def kustomize_wca_and_workloads_check() {
     print('Starting workloads...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 
-    def list = ["memcached-small","mutilate-small","redis-small","memtier-small","sysbench-memory-small"]
+    def list = ["stress-stream-small", "memcached-small","mutilate-small","redis-small","memtier-small","sysbench-memory-small"]
     for(item in list){
         sh "kubectl scale --replicas=1 statefulset $item"
     }

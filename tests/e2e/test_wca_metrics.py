@@ -80,6 +80,7 @@ def test_wca_metrics(workload_name):
 
 @pytest.mark.parametrize('workload_name', [
     'memcached-mutilate',
+    'redis-memtier',
     'sysbench-memory'
 ])
 def test_wca_metrics_kustomize(workload_name):
