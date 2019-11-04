@@ -221,29 +221,7 @@ pipeline {
                         KUSTOMIZATION_WORKLOAD='examples/kubernetes/workloads/'
                     }
                     steps {
-                        replace_commit_kustomization()
-                        add_labels_kustomization("memcached-mutilate")
-                        add_labels_kustomization("redis-memtier")
-                        add_labels_kustomization("stress")
-                        add_labels_kustomization("sysbench-memory")
-                        set_docker_image("redis-memtier", "memtier_benchmark")
-                        set_docker_image("stress", "stress_ng")
-
-                        print('Starting wca...')
-                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
-                        print('Starting workloads...')
-                        sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
-                        sh "kubectl scale --replicas=1 statefulset/stress-stream-small"
-                        sh "kubectl scale --replicas=1 statefulset/memcached-small"
-                        sh "kubectl scale --replicas=1 statefulset/mutilate-small"
-                        sh "kubectl scale --replicas=1 statefulset/redis-small"
-                        sh "kubectl scale --replicas=1 statefulset/memtier-small"
-                        sh "kubectl scale --replicas=1 statefulset/sysbench-memory-small"
-
-                        print('Sleep while workloads are running...')
-                        sleep RUN_WORKLOADS_SLEEP_TIME
-                        print('Starting workloads...')
-                        test_wca_metrics_kustomization()
+                        kustomize_wca_and_workloads_check()
                     }
                     post {
                         always {
@@ -319,7 +297,33 @@ def wca_and_workloads_check() {
     test_wca_metrics()
 }
 
-def set_docker_image(workload, workload_image) {
+def kustomize_wca_and_workloads_check() {
+    print('Configure wca...')
+    kustomize_replace_commit()
+    kustomize_add_labels("memcached-mutilate")
+    kustomize_add_labels("redis-memtier")
+    kustomize_add_labels("stress")
+    kustomize_add_labels("sysbench-memory")
+    kustomize_set_docker_image("redis-memtier", "memtier_benchmark")
+    kustomize_set_docker_image("stress", "stress_ng")
+
+    print('Starting wca...')
+    sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
+
+    print('Starting workloads...')
+    sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
+
+    def list = ["memcached-small","mutilate-small","redis-small","memtier-small","sysbench-memory-small"]
+    for(item in list){
+        sh "kubectl scale --replicas=1 statefulset $item"
+    }
+
+    print('Sleep while workloads are running...')
+    sleep RUN_WORKLOADS_SLEEP_TIME
+    test_wca_metrics_kustomize()
+}
+
+def kustomize_set_docker_image(workload, workload_image) {
     file = "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml"
     testing_image = "images:\n" +
     "  - name: ${workload_image}\n" +
@@ -328,7 +332,7 @@ def set_docker_image(workload, workload_image) {
     sh "echo '${testing_image}' >> ${file}"
 }
 
-def replace_commit_kustomization() {
+def kustomize_replace_commit() {
     contentReplace(
         configs: [
             fileContentReplaceConfig(
@@ -339,7 +343,7 @@ def replace_commit_kustomization() {
                 filePath: "${WORKSPACE}/examples/kubernetes/monitoring/wca/kustomization.yaml")])
 }
 
-def add_labels_kustomization(workload) {
+def kustomize_add_labels(workload) {
     contentReplace(
         configs: [
             fileContentReplaceConfig(
@@ -357,8 +361,8 @@ def add_labels_kustomization(workload) {
                 filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
 }
 
-def test_wca_metrics_kustomization() {
-    sh "make venv; PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics_kustomization --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v"
+def test_wca_metrics_kustomize() {
+    sh "make venv; PYTHONPATH=. pipenv run pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics_kustomize --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v"
 }
 
 def images_check() {

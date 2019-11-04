@@ -82,7 +82,7 @@ def test_wca_metrics(workload_name):
     'memcached-mutilate',
     'sysbench-memory'
 ])
-def test_wca_metrics_kustomization(workload_name):
+def test_wca_metrics_kustomize(workload_name):
     test_wca(workload_name)
 
 
