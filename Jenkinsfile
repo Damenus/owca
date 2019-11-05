@@ -322,7 +322,7 @@ def wca_and_workloads_check() {
 }
 
 def kustomize_wca_and_workloads_check() {
-    print('Configure wca...')
+    print('Configure wca and workloads...')
     kustomize_replace_commit()
     kustomize_add_labels("memcached-mutilate")
     kustomize_add_labels("redis-memtier")
