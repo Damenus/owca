@@ -23,7 +23,7 @@
 # docker build -t wca:latest .
 
 # 2. Run
-# sudo docker run -it --privileged --rm wca -c /wca/examples/configs/extra/static_measurements.yaml -0
+# sudo docker run -it --privileged --rm wca -c /wca/configs/extra/static_measurements.yaml -0
 # should output some metrics
 
 # ------------------------ devel ----------------------
@@ -53,7 +53,7 @@ ENV PYTHONPATH=/wca
 
 
 # note: Cache will be propably invalidated here.
-COPY examples/configs ./examples/configs
+COPY configs ./configs
 
 COPY examples/external_package.py ./examples
 COPY examples/hello_world_runner.py ./examples

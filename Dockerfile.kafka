@@ -18,7 +18,7 @@
 FROM centos:7
 
 RUN echo "" && rpm --import https://packages.confluent.io/rpm/5.2/archive.key
-COPY /examples/configs/confluent_repo/confluent.repo /etc/yum.repos.d/confluent.repo
+COPY /configs/confluent_repo/confluent.repo /etc/yum.repos.d/confluent.repo
 
 RUN yum -y update && yum -y install epel-release
 RUN yum -y install python36 python-pip which make git \
