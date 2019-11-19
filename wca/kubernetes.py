@@ -182,7 +182,7 @@ class KubernetesNode(Node):
             container_statuses = pod.get('status').get('containerStatuses')
 
             # Kubeapi returns all pods in cluster
-            if not self.kubelet_enabled and self.node_ip.strip() != pod["status"]["hostIP"]:
+            if not self.kubelet_enabled and pod["status"]["hostIP"] != self.node_ip.strip():
                 continue
 
             # Kubelet return all pods on the node. Ignore pods in not monitored namespaces.
