@@ -20,7 +20,6 @@ RUN yum install -y wget git which && \
     yum makecache && \
     yum install -y python36 python3-distutils && \
     yum install -y scons gengetopt libzmq-dev && \
-#    yum install -y g++ zlib1g-dev build-essential && \
     yum install -y gcc-c++ libevent-devel
 
 RUN git clone https://github.com/leverich/mutilate.git
