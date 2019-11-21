@@ -1,4 +1,25 @@
 tests:
+  - test_case_name0:
+    tasks:
+      - /wcatask1
+      - /wcatask2
+
+    allocator: !StaticAllocator
+      rules:
+        - name: Example first rule
+          allocations:
+            cpu_quota: 0.5
+            cpu_shares: 10
+            cpuset_cpus: '0-3'
+            rdt:
+              name: 'test'
+              l3: 'L3:0=3;1=2'
+    checks:
+      - !FileCheck
+        path: /sys/fs/cgroup/cpu/wcatask1/cpu.shares
+        line: '10000'
+        subvalue: '100'
+
   - test_case_name1:
     tasks:
       - /wcatask1
