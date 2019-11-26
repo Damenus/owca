@@ -11,6 +11,9 @@ tests:
             cpu_quota: 0.5
             cpu_shares: 10
             cpuset_cpus: '0-3'
+            cpuset_mems: 100 # a
+            cpu_set_memory_migrate: 1 # 0 1
+            migrate_pages: # syscall
             rdt:
               name: 'test'
               l3: 'L3:0=3;1=2'
