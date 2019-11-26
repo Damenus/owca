@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 requests = "==2.22.0"                 # 2019.05.16
-"ruamel.yaml" = "==0.16.5"            # 2019.09.18
+"ruamel.yaml" = "==0.15.100"          # 2019.11.26  - cannot be upgraded to 0.16.0 because of 'anchor problem'
 colorlog = "==4.0.2"                  # 2018.12.14
 logging-tree = "==1.8"                # 2018.08.05
 dataclasses = "==0.6"                 # 2018.05.18
