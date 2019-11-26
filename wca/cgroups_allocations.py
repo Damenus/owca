@@ -211,6 +211,7 @@ def _migrate_pages(task_pids, to_node, number_of_nodes):
         log.log(TRACE, 'migrate pages cmd: %s', ' '.join(cmd))
         try:
             start = time.time()
+            # TODO: change to syscall
             subprocess.check_output(cmd)  # nosec - input is already validated
             duration = time.time() - start
             log.debug('Moving duration %0.2fs', duration)
