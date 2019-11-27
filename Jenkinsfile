@@ -62,7 +62,7 @@ pipeline {
                 IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca:${GIT_COMMIT}
                 IMAGE_DIR=${WORKSPACE}
 
-                docker build --no-cache -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
+                docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
                 docker push ${IMAGE_NAME}
                 '''
             }
