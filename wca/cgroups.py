@@ -135,14 +135,12 @@ class Cgroup:
             raise MissingMeasurementException(
                 'File {} is missing. Metric unavailable.'.format(e.filename))
 
-        has_hierarchical_metrics = False
-        try:
+        def get_metric(metric):
             with open(os.path.join(
-                    self.cgroup_memory_fullpath, CgroupResource.NUMA_STAT)) as resource_file:
+                        self.cgroup_memory_fullpath, CgroupResource.NUMA_STAT)) as resource_file:
                 for line in resource_file.readlines():
                     # Requires mem.use_hierarchy = 1
-                    if line.startswith("hierarchical_total="):
-                        has_hierarchical_metrics = True
+                    if line.startswith(metric):
                         for stat in line.split()[1:]:
                             k, v = stat.split("=")
                             k, v = k[1:], int(v)
@@ -152,22 +150,14 @@ class Cgroup:
                                 measurements[MetricName.MEM_NUMA_STAT_PER_TASK][k] = v
                         break
 
+        try:
+            has_hierarchical_metrics = False
+            get_metric("hierarchical_total=")
             if not has_hierarchical_metrics:
-                with open(os.path.join(
-                        self.cgroup_memory_fullpath, CgroupResource.NUMA_STAT)) as resource_file:
-                    for line in resource_file.readlines():
-                        # Requires mem.use_hierarchy = 1
-                        if line.startswith("total="):
-                            import warnings
-                            warnings.warn("Warning. No hierarchical mem stat for tasks in cgroup. ")
-                            for stat in line.split()[1:]:
-                                k, v = stat.split("=")
-                                k, v = k[1:], int(v)
-                                if MetricName.MEM_NUMA_STAT_PER_TASK not in measurements:
-                                    measurements[MetricName.MEM_NUMA_STAT_PER_TASK] = {k: v}
-                                else:
-                                    measurements[MetricName.MEM_NUMA_STAT_PER_TASK][k] = v
-                            break
+                import warnings
+                warnings.warn("Warning. No hierarchical mem stat for tasks in cgroup. Use ")
+                get_metric("total=")
+
         except FileNotFoundError as e:
             raise MissingMeasurementException(
                 'File {} is missing. Metric unavailable.'.format(e.filename))
