@@ -135,12 +135,14 @@ class Cgroup:
             raise MissingMeasurementException(
                 'File {} is missing. Metric unavailable.'.format(e.filename))
 
+        has_hierarchical_metrics = False
         try:
             with open(os.path.join(
                     self.cgroup_memory_fullpath, CgroupResource.NUMA_STAT)) as resource_file:
                 for line in resource_file.readlines():
                     # Requires mem.use_hierarchy = 1
                     if line.startswith("hierarchical_total="):
+                        has_hierarchical_metrics = True
                         for stat in line.split()[1:]:
                             k, v = stat.split("=")
                             k, v = k[1:], int(v)
@@ -149,9 +151,27 @@ class Cgroup:
                             else:
                                 measurements[MetricName.MEM_NUMA_STAT_PER_TASK][k] = v
                         break
+
+            if not has_hierarchical_metrics:
+                with open(os.path.join(
+                        self.cgroup_memory_fullpath, CgroupResource.NUMA_STAT)) as resource_file:
+                    for line in resource_file.readlines():
+                        # Requires mem.use_hierarchy = 1
+                        if line.startswith("total="):
+                            import warnings
+                            warnings.warn("Warning. No hierarchical mem stat for tasks in cgroup. ")
+                            for stat in line.split()[1:]:
+                                k, v = stat.split("=")
+                                k, v = k[1:], int(v)
+                                if MetricName.MEM_NUMA_STAT_PER_TASK not in measurements:
+                                    measurements[MetricName.MEM_NUMA_STAT_PER_TASK] = {k: v}
+                                else:
+                                    measurements[MetricName.MEM_NUMA_STAT_PER_TASK][k] = v
+                            break
         except FileNotFoundError as e:
             raise MissingMeasurementException(
                 'File {} is missing. Metric unavailable.'.format(e.filename))
+
         # Check whether consecutive keys.
         assert MetricName.MEM_NUMA_STAT_PER_TASK not in measurements or \
             list(measurements[MetricName.MEM_NUMA_STAT_PER_TASK].keys()) == \
