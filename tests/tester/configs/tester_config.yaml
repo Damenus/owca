@@ -1,5 +1,4 @@
 tests:
-
   - test_case_numa:
     tasks:
       - /wcatask1
@@ -249,3 +248,23 @@ tests:
         labels:
           task: wcatask4
         value: 4
+  - test_case_name3:
+    tasks:
+      - /wcatask1
+      - /wcatask2
+
+    allocator: !StaticAllocator
+      rules:
+        - name: Example third rule
+          allocations:
+            cpuset_mems: '1'
+            cpu_set_memory_migrate: 1
+#            migrate_pages:
+
+    checks:
+      - !FileCheck
+        path: /sys/fs/cgroup/cpuset/wcatask1/cpuset.mems
+        line: '1'
+      - !FileCheck
+        path: /sys/fs/cgroup/cpuset/wcatask1/cpuset.memory_migrate
+        line: '1'
