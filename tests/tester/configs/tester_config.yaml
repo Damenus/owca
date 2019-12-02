@@ -259,7 +259,6 @@ tests:
           allocations:
             cpuset_mems: '1'
             cpu_set_memory_migrate: 1
-#            migrate_pages:
 
     checks:
       - !FileCheck
