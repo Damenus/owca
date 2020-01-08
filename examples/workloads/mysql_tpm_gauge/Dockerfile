@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2018 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM centos:7
+
+# Building mysql_tpm_gauge.
+FROM centos:7 AS mysql_tpm_gauge
 
 RUN yum -y update
 RUN yum -y install epel-release
-RUN yum -y install sysbench
+RUN yum -y install python36 python-pip python36-pip which make git
 
-RUN useradd -M sysbench
+RUN pip3 install mysql-connector-python
+
+WORKDIR /mysql-tpm-gauge
+
+COPY mysql_tpm_gauge.py .
+COPY /dist/mysql_tpm_gauge_wrapper.pex /usr/bin/
