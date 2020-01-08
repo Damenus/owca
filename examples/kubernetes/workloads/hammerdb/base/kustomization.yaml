@@ -1,0 +1,17 @@
+resources:
+  - hammerdb.yaml
+  - mariadb.yaml
+
+images:
+  - name: hammerdb
+    newName: 100.64.176.12:80/wca/hammerdb
+    newTag: da2bc9bcac5a79c7158553a950ca3670685ea25b
+  - name: mysql_tpm_gauge
+    newName: 100.64.176.12:80/wca/mysql_tpm_gauge
+    newTag: 36f55e38a61fbcb57d3cab93b27a7e555dfaf7f2
+
+configMapGenerator:
+  - name: mysql-tpm-gauge-tcl-script
+    files:
+      - workload.tcl
+      - build_workload.tcl

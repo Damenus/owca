@@ -52,7 +52,7 @@ spec:
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
 
       - name:  initialize-database-schema
-        image: 100.64.176.12:80/wca/hammerdb:da2bc9bcac5a79c7158553a950ca3670685ea25b
+        image: hammerdb
         command: [ "./hammerdbcli", "auto" ]
         args:  ["/etc/hammerdb/config/build_workload.tcl" ]
         volumeMounts:
@@ -61,7 +61,7 @@ spec:
 
       containers:
       - name: hammerdb
-        image: 100.64.176.12:80/wca/hammerdb:da2bc9bcac5a79c7158553a950ca3670685ea25b
+        image: hammerdb
         command: [ "./hammerdbcli", "auto" ]
         args:  ["/etc/hammerdb/config/workload.tcl" ]
         volumeMounts:
@@ -70,68 +70,25 @@ spec:
 
         # python3 /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql
       - name: mysql-tpm-gauge
-        image: 100.64.176.12:80/wca/mysql_tpm_gauge:36f55e38a61fbcb57d3cab93b27a7e555dfaf7f2
+        image: mysql_tpm_gauge
         command:
           - bash
           - -c
-          - "identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
-          mysql_tpm_gauge_wrapper.pex \
-          --command 'python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host ${identifier}' \
-          --log_level DEBUG \
-          --stderr 0 \
-          --labels '{\"workload\": \"hammerdb\"}' \
-          --metric_name_prefix 'sql_' \
-          --storage_output_filename=/var/log/wrapper/metrics.prom
-          "
+          - >
+            identifier=${podname#hammerdb-};
+            service=${identifier%-[+[:digit:]]};
+
+            mysql_tpm_gauge_wrapper.pex
+            --command 'python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host ${identifier}'
+            --log_level DEBUG
+            --stderr 0
+            --labels '{\"workload\": \"hammerdb\"}'
+            --metric_name_prefix 'sql_' \
+            --storage_output_filename=/var/log/wrapper/metrics.prom
+
         env:
           - name: podname
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
-        volumeMounts:
-          - name: var-log-wrapper
-            mountPath: /var/log/wrapper
-
-      - name: node-exporter
-        image: prom/node-exporter:v0.18.1
-        securityContext:
-          privileged: true
-        args:
-          - --collector.textfile.directory=/var/log/wrapper
-          - --web.disable-exporter-metrics
-          - --no-collector.arp
-          - --no-collector.bcache
-          - --no-collector.bonding
-          - --no-collector.conntrack
-          - --no-collector.cpu
-          - --no-collector.cpufreq
-          - --no-collector.diskstats
-          - --no-collector.edac
-          - --no-collector.entropy
-          - --no-collector.filefd
-          - --no-collector.filesystem
-          - --no-collector.hwmon
-          - --no-collector.infiniband
-          - --no-collector.ipvs
-          - --no-collector.loadavg
-          - --no-collector.mdadm
-          - --no-collector.meminfo
-          - --no-collector.netclass
-          - --no-collector.netdev
-          - --no-collector.netstat
-          - --no-collector.nfs
-          - --no-collector.nfsd
-          - --no-collector.pressure
-          - --no-collector.sockstat
-          - --no-collector.stat
-          - --no-collector.time
-          - --no-collector.timex
-          - --no-collector.uname
-          - --no-collector.vmstat
-          - --no-collector.xfs
-          - --no-collector.zfs
-          - --log.level=debug
-        ports:
-          - containerPort: 9100
-            protocol: TCP
         volumeMounts:
           - name: var-log-wrapper
             mountPath: /var/log/wrapper
@@ -141,6 +98,4 @@ spec:
         configMap:
           name: mysql-tpm-gauge-tcl-script
       - name: changed-config-volume
-        emptyDir: {}
-      - name: var-log-wrapper
         emptyDir: {}
