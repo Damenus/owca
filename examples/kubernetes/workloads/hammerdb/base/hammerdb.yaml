@@ -18,8 +18,8 @@ spec:
       securityContext:
         fsGroup: 1000
 
-      nodeSelector:
-        own_ip: 100.64.176.38
+#      nodeSelector:
+#        own_ip: 100.64.176.38
 
       initContainers:
       - name: change-config-workload
@@ -99,3 +99,5 @@ spec:
           name: mysql-tpm-gauge-tcl-script
       - name: changed-config-volume
         emptyDir: {}
+
+  volumeClaimTemplates: []
