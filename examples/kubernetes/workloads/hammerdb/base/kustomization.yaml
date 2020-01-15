@@ -7,3 +7,7 @@ configMapGenerator:
     files:
       - workload.tcl
       - build_workload.tcl
+
+  - name: hammerdb-parameters
+    literals:
+      - number_runners=2

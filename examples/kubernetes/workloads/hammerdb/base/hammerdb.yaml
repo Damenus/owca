@@ -26,9 +26,9 @@ spec:
         image: busybox
         command: [ "/bin/sh", "-c"]
         args:
-          - "identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
-             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/;s/WORKER_NUMBER/$number_runners/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
-             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql/\" /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl"
+          - "identifier=${podname#hammerdb-}; service=${identifier%-[+[:digit:]]};
+             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/;s/WORKER_NUMBER/$number_runners/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
+             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/\" /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl"
         volumeMounts:
           - name: config-volume
             mountPath: /etc/config
@@ -40,16 +40,16 @@ spec:
           - name: number_runners
             valueFrom: {configMapKeyRef: { name: hammerdb-parameters, key: number_runners }}
 
-      - name: wait-for-database-init
-        image: alpine:3.6
-        # mysqladmin -u testuser -h mysql-0.mysql -ptestpassword status
-        # Uptime: 963  Threads: 4  Questions: 1043  Slow queries: 0  Opens: 67  Flush tables: 1  Open tables: 60  Queries per second avg: 1.083
-        command: [ "/bin/sh", "-c", "sleep 20" ]
-        args:
-          - identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
-        env:
-          - name: podname
-            valueFrom: {fieldRef: {fieldPath: metadata.name}}
+#      - name: wait-for-database-init
+#        image: alpine:3.6
+#        # mysqladmin -u testuser -h mysql-0.mysql -ptestpassword status
+#        # Uptime: 963  Threads: 4  Questions: 1043  Slow queries: 0  Opens: 67  Flush tables: 1  Open tables: 60  Queries per second avg: 1.083
+#        command: [ "/bin/sh", "-c", "sleep 20" ]
+#        args:
+#          - identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
+#        env:
+#          - name: podname
+#            valueFrom: {fieldRef: {fieldPath: metadata.name}}
 
       - name:  initialize-database-schema
         image: hammerdb
@@ -74,17 +74,22 @@ spec:
         command:
           - bash
           - -c
+          - -i
           - >
             identifier=${podname#hammerdb-};
-            service=${identifier%-[+[:digit:]]};
+            service=${identifier%-*};
+
+            set -x;
+
+            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-${identifier}.mysql-${service}
 
             mysql_tpm_gauge_wrapper.pex
-            --command 'python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host ${identifier}'
+            --command "python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-${identifier}.mysql-${service}"
             --log_level DEBUG
             --stderr 0
             --labels '{\"workload\": \"hammerdb\"}'
             --metric_name_prefix 'sql_' \
-            --storage_output_filename=/var/log/wrapper/metrics.prom
+            --storage_output_filename /var/log/wrapper/metrics.prom
 
         env:
           - name: podname
@@ -99,5 +104,8 @@ spec:
           name: mysql-tpm-gauge-tcl-script
       - name: changed-config-volume
         emptyDir: {}
+      - name: var-log-wrapper
+        emptyDir: {}
 
   volumeClaimTemplates: []
+
