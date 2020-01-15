@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
+import re
 from io import TextIOWrapper
 import logging
 from typing import List, Dict
@@ -27,16 +26,19 @@ log = logging.getLogger(__name__)
 def parse(input: TextIOWrapper, regexp: str, separator: str = None,
           labels: Dict[str, str] = {}, metric_name_prefix: str = '') -> List[Metric]:
     """Custom parse function for gauge tpm from mysql.
-        87060.0
-        95220.0
-        93600.0
-        90000.0
+        TPM: 87060.0
+        TPM: 95220.0
+        TPM: 93600.0
+        TPM: 90000.0
     """
     new_metrics = []
 
     new_line = readline_with_check(input, EOF_line='end')
 
-    new_metrics.append(Metric(metric_name_prefix + 'tpm', new_line,
+    regex = dict(re.findall(r'TPM: (?P<tpm>\d+).', new_line))
+    tpm = float(regex['tpm'])
+
+    new_metrics.append(Metric(metric_name_prefix + 'tpm', tpm,
                               type=MetricType.GAUGE, labels=labels,
                               help="TPM (transaction per minute) from mysql"))
 

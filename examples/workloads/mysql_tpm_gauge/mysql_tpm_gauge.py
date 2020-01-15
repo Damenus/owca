@@ -76,7 +76,7 @@ def main():
         delta = now - before
         before = now
         tpm = delta * 60 / interval
-        print(tpm)
+        print("TPM: %f" % tpm)
 
         time.sleep(interval)
 

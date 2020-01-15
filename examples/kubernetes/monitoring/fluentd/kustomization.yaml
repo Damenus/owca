@@ -5,7 +5,7 @@ configMapGenerator:
   - name: fconf
     files:
     - configurations/fluent.conf
-    - configurations/hammerdb_mysql_tpm_gauge.conf
+    - configurations/hammerdb.conf
     - configurations/stress.conf
     - configurations/mutilate.conf
     - configurations/sysbench.conf
