@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-# Building mysql_tpm_gauge.
 FROM centos:7 AS mysql_tpm_gauge
 
 RUN yum -y update
@@ -25,4 +24,4 @@ RUN pip3 install mysql-connector-python
 WORKDIR /mysql-tpm-gauge
 
 COPY mysql_tpm_gauge.py .
-COPY /dist/mysql_tpm_gauge_wrapper.pex /usr/bin/
+#COPY /dist/mysql_tpm_gauge_wrapper.pex /usr/bin/
