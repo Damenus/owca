@@ -240,6 +240,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/hammerdb:${GIT_COMMIT}
+                    BRANCH_IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/hammerdb:${GIT_BRANCH}
                     IMAGE_DIR=${WORKSPACE}/examples/workloads/hammerdb
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
@@ -254,6 +255,7 @@ pipeline {
                     steps {
                     sh '''
                     IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/mysql_tpm_gauge:${GIT_COMMIT}
+                    BRANCH_IMAGE_NAME=${DOCKER_REPOSITORY_URL}/wca/mysql_tpm_gauge:${GIT_BRANCH}
                     IMAGE_DIR=${WORKSPACE}/examples/workloads/mysql_tpm_gauge
                     cp -r dist ${IMAGE_DIR}
                     docker build -t ${IMAGE_NAME} -f ${IMAGE_DIR}/Dockerfile ${IMAGE_DIR}
