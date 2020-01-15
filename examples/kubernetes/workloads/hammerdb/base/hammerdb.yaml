@@ -6,7 +6,7 @@ metadata:
     app: hammerdb
 spec:
   serviceName: mysql
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: hammerdb
@@ -15,41 +15,50 @@ spec:
       labels:
         app: hammerdb
     spec:
-      securityContext:
-        fsGroup: 1000
-
-#      nodeSelector:
-#        own_ip: 100.64.176.38
-
       initContainers:
       - name: change-config-workload
         image: busybox
-        command: [ "/bin/sh", "-c"]
-        args:
-          - "identifier=${podname#hammerdb-}; service=${identifier%-[+[:digit:]]};
-             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/;s/WORKER_NUMBER/$number_runners/\" /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
-             sed \"s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/\" /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl"
-        volumeMounts:
-          - name: config-volume
-            mountPath: /etc/config
-          - name: changed-config-volume
-            mountPath: /etc/hammerdb/config
         env:
           - name: podname
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
           - name: number_runners
             valueFrom: {configMapKeyRef: { name: hammerdb-parameters, key: number_runners }}
+        command:
+          - /bin/sh
+          - -c
+          - >
+            identifier=${podname#hammerdb-};
+            service=${identifier%-[+[:digit:]]};
 
-#      - name: wait-for-database-init
-#        image: alpine:3.6
-#        # mysqladmin -u testuser -h mysql-0.mysql -ptestpassword status
-#        # Uptime: 963  Threads: 4  Questions: 1043  Slow queries: 0  Opens: 67  Flush tables: 1  Open tables: 60  Queries per second avg: 1.083
-#        command: [ "/bin/sh", "-c", "sleep 20" ]
-#        args:
-#          - identifier=${podname#hammerdb-} service=${identifier%-[+[:digit:]]};
-#        env:
-#          - name: podname
-#            valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            sed "s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/;s/WORKER_NUMBER/$number_runners/"
+            /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
+
+            sed "s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/"
+            /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+          - name: changed-config-volume
+            mountPath: /etc/hammerdb/config
+
+      - name: wait-for-database-init
+        image: hammerdb
+        env:
+          - name: podname
+            valueFrom: {fieldRef: {fieldPath: metadata.name}}
+        command:
+          - /bin/sh
+          - -c
+          - >
+            identifier=${podname#hammerdb-};
+            service=${identifier%-[+[:digit:]]};
+
+            test=0;
+            until [ test -ne 1 ];
+            do
+              test=$(mysqladmin -u testuser -h mysql-${identifier}.mysql-${service} -ptestpassword ping | wc -l | tail -1);
+              echo $test;
+            done
 
       - name:  initialize-database-schema
         image: hammerdb
@@ -68,27 +77,20 @@ spec:
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
 
-        # python3 /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-0.mysql
       - name: mysql-tpm-gauge
         image: mysql_tpm_gauge
-        command:
-          - bash
-          - -c
-          - -i
-          - >
-            identifier=${podname#hammerdb-};
-            service=${identifier%-*};
-
-            set -x;
-
-            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-${identifier}.mysql-${service}
-
         env:
           - name: podname
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
-        volumeMounts:
-          - name: var-log-wrapper
-            mountPath: /var/log/wrapper
+        command:
+          - bash
+          - -c
+          - >
+            identifier=${podname#hammerdb-};
+            service=${identifier%-[+[:digit:]]};
+
+            set -x;
+            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py --host mysql-${identifier}.mysql-${service}
 
       volumes:
       - name: config-volume
@@ -96,8 +98,5 @@ spec:
           name: mysql-tpm-gauge-tcl-script
       - name: changed-config-volume
         emptyDir: {}
-      - name: var-log-wrapper
-        emptyDir: {}
 
   volumeClaimTemplates: []
-
