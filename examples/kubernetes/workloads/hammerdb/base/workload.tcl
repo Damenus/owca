@@ -27,5 +27,5 @@ loadscript
 vuset vu WORKER_NUMBER
 vucreate
 vurun
-runtimer 600
+runtimer 60000
 after 5000
