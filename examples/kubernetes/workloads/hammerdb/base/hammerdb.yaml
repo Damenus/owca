@@ -54,7 +54,7 @@ spec:
             service=${identifier%-[+[:digit:]]};
 
             test=0;
-            until [ $test -ne 1 ];
+            until [ $test -eq 1 ];
             do
               test=$(mysqladmin -u testuser -h mysql-${identifier}.mysql-${service} -ptestpassword ping | wc -l | tail -1);
               echo $test;
