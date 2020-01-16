@@ -20,7 +20,8 @@ diset connection mysql_port 3306
 diset tpcc mysql_user testuser
 diset tpcc mysql_pass testpassword
 diset tpcc mysql_driver timed
-diset tpcc my_duration 5
+diset tpcc mysql_rampup 1
+diset tpcc mysql_duration 60
 print dict
 
 loadscript
