@@ -427,9 +427,10 @@ def wca_and_workloads_check() {
 def kustomize_wca_and_workloads_check() {
     print('-kustomize_wca_and_workloads_check-')
     image_check("wca")
-    // examaples/kubernetes workloads like: memcached, memtier, redis use official images
+    // examaples/kubernetes workloads like: mysql, memcached, memtier, redis use official images
     sh "echo GIT_COMMIT=$GIT_COMMIT"
     print('Configure wca and workloads...')
+    kustomize_add_labels("hammerdb")
     kustomize_replace_commit_in_wca()
     kustomize_add_labels("memcached-mutilate")
     kustomize_add_labels("redis-memtier")
@@ -437,6 +438,7 @@ def kustomize_wca_and_workloads_check() {
     kustomize_add_labels("sysbench-memory")
 
     print('Configure images...')
+    kustomize_set_docker_image("hammerdb", "hammerdb")
     kustomize_set_docker_image("memcached-mutilate", "mutilate")
     kustomize_set_docker_image("redis-memtier", "memtier_benchmark")
     kustomize_set_docker_image("stress", "stress_ng")
