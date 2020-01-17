@@ -457,16 +457,18 @@ def kustomize_wca_and_workloads_check() {
 
 def kustomize_prepare(workload, workload_images) {
     file = "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml"
+
     testing_image = "\nimages:\n"
     for(workload_image in workload_images){
         testing_image +=
             "  - name: ${workload_image}\n" +
             "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
             "    newTag: ${GIT_COMMIT}\n"
-    }
-    sh "echo '${testing_image}' >> ${file}"
 
-    image_check("wca/${workload_image}")
+        image_check("wca/${workload_image}")
+    }
+
+    sh "echo '${testing_image}' >> ${file}"
 
     contentReplace(
     configs: [
