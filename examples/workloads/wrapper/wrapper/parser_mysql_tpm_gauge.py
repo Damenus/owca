@@ -35,12 +35,13 @@ def parse(input: TextIOWrapper, regexp: str, separator: str = None,
 
     new_line = readline_with_check(input, EOF_line='end')
 
-    regex = dict(re.findall(r'TPM: (?P<tpm>\d*.\d*).', new_line))
-    tpm = float(regex['tpm'])
+    if "TPM:" in new_line:
+        regex = re.findall(r'TPM: (?P<tpm>\d*.\d*)', new_line)
+        tpm = float(regex[0])
 
-    new_metrics.append(Metric(metric_name_prefix + 'tpm', tpm,
-                              type=MetricType.GAUGE, labels=labels,
-                              help="TPM (transaction per minute) from mysql"))
+        new_metrics.append(Metric(metric_name_prefix + 'tpm', tpm,
+                                  type=MetricType.GAUGE, labels=labels,
+                                  help="TPM (transaction per minute) from mysql"))
 
     return new_metrics
 
