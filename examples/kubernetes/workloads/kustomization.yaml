@@ -1,4 +1,5 @@
 bases:
+- hammerdb
 - stress
 - redis-memtier
 - memcached-mutilate

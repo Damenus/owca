@@ -1,0 +1,16 @@
+nameSuffix: -big
+bases:
+- ../base
+
+commonLabels:
+  app: hammerdb-big
+  size: big
+
+configMapGenerator:
+  - name: hammerdb-parameters
+    behavior: merge
+    literals:
+      - number_runners=10
+
+patchesStrategicMerge:
+  - resources.yaml

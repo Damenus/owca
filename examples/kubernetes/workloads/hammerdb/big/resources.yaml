@@ -9,5 +9,5 @@ spec:
         - name: hammerdb
           resources:
             requests:
-              cpu: 2
-              memory: 12G # valueSize*records = 10k * 1M = 10G
+              cpu: 3
+              memory: 13G # valueSize*records = 10k * 1M = 10G
