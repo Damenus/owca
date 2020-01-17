@@ -3,6 +3,9 @@ bases:
   - medium
   - big
 
+commonLabels:
+  fit: 2lm
+
 #namespace: ddarczuk
 #
 #images:

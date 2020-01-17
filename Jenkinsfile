@@ -430,19 +430,12 @@ def kustomize_wca_and_workloads_check() {
     // examaples/kubernetes workloads like: mysql, memcached, memtier, redis use official images
     sh "echo GIT_COMMIT=$GIT_COMMIT"
     print('Configure wca and workloads...')
-    kustomize_add_labels("hammerdb")
     kustomize_replace_commit_in_wca()
-    kustomize_add_labels("memcached-mutilate")
-    kustomize_add_labels("redis-memtier")
-    kustomize_add_labels("stress")
-    kustomize_add_labels("sysbench-memory")
-
-    print('Configure images...')
-    kustomize_set_docker_image("hammerdb", "hammerdb")
-    kustomize_set_docker_image("memcached-mutilate", "mutilate")
-    kustomize_set_docker_image("redis-memtier", "memtier_benchmark")
-    kustomize_set_docker_image("stress", "stress_ng")
-    kustomize_set_docker_image("sysbench-memory", "sysbench")
+    kustomize_prepare("hammerdb", ["hammerdb","mysql_tpm_gauge"])
+    kustomize_prepare("memcached-mutilate", ["mutilate"])
+    kustomize_prepare("redis-memtier", ["memtier_benchmark"])
+    kustomize_prepare("stress", ["stress_ng"])
+    kustomize_prepare("sysbench-memory", ["sysbench"])
 
     print('Starting wca...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
@@ -460,6 +453,37 @@ def kustomize_wca_and_workloads_check() {
     sleep RUN_WORKLOADS_SLEEP_TIME
     print('Test kustomize metrics...')
     test_wca_metrics_kustomize()
+}
+
+def kustomize_prepare(workload, workload_images) {
+    file = "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml"
+    testing_image = "\nimages:\n"
+    for(workload_image in workload_images){
+        testing_image +=
+            "  - name: ${workload_image}\n" +
+            "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
+            "    newTag: ${GIT_COMMIT}\n"
+    }
+    sh "echo '${testing_image}' >> ${file}"
+
+    image_check("wca/${workload_image}")
+
+    contentReplace(
+    configs: [
+        fileContentReplaceConfig(
+            configs: [
+                fileContentReplaceItemConfig( search: 'commonLabels:', replace:
+                "commonLabels:\n" +
+                    "  build_commit: '${GIT_COMMIT}'\n" +
+                    "  build_number: '${BUILD_NUMBER}'\n" +
+                    "  node_name: '${NODE_NAME}'\n" +
+                    "  workload_name: '${workload}'\n" +
+                    "  env_uniq_id: '32'\n",
+                matchCount: 0),
+            ],
+            fileEncoding: 'UTF-8',
+            filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
+
 }
 
 def kustomize_set_docker_image(workload, workload_image) {
