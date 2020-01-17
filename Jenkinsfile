@@ -444,7 +444,7 @@ def kustomize_wca_and_workloads_check() {
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 
     print('Scale up workloads...')
-    def list = ["hammerdb-small", "stress-stream-small", "redis-small", "memtier-small", "sysbench-memory-small", "memcached-small", "mutilate-small"]
+    def list = ["mysql-small", "hammerdb-small", "stress-stream-small", "redis-small", "memtier-small", "sysbench-memory-small", "memcached-small", "mutilate-small"]
     for(item in list){
         sh "kubectl scale --replicas=1 statefulset $item"
     }
