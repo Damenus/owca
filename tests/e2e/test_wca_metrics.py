@@ -88,7 +88,7 @@ def test_wca_metrics_kustomize(workload_name):
 
 
 @pytest.mark.parametrize('workload_name', [
-    'hammerdb'
+    'hammerdb-small'
 ])
 def test_wca_metrics_kustomize_throughput(workload_name):
     test_wca(workload_name, ['apm__sli2', 'task_cycles'])
