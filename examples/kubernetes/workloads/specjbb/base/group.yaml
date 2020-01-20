@@ -107,7 +107,7 @@ spec:
               -jar /home/specjbb/specjbb2015.jar
               -m BACKEND
               -G ${group}
-              -J JVM_A_${name_suffix}_${number}
+              -J JVM_A_${name_suffix//-/_}_${number}
 
         - name: injector
           image: specjbb
@@ -188,7 +188,7 @@ spec:
               -jar /home/specjbb/specjbb2015.jar
               -m TXINJECTOR
               -G ${group}
-              -J JVM_B_${name_suffix}_${number}
+              -J JVM_B_${name_suffix//-/_}_${number}
 
   # required for workaround bug with kustomize https://github.com/kubernetes-sigs/kustomize/issues/504
   # when using commonLabels
