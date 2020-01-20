@@ -68,6 +68,21 @@ spec:
         - record: apm__latency          # average mili seconds (ms) to transfer 1GB
           expr: 1e3 / (apm__sysbench_mbps_per_task/1e3)
 
+        # -------------Specjbb---------------------------
+        - record: apm__specjbb_alive
+          expr: ceil(rate(apm__specjbb_stdout_lines[15s])>0)
+        - record: apm__specjbb_ops
+          expr: avg_over_time(apm__specjbb_PR[90s]) and apm__specjbb_alive
+        - record: apm__specjbb_latency
+          expr: avg_over_time(apm__specjbb_p95[90s]) and apm__specjbb_alive
+        - record: apm__stress_ops_per_task
+          expr: apm__specjbb_ops * on(task_name) group_right() task_up
+          # T & L
+        - record: apm__throughput
+          expr: apm__specjbb_ops
+        - record: apm__latency
+          expr: apm__specjbb_latency
+
         #--------------------------------------- GENERIC FOR ALL WORKLODAS
         - record: apm__sli          #  SLI based on latency
           expr: apm__latency
