@@ -51,8 +51,6 @@ configMapGenerator:
         -XX:+PrintGCDetails
         -XX:+PrintHeapAtGC
         -XX:+PrintGCTimeStamps
-      - >
-        java2=
         -XX:MaxTenuringThreshold=15
         -XX:SurvivorRatio=10
         -XX:TargetSurvivorRatio=90

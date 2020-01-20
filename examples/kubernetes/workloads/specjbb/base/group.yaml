@@ -100,7 +100,6 @@ spec:
               -XX:MaxRAM=$MY_MEM_REQUEST
               -XX:ParallelGCThreads=${cores}
               $java
-              $java2
               -Dspecjbb.forkjoin.workers=$(($cores*2))
               -Dspecjbb.mapreducer.pool.size=$(($group_count*2))
               -Dspecjbb.controller.host=$target
