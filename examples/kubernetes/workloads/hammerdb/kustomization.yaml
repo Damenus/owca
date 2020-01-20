@@ -1,7 +1,17 @@
 bases:
-  - small
-  - medium
-  - big
+- small
+- medium
+- big
 
 commonLabels:
   fit: 2lm
+
+namespace: ddarczuk
+
+images:
+  - name: hammerdb
+    newName: 100.64.176.12:80/wca/hammerdb
+    newTag: 98c987794e32bce2eeafafd91bf474a6176f8f68
+  - name: mysql_tpm_gauge
+    newName: 100.64.176.12:80/wca/mysql_tpm_gauge
+    newTag: 98c987794e32bce2eeafafd91bf474a6176f8f68
