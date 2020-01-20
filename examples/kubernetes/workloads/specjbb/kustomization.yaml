@@ -1,5 +1,5 @@
 bases:
-- preset_small
+- preset-small
 - preset-medium
 - preset-big
 - fixed
