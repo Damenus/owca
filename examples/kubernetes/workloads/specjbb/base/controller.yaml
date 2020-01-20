@@ -24,7 +24,7 @@ spec:
         app: specjbb-controller
     spec:
       nodeSelector:
-        goal: service
+        goal: load_generator
       terminationGracePeriodSeconds: 0
       containers:
         - name: controller
