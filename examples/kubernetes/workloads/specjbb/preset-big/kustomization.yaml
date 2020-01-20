@@ -1,11 +1,11 @@
-nameSuffix: -habirrt
+nameSuffix: -preset-big
 bases:
 - ../base
 
 commonLabels:
-  app: specjbb-habirrt-medium
-  type: habirrt
-  size: medium
+  app: specjbb-preset-big
+  type: preset
+  size: big
 
 patchesStrategicMerge:
   - resources.yaml
@@ -14,16 +14,14 @@ configMapGenerator:
   - name: specjbb
     behavior: merge
     literals:
-      - specjbb.group.count=2
+      - specjbb.group.count=4
 
   - name: specjbb-controller
     behavior: merge
     literals:
-      - specjbb.controller.type=HABIR_RT
+      - specjbb.controller.type=PRESET
       - >
         specjbb_extra=
         -Dspecjbb.controller.validation.skip=true
-        -Dspecjbb.controller.preset.ir=1000
+        -Dspecjbb.controller.preset.ir=20000
         -Dspecjbb.controller.rampup.steps=1
-#        -Dspecjbb.preRunTest=false
-#        -Dspecjbb.postRunTest=false

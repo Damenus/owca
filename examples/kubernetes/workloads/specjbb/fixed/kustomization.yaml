@@ -1,10 +1,10 @@
-nameSuffix: -fixedrt
+nameSuffix: -fixed
 bases:
 - ../base
 
 commonLabels:
-  app: specjbb-fixedrt-medium
-  type: fixedrt
+  app: specjbb-fixed-medium
+  type: fixed
   size: medium
 
 patchesStrategicMerge:

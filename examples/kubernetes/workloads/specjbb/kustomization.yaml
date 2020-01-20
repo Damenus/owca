@@ -1,7 +1,9 @@
 bases:
-- PRESET
-- FIXED_RT
-- HBIR_RT
+- preset_small
+- preset-medium
+- preset-big
+- fixed
+- hbir
 
 #namespace: ddarczuk
 #
