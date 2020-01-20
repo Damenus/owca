@@ -5,6 +5,9 @@ bases:
 - fixed
 - hbir
 
+commonLabels:
+  fit: 1lm
+
 #namespace: ddarczuk
 #
 #images:
