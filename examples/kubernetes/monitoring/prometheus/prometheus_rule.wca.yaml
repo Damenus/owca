@@ -75,13 +75,15 @@ spec:
           expr: avg_over_time(apm__specjbb_PR[90s]) and apm__specjbb_alive
         - record: apm__specjbb_latency
           expr: avg_over_time(apm__specjbb_p95[90s]) and apm__specjbb_alive
-        - record: apm__stress_ops_per_task
+        - record: apm__specjbb_ops_per_task
           expr: apm__specjbb_ops * on(task_name) group_right() task_up
+        - record: apm__specjbb_latency_per_task
+          expr: apm__specjbb_latency * on(task_name) group_right() task_up
           # T & L
         - record: apm__throughput
-          expr: apm__specjbb_ops
+          expr: apm__specjbb_ops_per_task
         - record: apm__latency
-          expr: apm__specjbb_latency
+          expr: apm__specjbb_latency_per_task
 
         #--------------------------------------- GENERIC FOR ALL WORKLODAS
         - record: apm__sli          #  SLI based on latency
