@@ -70,9 +70,9 @@ spec:
 
         # -------------Hammerdb + MYSQL --------------
         - record: apm__hammerdb_alive
-          expr: ceil(rate(apm__hammerdb_stdout_lines[1m])>0)
+          expr: ceil(rate(apm__hammerdb_stdout_lines[30s])>0)
         - record: apm__hammerdb_ops
-          expr: avg_over_time(apm__hammerdb_scan_ops_sec[1m]) and apm__hammerdb_alive
+          expr: avg_over_time(apm__hammerdb_tpm[90s]) and apm__hammerdb_alive
         # common apm metrics
         - record: apm__mysql_qps
           expr: (label_replace(apm__hammerdb_ops, "task_name", "$1/mysql-$2", "task_name", "(.*)/hammerdb-(.*)")) * on(task_name) group_right() task_up
