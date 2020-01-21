@@ -79,6 +79,11 @@ spec:
           expr: apm__specjbb_ops * on(task_name) group_right() task_up
         - record: apm__specjbb_latency_per_task
           expr: apm__specjbb_latency * on(task_name) group_right() task_up
+        # common apm metrics
+        - record: apm__specjbb_latency_per_task
+          expr: (label_replace(apm__specjbb_ops, "task_name", "$1/specjbb-group-$2", "task_name", "(.*)/specjbb-controller-(.*)")) * on(task_name) group_right() task_up
+        - record: apm__specjbb_ops_per_task
+          expr: (label_replace(apm__specjbb_latency, "task_name", "$1/specjbb-group-$2", "task_name", "(.*)/specjbb-controller-(.*)")) * on(task_name) group_right() task_up
           # T & L
         - record: apm__throughput
           expr: apm__specjbb_ops_per_task
