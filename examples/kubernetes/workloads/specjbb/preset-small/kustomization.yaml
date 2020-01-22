@@ -23,5 +23,6 @@ configMapGenerator:
       - >
         specjbb_extra=
         -Dspecjbb.controller.validation.skip=true
+        -Dspecjbb.controller.preset.duration=1209600000
         -Dspecjbb.controller.preset.ir=20000
         -Dspecjbb.controller.rampup.steps=1
