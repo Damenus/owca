@@ -12,9 +12,9 @@ kind: StatefulSet
 metadata:
   name: specjbb-controller
 spec:
+  replicas: 0
   serviceName: specjbb-controller
   podManagementPolicy: Parallel
-  replicas: 0
   selector:
     matchLabels:
       app: specjbb-controller
@@ -28,37 +28,21 @@ spec:
       terminationGracePeriodSeconds: 0
       containers:
         - name: controller
-          #ALL ENV FROM FILE
           envFrom:
             - configMapRef:
                 name: specjbb
             - configMapRef:
                 name: specjbb-controller
           env:
-            - name: podname
+            - name: PODNAME
               valueFrom: {fieldRef: {fieldPath: metadata.name}}
           image: specjbb
           command:
             - sh
             - -c
             - >
-              target=${podname}.${podname%-*};
+              target=${PODNAME}.${PODNAME%-*};
               echo targeting: $target;
-
-              ### START PROPOSE Script to parse env from file
-              #
-              #FILES=/etc/config2/*;
-              #specjbb_paremeters="";
-              #for key in $FILES;
-              #do
-              #  if [[ $string == *"specjbb"* ]]; then
-              #    specjbb_paremeters="${specjbb_paremeters} -D${key##*/}=$(cat $key)";
-              #  fi;
-              #done;
-              #
-              #echo "$specjbb_paremeters";
-              #
-              ### END
 
               set -x;
 
@@ -75,7 +59,7 @@ spec:
               -m MULTICONTROLLER
               -l 0
 
-               mv /home/specjbb/result/specjbb2015-* /home/result/${podname}_$(date +%s)
+               mv /home/specjbb/result/specjbb2015-* /home/result/${PODNAME}_$(date +%s)
 
           volumeMounts:
             - name: results
