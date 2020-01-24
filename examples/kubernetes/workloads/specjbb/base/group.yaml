@@ -69,9 +69,9 @@ spec:
 
               ## Group, which group pod is (modulo operation)
 
-              group_identifier=$(($number%$group_count));
-              echo group_identifier: $group_identifier;
-              echo group_identifier=$group_identifier >> /var/prepare_names/env;
+              group=$(($number%$group_count));
+              echo group: $group;
+              echo group=$group >> /var/prepare_names/env;
 
           volumeMounts:
             - name: prepare-names-volume
@@ -136,12 +136,12 @@ spec:
             - name: CORES_REQUEST
               valueFrom:
                 resourceFieldRef:
-                  containerName: backend
+                  containerName: injector
                   resource: requests.cpu
             - name: MEM_REQUEST
               valueFrom:
                 resourceFieldRef:
-                  containerName: backend
+                  containerName: injector
                   resource: requests.memory
           command:
             - sh
