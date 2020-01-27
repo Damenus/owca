@@ -6,8 +6,14 @@ spec:
   template:
     spec:
       containers:
+# Minimal resource for specjbb.controller.preset.ir=1000
         - name: backend
           resources:
             requests:
               cpu: 1
-              memory: 1.5G # Must be equation: 1.5*cpu = memory
+              memory: 6G
+        - name: injector
+          resources:
+            requests:
+              cpu: 1
+              memory: 1G

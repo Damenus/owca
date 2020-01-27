@@ -1,11 +1,11 @@
-nameSuffix: -preset-small
+nameSuffix: -preset-big-220
 bases:
 - ../base
 
 commonLabels:
-  app: specjbb-preset-small
+  app: specjbb-preset-big-220
   type: preset
-  size: small
+  size: big-220
 
 patchesStrategicMerge:
   - resources.yaml
@@ -24,5 +24,5 @@ configMapGenerator:
         specjbb_extra=
         -Dspecjbb.controller.validation.skip=true
         -Dspecjbb.controller.preset.duration=1209600000
-        -Dspecjbb.controller.preset.ir=1000
+        -Dspecjbb.controller.preset.ir=30000
         -Dspecjbb.controller.rampup.steps=1
