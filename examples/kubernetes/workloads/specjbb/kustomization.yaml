@@ -1,7 +1,8 @@
 bases:
 - preset-small
 - preset-medium
-- preset-big
+- preset-big-60
+- preset-big-220
 - fixed
 - hbir
 
