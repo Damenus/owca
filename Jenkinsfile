@@ -431,7 +431,7 @@ def kustomize_wca_and_workloads_check() {
     sh "echo GIT_COMMIT=$GIT_COMMIT"
     print('Configure wca and workloads...')
     kustomize_replace_commit_in_wca()
-    kustomize_prepare("hammerdb", ["hammerdb","mysql_tpm_gauge"])
+    kustomize_prepare("mysql-hammerdb", ["hammerdb","mysql_tpm_gauge"])
     kustomize_prepare("memcached-mutilate", ["mutilate"])
     kustomize_prepare("redis-memtier", ["memtier_benchmark"])
     kustomize_prepare("stress", ["stress_ng"])
