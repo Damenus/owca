@@ -436,6 +436,7 @@ def kustomize_wca_and_workloads_check() {
     kustomize_prepare("redis-memtier", ["memtier_benchmark"])
     kustomize_prepare("stress", ["stress_ng"])
     kustomize_prepare("sysbench-memory", ["sysbench"])
+    kustomize_prepare("specjbb", ["specjbb"])
 
     print('Starting wca...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
@@ -448,6 +449,8 @@ def kustomize_wca_and_workloads_check() {
     for(item in list){
         sh "kubectl scale --replicas=1 statefulset $item"
     }
+
+    sh "kubectl scale --replicas=1 statefulset specjbb-controller-preset-small specjbb-group-preset-small"
 
     print('Sleep while workloads are running...')
     sleep RUN_WORKLOADS_SLEEP_TIME

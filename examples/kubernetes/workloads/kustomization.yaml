@@ -4,3 +4,4 @@ bases:
 - redis-memtier
 - memcached-mutilate
 - sysbench-memory
+- specjbb
