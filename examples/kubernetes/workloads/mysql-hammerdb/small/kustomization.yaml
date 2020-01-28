@@ -7,10 +7,15 @@ commonLabels:
   size: small
 
 configMapGenerator:
-  - name: hammerdb-parameters
+  - name: hammerdb
     behavior: merge
     literals:
-      - number_runners=1
+      - number_runners=4
+      - count_ware=4
+      - worker_building_schema=4
+
+# tpm 25000 150 50 50
+#      8500   4  4  4
 
 patchesStrategicMerge:
   - resources.yaml

@@ -20,11 +20,12 @@ spec:
       initContainers:
       - name: change-config-workload
         image: busybox
+        envFrom:
+          - configMapRef:
+              name: hammerdb
         env:
           - name: podname
             valueFrom: {fieldRef: {fieldPath: metadata.name}}
-          - name: number_runners
-            valueFrom: {configMapKeyRef: { name: hammerdb-parameters, key: number_runners }}
         command:
           - /bin/sh
           - -c
@@ -32,11 +33,17 @@ spec:
             identifier=${podname#hammerdb-};
             service=${identifier%-[+[:digit:]]};
 
-            sed "s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/;s/WORKER_NUMBER/$number_runners/"
+            sed
+            -e "s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/"
+            -e "s/WORKER_NUMBER/$number_runners/"
             /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
 
-            sed "s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/"
+            sed
+            -e "s/MYSQL_HOST/mysql-${identifier}.mysql-${service}/"
+            -e "s/COUNT_WARE/${count_ware}/"
+            -e "s/WORKER_BUILDING_SCHEMA/$worker_building_schema/"
             /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl
+
         volumeMounts:
           - name: config-volume
             mountPath: /etc/config

@@ -8,6 +8,11 @@ configMapGenerator:
       - workload.tcl
       - build_workload.tcl
 
-  - name: hammerdb-parameters
+  - name: hammerdb
     literals:
       - number_runners=1
+      - count_ware=4
+      - worker_building_schema=4
+
+# https://www.hammerdb.com/blog/
+# https://www.hammerdb.com/document.html

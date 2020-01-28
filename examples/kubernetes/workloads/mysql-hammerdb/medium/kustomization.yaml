@@ -7,7 +7,7 @@ commonLabels:
   size: medium
 
 configMapGenerator:
-  - name: hammerdb-parameters
+  - name: hammerdb
     behavior: merge
     literals:
       - number_runners=2
