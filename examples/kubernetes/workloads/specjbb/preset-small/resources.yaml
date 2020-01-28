@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       containers:
-# Minimal resource for specjbb.controller.preset.ir=1000
+      # Minimal resource for specjbb.controller.preset.ir=1000
         - name: backend
           resources:
             requests:
