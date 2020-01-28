@@ -484,7 +484,7 @@ def kustomize_prepare(workload, workload_images) {
                 matchCount: 0),
             ],
             fileEncoding: 'UTF-8',
-            filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
+            filePath: "${file}")])
 
 }
 
