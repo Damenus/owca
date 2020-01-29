@@ -10,12 +10,16 @@ configMapGenerator:
   - name: hammerdb
     behavior: merge
     literals:
-      - number_runners=4
-      - count_ware=4
-      - worker_building_schema=4
+      - number_runners=25
+      - count_ware=25
+      - worker_building_schema=25 # max 150
 
-# tpm 25000 150 50 50
+#      tpm              bandwith
+#     25000 150 50 50
 #      8500   4  4  4
+#     50000   1  1  1  200-300  10cpu,20
+#     65000   5  5  5  1,4G     10cpu,20
+#     43000  25 25 25  max3g stabilne 1,9 10cpu,20
 
 patchesStrategicMerge:
   - resources.yaml
