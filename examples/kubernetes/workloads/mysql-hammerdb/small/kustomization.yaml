@@ -3,7 +3,7 @@ bases:
 - ../base
 
 commonLabels:
-  app: hammerdb-small
+  app: mysql-small
   size: small
 
 configMapGenerator:
