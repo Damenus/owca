@@ -1,5 +1,5 @@
 bases:
-- hammerdb
+- mysql-hammerdb
 - stress
 - redis-memtier
 - memcached-mutilate
