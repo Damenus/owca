@@ -440,7 +440,7 @@ def kustomize_wca_and_workloads_check() {
     kustomize_replace_commit_in_wca()
     def workloads = ["memcached-mutilate", "memcached-mutilate", "redis-memtier", "stress", "sysbench-memory", "specjbb"]
     for(workload in workloads){
-        kustomize_configure_workload_to_test($workload)
+        kustomize_configure_workload_to_test("$workload")
     }
 
     print('Starting wca...')
