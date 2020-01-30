@@ -426,17 +426,22 @@ def wca_and_workloads_check() {
 
 def kustomize_wca_and_workloads_check() {
     print('-kustomize_wca_and_workloads_check-')
+    sh "echo GIT_COMMIT=$GIT_COMMIT"
+
+    print('Image checks wca and workloads...')
     image_check("wca")
     // examaples/kubernetes workloads like: mysql, memcached, memtier, redis use official images
-    sh "echo GIT_COMMIT=$GIT_COMMIT"
-    print('Configure wca and workloads...')
+    def images = ["mutilate", "hammerdb", "mysql_tpm_gauge", "memtier_benchmark", "stress_ng", "sysbench", "specjbb"]
+    for(image in images){
+        image_check("wca/$image")
+    }
+
+    print('Configure workloads...')
     kustomize_replace_commit_in_wca()
-    kustomize_prepare("mysql-hammerdb", ["hammerdb","mysql_tpm_gauge"])
-    kustomize_prepare("memcached-mutilate", ["mutilate"])
-    kustomize_prepare("redis-memtier", ["memtier_benchmark"])
-    kustomize_prepare("stress", ["stress_ng"])
-    kustomize_prepare("sysbench-memory", ["sysbench"])
-    kustomize_prepare("specjbb", ["specjbb"])
+    def workloads = ["memcached-mutilate", "memcached-mutilate", "redis-memtier", "stress", "sysbench-memory", "specjbb"]
+    for(workload in workloads){
+        kustomize_configure_workload_to_test($workload)
+    }
 
     print('Starting wca...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
@@ -445,63 +450,15 @@ def kustomize_wca_and_workloads_check() {
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 
     print('Scale up workloads...')
-    def list = ["mysql-small", "hammerdb-small", "stress-stream-small", "redis-small", "memtier-small", "sysbench-memory-small", "memcached-small", "mutilate-small"]
+    def list = ["mysql", "hammerdb", "stress-stream", "redis", "memtier", "sysbench-memory", "memcached", "mutilate", "specjbb-controller-preset", "specjbb-group-preset"]
     for(item in list){
-        sh "kubectl scale --replicas=1 statefulset $item"
+        sh "kubectl scale --replicas=1 statefulset $item-small"
     }
-
-    sh "kubectl scale --replicas=1 statefulset specjbb-controller-preset-small specjbb-group-preset-small"
 
     print('Sleep while workloads are running...')
     sleep RUN_WORKLOADS_SLEEP_TIME
     print('Test kustomize metrics...')
     test_wca_metrics_kustomize()
-}
-
-def kustomize_prepare(workload, workload_images) {
-    file = "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml"
-
-    testing_image = "\nimages:\n"
-    for(workload_image in workload_images){
-        testing_image +=
-            "  - name: ${workload_image}\n" +
-            "    newName: ${DOCKER_REPOSITORY_URL}/wca/${workload_image}\n" +
-            "    newTag: ${GIT_COMMIT}\n"
-
-        image_check("wca/${workload_image}")
-    }
-
-    sh "echo '${testing_image}' >> ${file}"
-
-    contentReplace(
-    configs: [
-        fileContentReplaceConfig(
-            configs: [
-                fileContentReplaceItemConfig( search: 'commonLabels:', replace:
-                "commonLabels:\n" +
-                    "  build_commit: '${GIT_COMMIT}'\n" +
-                    "  build_number: '${BUILD_NUMBER}'\n" +
-                    "  node_name: '${NODE_NAME}'\n" +
-                    "  workload_name: '${workload}'\n" +
-                    "  env_uniq_id: '32'\n",
-                matchCount: 0),
-            ],
-            fileEncoding: 'UTF-8',
-            filePath: "${file}")])
-
-}
-
-def kustomize_set_docker_image(workload, workload_image) {
-    image_check("wca/${workload_image}")
-
-    contentReplace(
-    configs: [
-        fileContentReplaceConfig(
-            configs: [
-                fileContentReplaceItemConfig( search: 'newTag: master', replace: "newTag: ${GIT_COMMIT}", matchCount: 0),
-            ],
-            fileEncoding: 'UTF-8',
-            filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
 }
 
 def kustomize_replace_commit_in_wca() {
@@ -515,7 +472,16 @@ def kustomize_replace_commit_in_wca() {
                 filePath: "${WORKSPACE}/examples/kubernetes/monitoring/wca/kustomization.yaml")])
 }
 
-def kustomize_add_labels(workload) {
+def kustomize_configure_workload_to_test(workload) {
+    contentReplace(
+    configs: [
+        fileContentReplaceConfig(
+            configs: [
+                fileContentReplaceItemConfig( search: 'newTag: master', replace: "newTag: ${GIT_COMMIT}", matchCount: 0),
+            ],
+            fileEncoding: 'UTF-8',
+            filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
+
     contentReplace(
         configs: [
             fileContentReplaceConfig(
