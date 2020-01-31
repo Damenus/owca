@@ -7,7 +7,7 @@ pipeline {
       booleanParam defaultValue: true, description: 'E2E for Mesos.', name: 'E2E_MESOS'
       booleanParam defaultValue: true, description: 'E2E for Kubernetes.', name: 'E2E_K8S'
       booleanParam defaultValue: true, description: 'E2E for Kubernetes as Daemonset.', name: 'E2E_K8S_DS'
-      string defaultValue: '300', description: 'Sleep time for E2E tests', name: 'SLEEP_TIME'
+      string defaultValue: '200', description: 'Sleep time for E2E tests', name: 'SLEEP_TIME'
     }
     environment {
         DOCKER_REPOSITORY_URL = '100.64.176.12:80'
@@ -454,6 +454,8 @@ def kustomize_wca_and_workloads_check() {
     for(item in list){
         sh "kubectl scale --replicas=1 statefulset $item-small"
     }
+
+    sh "kubectl scale --replicas=1 statefulset specjbb-controller-preset-small specjbb-group-preset-small"
 
     print('Sleep while workloads are running...')
     sleep RUN_WORKLOADS_SLEEP_TIME
