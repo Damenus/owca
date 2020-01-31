@@ -41,7 +41,7 @@ spec:
           - /bin/sh
           - -c
           - >
-            local_host = '127.0.0.1'
+            local_host='127.0.0.1'
 
             sed
             -e "s/MYSQL_HOST/${local_host}/"
@@ -67,6 +67,15 @@ spec:
           - bash
           - -c
           - >
+            local_host='127.0.0.1'
+
+            test=0;
+            until [ $test -eq 1 ];
+            do
+              test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
+              echo $test;
+            done
+
             ./hammerdbcli auto /etc/hammerdb/config/build_workload.tcl
 
             ./hammerdbcli auto /etc/hammerdb/config/workload.tcl
@@ -81,7 +90,14 @@ spec:
           - bash
           - -c
           - >
-            local_host = '127.0.0.1'
+            local_host='127.0.0.1'
+
+            test=0;
+            until [ $test -eq 1 ];
+            do
+              test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
+              echo $test;
+            done
 
             set -x;
             python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py ${local_host}
