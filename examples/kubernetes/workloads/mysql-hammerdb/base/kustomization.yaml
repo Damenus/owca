@@ -1,6 +1,5 @@
 resources:
-  - hammerdb.yaml
-  - mysql.yaml
+  - mysql-hammerdb.yaml
 
 configMapGenerator:
   - name: mysql-tpm-gauge-tcl-script

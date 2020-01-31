@@ -3,7 +3,7 @@ bases:
 - ../base
 
 commonLabels:
-  app: mysql-big
+  app: mysql-hammerdb-big
   size: big
 
 configMapGenerator:
