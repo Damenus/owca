@@ -60,19 +60,17 @@ spec:
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
 
-      - name:  initialize-database-schema
-        image: hammerdb
-        command: [ "./hammerdbcli", "auto" ]
-        args:  ["/etc/hammerdb/config/build_workload.tcl" ]
-        volumeMounts:
-          - name: changed-config-volume
-            mountPath: /etc/hammerdb/config
-
       containers:
       - name: hammerdb
         image: hammerdb
-        command: [ "./hammerdbcli", "auto" ]
-        args:  ["/etc/hammerdb/config/workload.tcl" ]
+        command:
+          - bash
+          - -c
+          - >
+            ./hammerdbcli auto /etc/hammerdb/config/build_workload.tcl
+
+            ./hammerdbcli auto /etc/hammerdb/config/workload.tcl
+
         volumeMounts:
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
