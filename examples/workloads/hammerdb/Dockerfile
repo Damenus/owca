@@ -17,7 +17,7 @@
 FROM centos:7 AS hammerdb
 
 RUN yum update -y
-RUN yum install -y wget
+RUN yum install -y wget mysql
 
 RUN wget https://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/p/proj-4.8.0-4.el7.x86_64.rpm
 #rpm -Uvh proj-4.8.0-4.el7.x86_64.rpm
