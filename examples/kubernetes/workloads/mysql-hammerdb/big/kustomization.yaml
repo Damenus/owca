@@ -10,8 +10,8 @@ configMapGenerator:
   - name: hammerdb
     behavior: merge
     literals:
-      - number_runners=150
-      - count_ware=150
+      - number_runners=300
+      - count_ware=300
       - worker_building_schema=150
 
 patchesStrategicMerge:
