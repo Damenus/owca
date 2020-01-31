@@ -94,16 +94,16 @@ spec:
 
     - name: mysql-hammerdb
       rules:
-        - record: apm__hammerdb_alive
-          expr: ceil(rate(apm__hammerdb_stdout_lines[30s])>0)
-        - record: apm__hammerdb_ops
-          expr: avg_over_time(apm__hammerdb_tpm[90s]) and apm__hammerdb_alive
+        - record: apm-hammerdb_alive
+          expr: ceil(rate(apm-hammerdb_stdout_lines[30s])>0)
+        - record: apm-hammerdb_ops
+          expr: avg_over_time(apm-hammerdb_tpm[90s]) and apm-hammerdb_alive
         # common apm metrics
-        - record: apm__mysql_qps
-          expr: (label_replace(apm__hammerdb_ops, "task_name", "$1/mysql-$2", "task_name", "(.*)/hammerdb-(.*)")) * on(task_name) group_right() task_up
+        - record: apm_mysql_qps
+          expr: (label_replace(apm-hammerdb_ops, "task_name", "$1/mysql-$2", "task_name", "(.*)/hammerdb-(.*)")) * on(task_name) group_right() task_up
         # T & L per app
-        - record: apm__throughput      # transaction per minute from mysql (get by script 'mysql_tpm_gauge.py')
-          expr: apm__mysql_qps
+        - record: apm_throughput      # transaction per minute from mysql (get by script 'mysql_tpm_gauge.py')
+          expr: apm-mysql_qps
         # no latency from hammerdb or mysql
 
     - name: apm-generic
