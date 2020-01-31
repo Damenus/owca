@@ -100,7 +100,7 @@ spec:
             done
 
             set -x;
-            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py ${local_host}
+            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py -s ${local_host}
 
       - name: mysql
         image: mysql:5.6
