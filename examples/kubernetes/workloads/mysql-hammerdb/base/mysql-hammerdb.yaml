@@ -46,21 +46,6 @@ spec:
           - name: changed-config-volume
             mountPath: /etc/hammerdb/config
 
-      - name: wait-for-database-init
-        image: mysql_tpm_gauge
-        command:
-          - /bin/sh
-          - -c
-          - >
-            local_host = '127.0.0.1'
-
-            test=0;
-            until [ $test -eq 1 ];
-            do
-              test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
-              echo $test;
-            done
-
       - name:  initialize-database-schema
         image: hammerdb
         command: [ "./hammerdbcli", "auto" ]
