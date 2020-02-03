@@ -10,9 +10,9 @@ configMapGenerator:
   - name: hammerdb
     behavior: merge
     literals:
-      - number_runners=100
+      - virtual_users=100
       - count_ware=100
-      - worker_building_schema=100
+      - virtual_users_build=100
 
 patchesStrategicMerge:
   - resources.yaml
