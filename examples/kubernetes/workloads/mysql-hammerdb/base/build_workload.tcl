@@ -14,7 +14,7 @@ diset tpcc mysql_pass testpassword
 diset tpcc mysql_count_ware COUNT_WARE
 diset tpcc mysql_partition true
 diset tpcc mysql_num_vu VIRTUAL_USERS_BUILD
-diset tpcc mysql_storage_engine innodb
+diset tpcc mysql_storage_engine STORAGE_ENGINE
 print dict
 buildschema
 wait_to_complete

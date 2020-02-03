@@ -45,14 +45,15 @@ spec:
 
             sed
             -e "s/MYSQL_HOST/${local_host}/"
-            -e "s/VIRTUAL_USERS/$virtual_users/"
-            /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
+            -e "s/COUNT_WARE/${count_ware}/"
+            -e "s/VIRTUAL_USERS_BUILD/$virtual_users_build/"
+            -e "s/STORAGE_ENGINE/$storage_engine"
+            /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl
 
             sed
             -e "s/MYSQL_HOST/${local_host}/"
-            -e "s/COUNT_WARE/${count_ware}/"
-            -e "s/VIRTUAL_USERS_BUILD/$virtual_users_build/"
-            /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl
+            -e "s/VIRTUAL_USERS/$virtual_users/"
+            /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
 
         volumeMounts:
           - name: config-volume
