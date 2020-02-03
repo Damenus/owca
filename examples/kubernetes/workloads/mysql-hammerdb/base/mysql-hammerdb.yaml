@@ -74,6 +74,7 @@ spec:
             do
               test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
               echo $test;
+              sleep 5;
             done
 
             ./hammerdbcli auto /etc/hammerdb/config/build_workload.tcl
@@ -97,6 +98,7 @@ spec:
             do
               test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
               echo $test;
+              sleep 5;
             done
 
             set -x;
