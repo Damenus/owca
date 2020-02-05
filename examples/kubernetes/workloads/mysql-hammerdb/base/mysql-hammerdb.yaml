@@ -32,13 +32,13 @@ spec:
             sed
             -e "s/MYSQL_HOST/${local_host}/"
             -e "s/COUNT_WARE/${count_ware}/"
-            -e "s/VIRTUAL_USERS_BUILD/$virtual_users_build/"
-            -e "s/STORAGE_ENGINE/$storage_engine"
+            -e "s/VIRTUAL_USERS_BUILD/${virtual_users_build}/"
+            -e "s/STORAGE_ENGINE/${storage_engine}/"
             /etc/config/build_workload.tcl > /etc/hammerdb/config/build_workload.tcl
 
             sed
             -e "s/MYSQL_HOST/${local_host}/"
-            -e "s/VIRTUAL_USERS/$virtual_users/"
+            -e "s/VIRTUAL_USERS/${virtual_users}/"
             /etc/config/workload.tcl > /etc/hammerdb/config/workload.tcl;
 
         volumeMounts:
@@ -50,19 +50,35 @@ spec:
       containers:
       - name: hammerdb
         image: hammerdb
+        env:
+          # Downward API
+          - name: MEM_REQUEST
+            valueFrom:
+              resourceFieldRef:
+                containerName: mysql
+                resource: requests.memory
         command:
           - bash
           - -c
           - >
-            local_host='127.0.0.1'
+            # Wait to initialize mysql db
 
             test=0;
             until [ $test -eq 1 ];
             do
-              test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
+              test=$(mysqladmin -u testuser -h 127.0.0.1 -ptestpassword ping | wc -l | tail -1);
               echo $test;
               sleep 5;
             done
+
+            set -x;
+
+            # Set in mysql properties
+
+            mysql
+            -u root -h 127.0.0.1 -ppassword
+            -e "SET GLOBAL tmp_table_size = ${MEM_REQUEST};
+                SET GLOBAL max_heap_table_size = ${MEM_REQUEST};"
 
             ./hammerdbcli auto /etc/hammerdb/config/build_workload.tcl
 
@@ -78,18 +94,16 @@ spec:
           - bash
           - -c
           - >
-            local_host='127.0.0.1'
-
             test=0;
             until [ $test -eq 1 ];
             do
-              test=$(mysqladmin -u testuser -h ${local_host} -ptestpassword ping | wc -l | tail -1);
+              test=$(mysqladmin -u testuser -h 127.0.0.1 -ptestpassword ping | wc -l | tail -1);
               echo $test;
               sleep 5;
             done
 
             set -x;
-            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py -s ${local_host}
+            python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py -s 127.0.0.1
 
       - name: mysql
         image: mysql:5.6
@@ -109,7 +123,7 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: mysql-tpm-gauge-tcl-script
+          name: hammerdb-scripts
       - name: changed-config-volume
         emptyDir: {}
 

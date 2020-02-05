@@ -2,7 +2,7 @@ resources:
   - mysql-hammerdb.yaml
 
 configMapGenerator:
-  - name: mysql-tpm-gauge-tcl-script
+  - name: hammerdb-scripts
     files:
       - workload.tcl
       - build_workload.tcl
