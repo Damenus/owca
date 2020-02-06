@@ -1,4 +1,5 @@
 #!/bin/tclsh
+
 proc runtimer { seconds } {
 set x 0
 set timerstop 0
@@ -14,6 +15,8 @@ if {  [ vucomplete ] || $x eq $seconds } { set timerstop 1 }
     }
 return
 }
+
+
 dbset db mysql
 diset connection mysql_host MYSQL_HOST
 diset connection mysql_port 3306
@@ -21,12 +24,12 @@ diset tpcc mysql_user testuser
 diset tpcc mysql_pass testpassword
 diset tpcc mysql_driver timed
 diset tpcc mysql_rampup 1
-diset tpcc mysql_duration 60
+diset tpcc mysql_duration 20160
 print dict
 
 loadscript
 vuset vu VIRTUAL_USERS
 vucreate
 vurun
-runtimer 60000
+runtimer 1209600
 after 5000
