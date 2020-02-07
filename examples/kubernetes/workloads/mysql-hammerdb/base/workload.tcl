@@ -15,12 +15,17 @@ diset tpcc mysql_user testuser
 diset tpcc mysql_pass testpassword
 diset tpcc mysql_driver timed
 diset tpcc mysql_rampup 1
+diset tpcc mysql_timeprofile true
+diset tpcc mysql_allwarehouse true
 diset tpcc mysql_duration 20160
 print dict
-
 loadscript
+
 vuset vu VIRTUAL_USERS
+vuset delay 100
+vuset repeat 500
 vucreate
 vurun
+
 wait_to_complete
 vwait forever
