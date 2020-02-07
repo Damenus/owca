@@ -2,6 +2,10 @@ resources:
   - mysql-hammerdb.yaml
 
 configMapGenerator:
+  - name: mysql-conf
+    files:
+      - my.cnf
+
   - name: hammerdb-scripts
     files:
       - workload.tcl

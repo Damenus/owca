@@ -11,7 +11,7 @@ configMapGenerator:
     behavior: merge
     literals:
       - virtual_users=50
-      - count_ware=100
+      - count_ware=200
       - virtual_users_build=100
 
 patchesStrategicMerge:

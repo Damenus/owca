@@ -73,17 +73,6 @@ spec:
 
             set -x;
 
-            # Set in mysql properties
-
-            mem=$(($MEM_REQUEST*90/100))
-
-            mysql
-            -u root -h 127.0.0.1 -ppassword
-            -e "SET GLOBAL tmp_table_size = $mem;
-                SET GLOBAL max_connections = 1000;
-                SET GLOBAL innodb_numa_interleave = 1;
-            "
-
             ./hammerdbcli auto /etc/hammerdb/config/build_workload.tcl
 
             ./hammerdbcli auto /etc/hammerdb/config/workload.tcl
@@ -110,7 +99,7 @@ spec:
             python3 -u /mysql-tpm-gauge/mysql_tpm_gauge.py -s 127.0.0.1
 
       - name: mysql
-        image: mysql:5.6
+        image: mysql:8
         env:
           - name: MYSQL_ROOT_PASSWORD
             value: password
@@ -123,8 +112,14 @@ spec:
         ports:
           - containerPort: 3306
             name: mysql
+        volumeMounts:
+          - name: mysql-config-volume
+            mountPath: /etc/mysql
 
       volumes:
+      - name: mysql-config-volume
+        configMap:
+          name: mysql-conf
       - name: config-volume
         configMap:
           name: hammerdb-scripts
