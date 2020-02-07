@@ -9,8 +9,8 @@ spec:
         - name: mysql
           resources:
             requests:
-              cpu: 1.5
-              memory: 1.5G
+              cpu: 2
+              memory: 2G
         - name: hammerdb
           resources:
             requests:

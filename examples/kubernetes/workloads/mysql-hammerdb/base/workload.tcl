@@ -1,19 +1,10 @@
 #!/bin/tclsh
 
-proc runtimer { seconds } {
-set x 0
-set timerstop 0
-while {!$timerstop} {
-incr x
-after 1000
-  if { ![ expr {$x % 60} ] } {
-          set y [ expr $x / 60 ]
-          puts "Timer: $y minutes elapsed"
-  }
-update
-if {  [ vucomplete ] || $x eq $seconds } { set timerstop 1 }
-    }
-return
+global complete
+proc wait_to_complete {} {
+global complete
+set complete [vucomplete]
+if {!$complete} { after 5000 wait_to_complete } else { exit }
 }
 
 
@@ -31,5 +22,5 @@ loadscript
 vuset vu VIRTUAL_USERS
 vucreate
 vurun
-runtimer 1209600
-after 5000
+wait_to_complete
+vwait forever

@@ -75,10 +75,11 @@ spec:
 
             # Set in mysql properties
 
+            mem=$(($MEM_REQUEST*90/100))
+
             mysql
             -u root -h 127.0.0.1 -ppassword
-            -e "SET GLOBAL tmp_table_size = ${MEM_REQUEST};
-                SET GLOBAL max_heap_table_size = ${MEM_REQUEST};
+            -e "SET GLOBAL tmp_table_size = $mem;
                 SET GLOBAL max_connections = 1000;
                 SET GLOBAL innodb_numa_interleave = 1;
             "
