@@ -54,7 +54,7 @@ flake8:
 
 bandit:
 	@echo Checking code with bandit.
-	$(call execute_in_venv, bandit -r wca -s B101 -f html -o wca-bandit.html)
+	$(call execute_in_venv,	pip install bandit==1.6.2; bandit -r wca -s B101 -f html -o wca-bandit.html)
 
 bandit_pex:
 	@echo Checking pex with bandit.
