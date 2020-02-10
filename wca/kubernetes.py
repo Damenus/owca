@@ -32,8 +32,8 @@ from wca.security import SSL, HTTPSAdapter
 
 log = logging.getLogger(__name__)
 
-SERVICE_TOKEN_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/token"  # nosec
-SERVICE_CERT_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"  # nosec
+SERVICE_TOKEN_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+SERVICE_CERT_FILENAME = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
 
 @dataclass
