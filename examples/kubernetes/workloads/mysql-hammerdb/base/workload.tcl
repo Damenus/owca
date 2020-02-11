@@ -1,10 +1,19 @@
 #!/bin/tclsh
 
-global complete
-proc wait_to_complete {} {
-global complete
-set complete [vucomplete]
-if {!$complete} { after 5000 wait_to_complete } else { exit }
+proc runtimer { seconds } {
+set x 0
+set timerstop 0
+while {!$timerstop} {
+incr x
+after 1000
+  if { ![ expr {$x % 60} ] } {
+          set y [ expr $x / 60 ]
+          puts "Timer: $y minutes elapsed"
+  }
+update
+if {  [ vucomplete ] || $x eq $seconds } { set timerstop 1 }
+    }
+return
 }
 
 
@@ -17,15 +26,17 @@ diset tpcc mysql_driver timed
 diset tpcc mysql_rampup 1
 diset tpcc mysql_timeprofile true
 diset tpcc mysql_allwarehouse true
-diset tpcc mysql_duration 20160
+diset tpcc mysql_duration 1209600
+diset tpcc mysql_total_iterations 1000000000
 print dict
 loadscript
 
 vuset vu VIRTUAL_USERS
-vuset delay 100
-vuset repeat 500
+vuset delay 500
+vuset repeat 1209600000
 vucreate
 vurun
 
-wait_to_complete
-vwait forever
+runtimer 1209600000
+vudestroy
+after 5000
