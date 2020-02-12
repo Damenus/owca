@@ -275,4 +275,4 @@ Further reading
 - `Extending WCA <docs/extending.rst>`_
 - `Workload Collocation Agent API <docs/api.rst>`_
 
-.. _`[Outdated] WCA Architecture v1.7.pdf`: docs/`[Outdated] WCA Architecture v1.7.pdf`
+.. _`[Outdated] WCA Architecture v1.7.pdf`: docs/%5BOutdated%5D%20WCA%20Architecture%20v1.7.pdf
