@@ -111,7 +111,7 @@ spec:
         - record: apm_throughput      # transaction per minute from mysql (get by script 'mysql_tpm_gauge.py')
           expr: apm_mysql_qps
         - record: apm_latency
-          expr: apm_mysql_latency
+          expr: apm_mysql_latency{quantile='0.9',type_query='neword'}
 
     - name: apm-generic
       rules:
