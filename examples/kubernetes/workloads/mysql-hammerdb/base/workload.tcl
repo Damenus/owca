@@ -26,7 +26,7 @@ diset tpcc mysql_driver timed
 diset tpcc mysql_rampup 1
 diset tpcc mysql_timeprofile true
 diset tpcc mysql_allwarehouse true
-diset tpcc mysql_duration 1209600
+diset tpcc mysql_duration 1209600000
 diset tpcc mysql_total_iterations 1000000000
 print dict
 loadscript
