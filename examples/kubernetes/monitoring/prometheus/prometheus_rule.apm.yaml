@@ -108,9 +108,9 @@ spec:
         - record: apm_mysql_qps
           expr: apm_hammerdb_ops * on(task_name) group_right() task_up
         # T & L per app
-        - record: apm_throughput      # transaction per minute from mysql (get by script 'mysql_tpm_gauge.py')
+        - record: apm_throughput      # transaction per minute from mysql (get by script 'mysql_tpm_gauge.py') https://www.hammerdb.com/docs/ch06s04.html
           expr: apm_mysql_qps
-        - record: apm_latency         # perform 'neword' operation in milliseconds (ms) on quantile 90%
+        - record: apm_latency         # perform 'neword' operation in milliseconds (ms) on quantile 90% https://www.hammerdb.com/docs/ch03s07.html
           expr: apm_mysql_latency
 
     - name: apm-generic
