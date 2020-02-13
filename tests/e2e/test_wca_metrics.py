@@ -81,11 +81,18 @@ def test_wca_metrics(workload_name):
     'redis-memtier',
     'sysbench-memory',
     'memcached-mutilate',
-    'specjbb',
-    'mysql-hammerdb'
+    'specjbb'
 ])
 def test_wca_metrics_kustomize(workload_name):
     test_wca(workload_name, ['apm_sli', 'task_cycles'])
+
+
+# mysql is initializing too long for sli tests
+@pytest.mark.parametrize('workload_name', [
+    'mysql-hammerdb'
+])
+def test_wca_metrics_kustomize_throughput(workload_name):
+    test_wca(workload_name, ['apm_sli2', 'task_cycles'])
 
 
 def test_wca(workload_name, metrics):
