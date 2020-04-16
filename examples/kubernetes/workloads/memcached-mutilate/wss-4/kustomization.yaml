@@ -1,0 +1,21 @@
+nameSuffix: -wss-0
+bases:
+- ../base
+
+commonLabels:
+  app: memcached-mutilate-wss-0
+
+configMapGenerator:
+- name: mutilate
+  behavior: merge
+  literals:
+  - load_records=70000
+  - records=70000 #1000000
+  - valuesize=256000 # B   # 360000 # 400000 # 80000    # 80kB * 1M  <= 100GB
+  - qps=9000
+  - threads=4
+  - connections=4
+  - extra=--update=0.25
+
+patchesStrategicMerge:
+  - resources.yaml

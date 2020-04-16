@@ -1,0 +1,83 @@
+nameSuffix: -exp
+bases:
+- ../base
+
+commonLabels:
+  app: specjbb-exp
+  type: exp
+  size: medium
+
+patchesStrategicMerge:
+  - resources.yaml
+
+configMapGenerator:
+  - name: specjbb
+    behavior: merge
+    literals:
+      - specjbb.group.count=8
+
+  - name: specjbb-controller
+    literals:
+      - specjbb.controller.type=PRESET
+      - specjbb.controller.rtcurve.warmup.step=0.5
+      - specjbb.controller.rtcurve.step=1
+      - specjbb.txi.pergroup.count=1
+      - >
+      java=
+      -Xmx2g
+      -Xms2g
+      -Xmn1536m
+      -XX:+AlwaysPreTouch
+      -XX:ParallelGCThreads=2
+      - >
+      specjbb_extra=
+      # -Dspecjbb.forkjoin.workers=2 # 2*cores
+      # extra params needs '-D' prefix, like above
+  - name: specjbb-backend
+#      - backendimeg='18000M'
+#      - backendinew='16920M'
+#      - gc_size='12'
+#      - worker_size='12'
+    literals:
+      - >
+        java=
+        -XX:+AlwaysPreTouch
+        -XX:-UseAdaptiveSizePolicy
+        -XX:-UseBiasedLocking
+        -XX:+AggressiveOpts
+        -XX:+UseParallelOldGC
+        -XX:+PrintGCDetails
+        -XX:+PrintHeapAtGC
+        -XX:+PrintGCTimeStamps
+      - >
+        java2=
+        -XX:MaxTenuringThreshold=15
+        -XX:SurvivorRatio=10
+        -XX:TargetSurvivorRatio=90
+      # Below params are calculated for jvm
+      #      -Xmx$(($MY_MEM_REQUEST*80/100))
+      #      -Xms$(($MY_MEM_REQUEST*80/100))
+      #      -Xmn$(($MY_MEM_REQUEST*80/100*94/100))
+      #      -XX:MaxRAM=$MY_MEM_REQUEST
+      #      -XX:ParallelGCThreads=${cores}
+      - >
+        specjbb_extra=
+  # Below params are calculated for specjbb
+  #      -Dspecjbb.forkjoin.workers=$(($cores*2))
+  #      -Dspecjbb.mapreducer.pool.size=$(($group_count*2))
+  - name: specjbb-injector
+#      # for the injector
+#      - tximeg_numeric_gb=2
+#      - tximeg="2g"
+#      - txinew="1536m"
+    literals:
+      - >
+        java=
+        -XX:+AlwaysPreTouch
+        -XX:ParallelGCThreads=2
+      # Below params are calculated for jvm
+      #      -Xmx$(($MY_MEM_REQUEST*80/100))
+      #      -Xms$(($MY_MEM_REQUEST*80/100))
+      #      -Xmn$(($MY_MEM_REQUEST*80/100*94/100))
+      - >
+        specjbb_extra=

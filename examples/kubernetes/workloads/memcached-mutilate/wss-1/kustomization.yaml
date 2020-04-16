@@ -1,0 +1,18 @@
+nameSuffix: -wss-1
+bases:
+- ../base
+
+commonLabels:
+  app: memcached-mutilate-wss-1
+
+configMapGenerator:
+- name: mutilate
+  behavior: merge
+  literals:
+  - records=10000           # 100k
+  - valuesize=100000 #10000       # 20kB * 1M <= 25GB
+  - qps=50000       # 50k per second
+#  - extra=--update=0.5
+
+patchesStrategicMerge:
+  - resources.yaml

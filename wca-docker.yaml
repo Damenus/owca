@@ -1,0 +1,21 @@
+# wca.yaml
+# requires WCA from
+runner: !MeasurementRunner
+  node: !StaticNode
+    tasks: []
+    directory: docker #'/sys/fs/cgroup/memory/docker' # can automatically discover tasks from Docker (but without metadata)
+  # event_names: # Crashes the kernel
+  #   - task_stalled_mem_loads
+  uncore_event_names:
+    - platform_pmm_bandwidth_reads
+    - platform_pmm_bandwidth_writes
+    - platform_cas_count_reads
+    - platform_cas_count_writes
+    - platform_upi_rxl_flits
+    - platform_upi_txl_flits
+  enable_derived_metrics: true
+  gather_hw_mm_topology: true
+  metrics_storage: !LogStorage
+    output_filename: '/home/ddarczuk/nodeexporter/metrics.prom' # have to be put in the same working director as node exporter
+    #output_filename: 'node_exporter-1.0.0-rc.0.linux-amd64/metrics.prom'
+    overwrite: true

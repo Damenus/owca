@@ -42,6 +42,25 @@ spec:
           expr: apm_redis_qps
         - record: apm_latency
           expr: apm_redis_latency
+    - name: memcached-memtier
+      rules:
+        # intermediary
+        - record: apm_memcached_memtier_alive
+          expr: ceil(rate(apm_memcached_memtier_stdout_lines[1m])>0)
+        - record: apm_memcached_memtier_ops
+          expr: avg_over_time(apm_memcached_memtier_scan_ops_sec[1m]) and apm_memcached_memtier_alive
+        - record: apm_memcached_memtier_latency
+          expr: avg_over_time(apm_memcached_memtier_scan_latency[1m]) and apm_memcached_memtier_alive
+        # common apm metrics
+        - record: apm_memcached_latency  # msec latency
+          expr: apm_memcached_memtier_latency * on(task_name) group_right() task_up
+        - record: apm_memcached_qps
+          expr: apm_memcached_memtier_ops * on(task_name) group_right() task_up
+        # T & L per app
+        - record: apm_throughput
+          expr: apm_memcached_qps
+        - record: apm_latency
+          expr: apm_memcached_latency
 
     - name: stress-stream
       rules:

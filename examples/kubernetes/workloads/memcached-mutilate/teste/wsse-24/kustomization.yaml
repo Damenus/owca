@@ -1,0 +1,18 @@
+bases:
+- ../../base
+commonLabels:
+  app: memcached-mutilate-wsse-24
+configMapGenerator:
+- behavior: merge
+  literals:
+  - load_records=25000000
+  - records=25000000
+  - valuesize=2000
+  - qps=15000
+  - threads=1
+  - connections=1
+  - update=0.5
+  name: mutilate
+nameSuffix: -wsse-24
+patchesStrategicMerge:
+- resources.yaml

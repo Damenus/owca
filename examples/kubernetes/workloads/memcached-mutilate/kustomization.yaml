@@ -3,6 +3,24 @@ bases:
 - medium
 - big
 - big-wss
+- wss-0
+- wss-1
+- wss-5
+- wssM
+- wssM-max
+- test
+#- testm
+#- testa
+#- testb
+#- testc
+#- testd
+#- teste
+#- testf
+- testg
+- testh
+- testi
+- testj
+- testk
 
 commonLabels:
   fit: 2lm

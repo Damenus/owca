@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mutilate
+spec:
+  replicas: 0
+  serviceName: memcached
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: mutilate
+  template:
+    metadata:
+      labels:
+        app: mutilate
+    spec:
+      nodeName: node100
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: mutilate
+          image: mutilate
+          envFrom:
+            - configMapRef:
+                name: mutilate
+          env:
+            # Downward API
+            - name: podname
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            - name: CORES_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: mutilate
+                  resource: requests.cpu
+            - name: MEM_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: mutilate
+                  resource: requests.memory
+          command:
+            - bash
+            - -c
+            - >
+              echo sleeping...;
+              sleep 30;
+              shopt -s extglob;
+              identifier=${podname#mutilate-};
+              service=${identifier%-+([[:digit:]])};
+              target=memcached-${identifier}.memcached-${service};
+              echo targeting: $target;
+
+              echo loading;
+              ./mutilate
+              -T 1
+              -s ${target}:11211
+              --loadonly
+              -r $load_records
+              -V $valuesize
+              -v
+
+              echo started;
+              ./mutilate
+              -c $connections
+              -T $threads
+              -t $time
+              -s ${target}:11211
+              --noload
+              --scan $qps:$qps:0
+              -r $records
+              -V $valuesize
+              -u $update
+              $extra
+
+  # required for workaround bug with kustomize https://github.com/kubernetes-sigs/kustomize/issues/504
+  # when using commonLabels
+  # fixed in 2.1.0 https://github.com/kubernetes-sigs/kustomize/commit/c470982ce5b96da82a757f088a842bb05d3bcdb4
+  volumeClaimTemplates: []

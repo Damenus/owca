@@ -1,0 +1,17 @@
+bases:
+- ../../base
+commonLabels:
+  app: memcached-mutilate-wssa-1
+configMapGenerator:
+- behavior: merge
+  literals:
+  - load_records=26000000
+  - records=26000000
+  - valuesize=50000
+  - qps=12000
+  - threads=1
+  - connections=1
+  name: mutilate
+nameSuffix: -wssa-1
+patchesStrategicMerge:
+- resources.yaml

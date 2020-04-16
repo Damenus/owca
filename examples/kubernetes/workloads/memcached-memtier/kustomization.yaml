@@ -1,0 +1,12 @@
+bases:
+- small
+
+commonLabels:
+  fit: 2lm
+  workload: memcached-memtier
+
+images:
+- name: memtier_benchmark
+  newName: 100.64.176.12:80/wca/memtier_benchmark
+  newTag: master
+

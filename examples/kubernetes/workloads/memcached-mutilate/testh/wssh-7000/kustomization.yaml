@@ -1,0 +1,18 @@
+bases:
+- ../../base
+commonLabels:
+  app: memcached-mutilate-wssh-7000
+configMapGenerator:
+- behavior: merge
+  literals:
+  - load_records=109090909
+  - records=109090909
+  - valuesize=1000
+  - qps=7000
+  - threads=1
+  - connections=1
+  - update=0.2
+  name: mutilate
+nameSuffix: -wssh-7000
+patchesStrategicMerge:
+- resources.yaml

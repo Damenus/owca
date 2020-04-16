@@ -1,0 +1,18 @@
+bases:
+- ../../base
+commonLabels:
+  app: memcached-mutilate-wss-ddr-g-23
+configMapGenerator:
+- behavior: merge
+  literals:
+  - load_records=4743083
+  - records=4743083
+  - valuesize=1000
+  - qps=0
+  - threads=1
+  - connections=1
+  - update=0.2
+  name: mutilate
+nameSuffix: -wss-ddr-g-23
+patchesStrategicMerge:
+- resources.yaml

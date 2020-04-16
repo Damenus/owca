@@ -1,0 +1,32 @@
+nameSuffix: -wssm-13
+bases:
+- ../../base
+
+commonLabels:
+  app: memcached-mutilate-wssm-13
+
+configMapGenerator:
+- name: mutilate
+  behavior: merge
+  literals:
+  - load_records=1000000
+  - records=1000000 #350000 #1000000
+  - valuesize=100000 # B   # 360000 # 400000 # 80000    # 80kB * 1M  <= 100GB
+  - qps=4700
+  - threads=1
+  - connections=1
+#  - extra=--update=0.25
+
+patchesStrategicMerge:
+  - resources.yaml
+
+# experiment friday
+#  - load_records=350000
+#  - records=350000 #1000000
+#  - valuesize=100000 # B   # 360000 # 400000 # 80000    # 80kB * 1M  <= 100GB
+#  - qps=3000
+#  - threads=1
+#  - connections=1
+
+# 1 - 14000000
+# 2 - 7000000

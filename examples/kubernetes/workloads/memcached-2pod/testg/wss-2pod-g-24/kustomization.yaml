@@ -1,0 +1,19 @@
+bases:
+- ../../base
+commonLabels:
+  app: memcached-mutilate-wss-2pod-g-24
+configMapGenerator:
+- behavior: merge
+  literals:
+  - load_records=4545454
+  - records=4545454
+  - valuesize=1000
+  - qps=0
+  - threads=1
+  - connections=1
+  - update=0.2
+  name: mutilate
+nameSuffix: -wss-2pod-g-24
+patchesStrategicMerge:
+- resources1.yaml
+- resources2.yaml

@@ -1,0 +1,25 @@
+bases:
+- wss-10g
+- wss-15g
+- wss-30g
+- wss-40g
+- wss-50g
+- wss-60g
+- wss-75g
+- wss-80g
+- wss-10g-update-01
+- wss-10g-update-05
+- wss-10g-update-025
+- wss-10g-update-005
+- wss-40g-update-01
+- wss-40g-update-05
+- wss-40g-update-025
+- wss-40g-update-005
+- wss-50g-update-01
+- wss-50g-update-05
+- wss-50g-update-025
+- wss-50g-update-005
+- wss-75g-update-01
+- wss-75g-update-05
+- wss-75g-update-025
+- wss-75g-update-005

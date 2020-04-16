@@ -11,6 +11,7 @@ configMapGenerator:
     - configurations/mutilate.conf
     - configurations/specjbb.conf
     - configurations/sysbench.conf
+    - configurations/memcached-memtier.conf
 
 resources:
   - daemonset.yaml

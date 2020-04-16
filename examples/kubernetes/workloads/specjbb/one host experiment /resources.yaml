@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: specjbb-group
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          resources:
+            requests:
+              cpu: 11.87
+              memory: 17.81G # Must be equation: 1.5*cpu = memory
+        - name: injector
+          resources:
+            requests:
+              cpu: 2
+              memory: 17.81G # Must be equation: 1.5*cpu = memory

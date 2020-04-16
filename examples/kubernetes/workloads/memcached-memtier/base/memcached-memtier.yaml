@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: memcached-memtier
+spec:
+  replicas: 0
+  serviceName: memcached-memtier
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: memcached-memtier
+  template:
+    metadata:
+      labels:
+        app: memcached-memtier
+    spec:
+      terminationGracePeriodSeconds: 0
+      nodeName: node100
+      containers:
+        - name: memcached
+          image: memcached
+          envFrom:
+            - configMapRef:
+                name: memcached
+          env:
+            # Downward API
+            - name: CORES_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: memcached
+                  resource: requests.cpu
+            - name: MEM_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: memcached
+                  resource: requests.memory
+          command:
+            - sh
+            - -c
+            - >
+              memcached
+              -t $CORES_REQUEST
+              -m $MEM_REQUEST
+              -u root
+              $extra
+
+        - name: memtier
+          image: memtier_benchmark
+          securityContext:
+            privileged: true
+          envFrom:
+            - configMapRef:
+                name: memtier
+          env:
+            # Downward API
+            - name: podname
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            - name: CORES_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: memtier
+                  resource: requests.cpu
+            - name: MEM_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: memtier
+                  resource: requests.memory
+          tty: true
+          command:
+            - bash
+            - -c
+            - >
+              shopt -s extglob;
+              identifier=${podname#memtier-};
+              service=${identifier%-+([[:digit:]])};
+              target='127.0.0.1';
+              sleep 10;
+
+              # preparing data
+
+              memtier_benchmark
+              --run-count=1
+              --requests=allkeys
+              --server=$target
+              --threads=1
+              --clients=1
+              --pipeline=20000
+              --data-size=$datasize
+              --hide-histogram
+              --key-pattern=P:P
+              --key-maximum=$keymaximum_gen
+              --ratio 1:0
+              --protocol=memcache_binary
+              --port=11211
+              &> /dev/null
+
+              # Clear possible output from previous job on the same node
+
+              echo "[RUN #0 0%,   0 secs]  0 threads:           0 ops,       0 (avg:       0) ops/sec, 0.00KB/sec (avg: 0.00KB/sec),  0.00 (avg:  0.00) msec latency";
+
+              # loading
+
+              stdbuf -e0 -o0
+              memtier_benchmark
+              --run-count=9999
+              --requests=10000000000
+              --server=$target
+              --threads=$threads
+              --hide-histogram
+              --clients=$clients
+              --pipeline=$pipeline
+              --data-size=$datasize
+              --key-pattern=G:G
+              --key-maximum=$keymaximum_load
+              --ratio $ratio
+              --protocol=memcache_binary
+              --port=11211
+              2>&1 | stdbuf -e0 -o0 awk 'BEGIN { RS = "\r" } { print $0; fflush(); system("") }'
+
+
+  # required for workaround bug with kustomize https://github.com/kubernetes-sigs/kustomize/issues/504
+  # when using commonLabels
+  # fixed in 2.1.0 https://github.com/kubernetes-sigs/kustomize/commit/c470982ce5b96da82a757f088a842bb05d3bcdb4
+  volumeClaimTemplates: []

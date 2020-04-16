@@ -32,7 +32,7 @@ print dict
 loadscript
 
 vuset vu VIRTUAL_USERS
-vuset delay 500
+vuset delay 500 # nano
 vuset repeat 1209600000
 vucreate
 vurun

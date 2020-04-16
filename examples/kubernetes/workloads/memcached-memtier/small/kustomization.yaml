@@ -1,0 +1,20 @@
+nameSuffix: -small
+bases:
+- ../base
+
+commonLabels:
+  app: memcached-memtier-small
+  size: small
+
+configMapGenerator:
+- name: memtier
+  behavior: merge
+  literals:
+    - clients=10
+    - threads=1
+    - keymaximum_gen=34285714   # 200k
+    - keymaximum_load=34285714   # 200k
+    - datasize=1000       # 220-250M
+
+patchesStrategicMerge:
+  - resources.yaml

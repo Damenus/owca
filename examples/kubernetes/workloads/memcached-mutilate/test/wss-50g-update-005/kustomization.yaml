@@ -1,0 +1,21 @@
+nameSuffix: -wss-50g-update-005
+bases:
+- ../../base
+
+commonLabels:
+  app: memcached-mutilate-wss-50g-update-005
+
+configMapGenerator:
+- name: mutilate
+  behavior: merge
+  literals:
+  - load_records=1400000
+  - records=1400000
+  - valuesize=100000
+  - qps=2500
+  - threads=4
+  - connections=4
+  - extra=--update=0.05
+
+patchesStrategicMerge:
+  - resources.yaml
