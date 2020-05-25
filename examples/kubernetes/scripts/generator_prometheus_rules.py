@@ -19,10 +19,8 @@ if __name__ == '__main__':
         dest='output',
         help="Name output file",
         default="prometheus_rule_score.yaml")
-
     args = parser.parse_args()
     config_name = args.output
-
     period = args.period
     assert re.match('\d+\w', period)
 
