@@ -1,0 +1,49 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: prometheus-rules
+  name: prometheus-wca-pmem
+  namespace: prometheus
+spec:
+  groups:
+  - name: pmem
+    rules:
+    # ======================== example node pmem ===============================
+    # 26 core, Xeon Gold 6230R
+    # 2-2-1, kostki po 128GB, 1T
+    # "membw_read": 57, "membw_write": 16, "wss": 58
+    - record: node_capacity
+      expr: '52'
+      labels:
+        dim: cpu
+        node: 'node0'
+    - record: node_capacity
+      expr: '58'
+      labels:
+        dim: wss
+        node: 'node0'
+    - record: node_capacity
+      expr: '1000'
+      labels:
+        dim: mem
+        node: 'node0'
+    - record: node_capacity
+      expr: '82'
+      labels:
+        dim: mbw_flat
+        node: 'node0'
+
+    - record: platform_mem_mode_size_bytes
+      expr: '16'
+      labels:
+        node: '1023497637888'
+    - record: platform_dimm_speed_bytes_per_second
+      expr: '255999960000'
+      labels:
+        node: 'node0'
+    - record: platform_nvdimm_read_bandwidth_bytes_per_second
+      expr: '40800000000'
+      labels:
+        node: 'node0'
+        socket: 0
