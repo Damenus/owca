@@ -13,15 +13,11 @@ spec:
 
     # ============================ node ===================================
     # cpu
-    - record: node_capacity
+    - record: node_capacity_unsafe
       expr: 'sum(platform_topology_cpus) by (node)'
       labels:
         dim: cpu
     # mem
-    - record: node_capacity_unsafe
-      expr: 'ceil(sum(platform_dimm_total_size_bytes{dimm_type="ram"}) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes==0'
-      labels:
-        dim: mem
     - record: node_capacity_unsafe
       expr: 'ceil((sum(platform_mem_mode_size_bytes) by (node) / 1e9)) and on(node) platform_mem_mode_size_bytes!=0'
       labels:
@@ -31,19 +27,10 @@ spec:
       expr: 'ceil(sum(platform_nvdimm_read_bandwidth_bytes_per_second) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes!=0'
       labels:
         dim: mbw_flat
-    - record: node_capacity_unsafe
-      expr: 'ceil(sum(platform_dimm_speed_bytes_per_second) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes==0'
-      labels:
-        dim: mbw_flat
     # wss
     # -- wss on 2lm is devaulated to 30% because of direct mapping (that is approximated by us unsafe maximum)
-    # -- wss on 1lm nodes is just capacity of ram
     - record: node_capacity_unsafe
       expr: 'ceil(sum(platform_dimm_total_size_bytes{dimm_type="ram"}) by (node) * 0.3 / 1e9) and on(node) platform_mem_mode_size_bytes!=0'
-      labels:
-        dim: wss
-    - record: node_capacity_unsafe
-      expr: 'ceil(sum(platform_dimm_total_size_bytes{dimm_type="ram"}) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes==0'
       labels:
         dim: wss
 
@@ -67,10 +54,8 @@ spec:
 
     - record: node_capacity
       expr: node_capacity_unsafe * on(dim) group_left safety_weights
-
-    # ---------------------------- node nvm profile -----------------------------------------
-    # nvm profile only catch pmm nodes!!!!
-    # # and on(node) platform_mem_mode_size_bytes!=0
+    
+    # ---------------------------- node PMEM profile -----------------------------------------
 
     # Profile by mem
     - record: profile_node_by_mem
@@ -86,11 +71,6 @@ spec:
       labels:
         index: wss
 
-    # By specific nodes
-    - record: profile_nodes_by_mem
-      expr: 'avg(profile_node_by_mem and on(node) platform_mem_mode_size_bytes==0) by (index)'
-      labels:
-        memory: 1lm
     # Note: average (avg) all PMEM nodes
     - record: profile_nodes_by_mem
       expr: 'avg(profile_node_by_mem and on(node) platform_mem_mode_size_bytes != 0) by (index)'
@@ -121,24 +101,20 @@ spec:
       labels:
         memory: 2lm
     - record: task_mbw_read
-      expr: task_mbw_ * task_memory_rw_ratio_
+      expr: 'task_mbw_ * task_memory_rw_ratio_'
     - record: task_mbw_write
-      expr: (1 - task_memory_rw_ratio_) * task_mbw_ * on(memory) group_left node_mbw_write_weight
+      expr: '(1 - task_memory_rw_ratio_) * task_mbw_ * on(memory) group_left node_mbw_write_weight'
     - record: task_mbw_flat
-      expr: task_mbw_read + task_mbw_write
+      expr: 'task_mbw_read + task_mbw_write'
 
     - record: app_cpu
-      expr: 'max(max_over_time(task_requested_cpus[10m])) by (app)'
+      expr: 'max(max_over_time(task_requested_cpus[7d])) by (app)'
     - record: app_mem
-      expr: 'max(max_over_time(task_requested_mem_bytes[10m])) by (app) / 1e9'
-    - record: app_mbw_read
-      expr: 'app_mbw * app_mbw_rw'
-    - record: app_mbw_write
-      expr: 'app_mbw * (1-app_mbw_rw)'
+      expr: 'max(max_over_time(task_requested_mem_bytes[7d])) by (app) / 1e9'
     - record: app_mbw_flat
-      expr: 'max(quantile_over_time(0.95, task_mbw_flat[20m:10m])) by (app)'
+      expr: 'max(quantile_over_time(0.95, task_mbw_flat[7d:2m])) by (app)'
     - record: app_wss
-      expr: 'max(quantile_over_time(0.95, task_wss_referenced_bytes[20m:10m])) by (app) / 1e9'
+      expr: 'max(quantile_over_time(0.95, task_wss_referenced_bytes[7d:2m])) by (app) / 1e9'
 
     - record: app_req
       expr: 'app_cpu'
@@ -148,14 +124,6 @@ spec:
       expr: 'app_mem'
       labels:
         dim: mem
-    - record: app_req
-      expr: 'app_mbw_read'
-      labels:
-        dim: mbw_read
-    - record: app_req
-      expr: 'app_mbw_write'
-      labels:
-        dim: mbw_write
     - record: app_req
       expr: 'app_mbw_flat'
       labels:
