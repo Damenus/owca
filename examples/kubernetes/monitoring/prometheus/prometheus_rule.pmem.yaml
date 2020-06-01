@@ -13,22 +13,22 @@ spec:
     # 26 core, Xeon Gold 6230R
     # 2-2-1, kostki po 128GB, 1T
     # "membw_read": 57, "membw_write": 16, "wss": 58
-    - record: node_capacity
+    - record: node_capacity_unsafe
       expr: '52'
       labels:
         dim: cpu
         node: 'node0'
-    - record: node_capacity
+    - record: node_capacity_unsafe
       expr: '58'
       labels:
         dim: wss
         node: 'node0'
-    - record: node_capacity
+    - record: node_capacity_unsafe
       expr: '1000'
       labels:
         dim: mem
         node: 'node0'
-    - record: node_capacity
+    - record: node_capacity_unsafe
       expr: '82'
       labels:
         dim: mbw_flat
