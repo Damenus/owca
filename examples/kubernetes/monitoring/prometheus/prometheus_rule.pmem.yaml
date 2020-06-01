@@ -11,12 +11,18 @@ spec:
     rules:
     # ======================== example node pmem ===============================
     # 26 core, Xeon Gold 6230R
-    # 2-2-1, kostki po 128GB, 1T
+    # 2-2-1, kostki po 128GB (razy 8), 1T, 192 DRAM, (wss 192 * 0.3 = 57.6)
     # "membw_read": 57, "membw_write": 16, "wss": 58
+    # read, write 62.4, 21.44
     - record: node_capacity_unsafe
       expr: '52'
       labels:
         dim: cpu
+        node: 'node0'
+    - record: node_capacity_unsafe
+      expr: '1024'
+      labels:
+        dim: mem
         node: 'node0'
     - record: node_capacity_unsafe
       expr: '58'
@@ -24,18 +30,13 @@ spec:
         dim: wss
         node: 'node0'
     - record: node_capacity_unsafe
-      expr: '1000'
-      labels:
-        dim: mem
-        node: 'node0'
-    - record: node_capacity_unsafe
-      expr: '82'
+      expr: '62'
       labels:
         dim: mbw_flat
         node: 'node0'
 
     - record: platform_mem_mode_size_bytes
-      expr: '1023497637888'
+      expr: '1085958258688'
       labels:
         node: 'node0'
     - record: platform_dimm_speed_bytes_per_second
