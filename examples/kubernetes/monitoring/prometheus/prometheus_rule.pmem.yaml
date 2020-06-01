@@ -35,9 +35,9 @@ spec:
         node: 'node0'
 
     - record: platform_mem_mode_size_bytes
-      expr: '16'
+      expr: '1023497637888'
       labels:
-        node: '1023497637888'
+        node: 'node0'
     - record: platform_dimm_speed_bytes_per_second
       expr: '255999960000'
       labels:
@@ -46,4 +46,3 @@ spec:
       expr: '40800000000'
       labels:
         node: 'node0'
-        socket: 0
