@@ -11,8 +11,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '-p', '--features_history_period',
         dest='period',
-        help="Register additional components in config",
-        default="3d",
+        help="",
+        default="7d",
         required=True)
     parser.add_argument(
         '-o', '--output',
@@ -36,3 +36,6 @@ if __name__ == '__main__':
     with fileinput.FileInput(config_name, inplace=True) as file:
         for line in file:
             print(re.sub(period_regex_search, period_regex_replace, line), end='')
+
+    # Print information
+    print("Created Prometheus Rules with period {} in file {}.".format(period, config_name))
