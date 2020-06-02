@@ -15,7 +15,7 @@ spec:
     # wss 192 * 0.3 = 57.6;
     # mbw_read 62.4, mbw_write 21.44;
     - record: node_capacity_unsafe
-      expr: '52'
+      expr: '104'
       labels:
         dim: cpu
         node: 'virtual_node_pmem'
@@ -39,11 +39,15 @@ spec:
       expr: '1085958258688'
       labels:
         node: 'virtual_node_pmem'
-    - record: platform_dimm_speed_bytes_per_second
-      expr: '255999960000'
+    - record: platform_nvdimm_write_bandwidth_bytes_per_second
+      expr: '21440000000'
       labels:
         node: 'virtual_node_pmem'
     - record: platform_nvdimm_read_bandwidth_bytes_per_second
-      expr: '40800000000'
+      expr: '62000000000'
+      labels:
+        node: 'virtual_node_pmem'
+    - record: node_mbw_write_weight
+      expr: '2.91'
       labels:
         node: 'virtual_node_pmem'
