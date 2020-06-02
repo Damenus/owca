@@ -13,7 +13,7 @@ spec:
     # Xeon Gold 6230R, 26 core;
     # 2-2-1, 8x128GB, 1T; 192 DRAM;
     # wss 192 * 0.3 = 57.6;
-    # mbw_read 62.4, mbw_write 21.44;
+    # mbw_read 54.4, mbw_write 14.8;
     - record: node_capacity_unsafe
       expr: '104'
       labels:
@@ -30,7 +30,7 @@ spec:
         dim: wss
         node: 'virtual_node_pmem'
     - record: node_capacity_unsafe
-      expr: '62'
+      expr: '54'
       labels:
         dim: mbw_flat
         node: 'virtual_node_pmem'
@@ -40,10 +40,10 @@ spec:
       labels:
         node: 'virtual_node_pmem'
     - record: platform_nvdimm_write_bandwidth_bytes_per_second
-      expr: '21440000000'
+      expr: '14800000000'
       labels:
         node: 'virtual_node_pmem'
     - record: platform_nvdimm_read_bandwidth_bytes_per_second
-      expr: '62000000000'
+      expr: '54400000000'
       labels:
         node: 'virtual_node_pmem'
