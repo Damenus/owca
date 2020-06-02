@@ -47,7 +47,3 @@ spec:
       expr: '62000000000'
       labels:
         node: 'virtual_node_pmem'
-    - record: node_mbw_write_weight
-      expr: '2.91'
-      labels:
-        node: 'virtual_node_pmem'
