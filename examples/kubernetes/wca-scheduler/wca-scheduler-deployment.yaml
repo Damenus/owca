@@ -1,3 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wca-scheduler-service
+spec:
+  selector:
+    app: wca-scheduler
+  ports:
+    - protocol: TCP
+      port: 30180
+      targetPort: 30180
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,13 +30,8 @@ spec:
       labels:
         app: wca-scheduler
     spec:
-      hostNetwork: true
       serviceAccountName: wca-scheduler
       terminationGracePeriodSeconds: 1
-      # nodeName: node36
-      # Using nodeName works only for the first deployment.
-      # On the second one (e.g. after deleting pod) it'll try to schedule new pod while old one is terminating.
-      # This can cause some problems (e.g. until pod terminating is done, new pods gets "PodFitsHostPorts" status due to port using) 
       nodeSelector:
         kubernetes.io/hostname: node36
       tolerations:
@@ -48,10 +57,6 @@ spec:
 
         - name: nginx
           image: nginx:latest
-          ports:
-            - name: wca-scheduler
-              containerPort: 30180
-              hostPort: 30180
           volumeMounts:
             - name: wca-scheduler-socket
               mountPath: /var/run/wca
