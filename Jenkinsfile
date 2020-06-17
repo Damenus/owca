@@ -473,6 +473,11 @@ def kustomize_wca_and_workloads_check() {
     print('Starting wca...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
 
+    print('Create Service for Prometheus, for E2E only')
+    sh "kubectl expose pod prometheus-prometheus-0 --type=NodePort --port=9090 --name=prometheus-nodeport-service --namespace prometheus;
+        kubectl patch service prometheus-nodeport-service --namespace=prometheus --type='json' --patch='[
+        {\"op\": \"replace\", \"path\": \"/spec/ports/0/nodePort\", \"value\":30900}]'"
+
     print('Deploy workloads...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD}"
 
