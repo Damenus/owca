@@ -472,7 +472,7 @@ def kustomize_wca_and_workloads_check() {
 
     print('Starting wca...')
     sh "kubectl apply -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING}"
-    sleep 15
+    sleep 40
 
     print('Create Service for Prometheus, for E2E only')
     sh "kubectl expose pod prometheus-prometheus-0 --type=NodePort --port=9090 --name=prometheus-nodeport-service --namespace prometheus && \
