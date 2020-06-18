@@ -366,6 +366,7 @@ pipeline {
                             print('Cleaning workloads and wca...')
                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} --wait=false"
                             sh "kubectl delete -k ${WORKSPACE}/${KUSTOMIZATION_MONITORING} --wait=false"
+                            sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus"
                             junit 'unit_results.xml'
                         }
                     }
@@ -555,7 +556,6 @@ def clean() {
     print('Cleaning: stopping WCA and workloads .')
     stop_wca()
     stop_workloads("${EXTRA_ANSIBLE_PARAMS}")
-    sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus"
     junit 'unit_results.xml'
 }
 
