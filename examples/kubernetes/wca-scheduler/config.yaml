@@ -22,7 +22,6 @@ algorithm: !Score
       host: http://prometheus.prometheus.svc.cluster.local
       port: 9090
       timeout: 5.0
-
     queries: !Queries
       APP_REQUESTED_RESOURCES_QUERY_MAP:
         cpu: 'app_req{dim="cpu"}'
