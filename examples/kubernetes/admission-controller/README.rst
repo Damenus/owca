@@ -92,7 +92,7 @@ Create MutatingWebhookConfiguration
 +++++++++++++++++++++++++++++++++++
 
 Execute command below and copy its output use to replace ${CA_BUNDLE} field in mutating-webhook.yaml:
-    ``kubectl get configmap -n kube-system extension-apiserver-authentication -o=jsonpath='{.data.client-ca-file}' | base64 | tr -d '\n'``
+``kubectl get configmap -n kube-system extension-apiserver-authentication -o=jsonpath='{.data.client-ca-file}' | base64 | tr -d '\n'``
 
 Replace ${HOST} field in webhook-deployment.yaml file with name of the node where deployment will run.
 
