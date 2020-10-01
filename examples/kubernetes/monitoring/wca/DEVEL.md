@@ -3,7 +3,7 @@ ADVANCE WCA DEPLOY
 
 WCA can be deployed in 3 different ways
 
-1. as daemonset - described in doc/kubernetes.rst
+1. as daemonset - described in README.md
 2. as daemonset, but using kubelet to scrape workloads (historical option)
 3. outside pod
 
