@@ -38,77 +38,8 @@ Getting started
 ===============
 Reference configs are in `configuration file for kubernetes <../examples/kubernetes/monitoring>`_.
 
-`example configuration file for kubernetes <../examples/kubernetes/monitoring/wca>`_
-`example configuration file for kubernetes <../examples/kubernetes/monitoring/cadvisor>`_
-
-Below instruction is about run wca as DaemonSet on cluster. This way uses kustomize to deploy all components.
-Kustomize is available from kubectl 1.14.
-
-1. Prepare cluster
-Workload Collocation Agent required existing 'wca' namespace and label 'monitoring=wca' on nodes,
-where it will be deployed.
-
-Namespace and label can be crated by using kubectl by following commands:
-
-.. code-block:: bash
-
-    kubectl create namespace wca
-    kubectl label nodes node100 node101 node102 monitoring=wca
-
-Where names `node100 node101 node102` should be replaced by your kubernetes node names.
-If you want deploy wca on all nodes, you can delete affinity in daemonset spec.
-
-
-2. Build image(from main project repo) and push to your registry
-
-Build `Docker image <../Dockerfile>`_ and push to private repo. You can use make command to this. Like in example below.
-You have to replace DOCKER_REPOSITORY_URL variable to yours own docker registry.
-
-.. code-block:: bash
-
-    WCA_IMAGE=${DOCKER_REPOSITORY_URL}/wca
-    WCA_TAG=master
-    make wca_package_in_docker
-    make _wca_docker_devel
-    sudo docker build --network host --target standalone -f Dockerfile -t $WCA_IMAGE:$WCA_TAG .
-
-    docker push $WCA_IMAGE:$WCA_TAG
-
-
-3. Overwrite docker image name to your local repository in ../examples/kubernetes/monitoring/wca/kustomization.yaml
-
-In kustomization.yaml, you can find field **images**. You have to replace DOCKER_REPOSITORY_URL variable to yours own docker registry.
-
-```yaml
-...
-images:
-  - name: wca
-    newName: ${DOCKER_REPOSITORY_URL}/wca
-    newTag: master
-```
-
-Note the default image (from **kustomization.yaml**) is using private repository in testing cluster and **master** tag.
-
-4. Adjust the wca configuration
-Workload Collocation Agent requires configuration file.
-`Example config using by Daemonset <../examples/kubernetes/monitoring/wca/wca-config.yaml>`_.
-
-
-
-
-
-`Here is an example config to run wca in allocator mode <../example/manifest/configmap.yaml>`_.
-
-
-5. Deploy wca
-Finally use the command below to deploy all wca components.
-
-.. code-block:: bash
-
-    kubectl apply -k ./examples/kubernetes/monitoring/wca
-
-
-`README <../examples/kubernetes/monitoring/wca/README.md>`_ for more advance wca configuration.
+`How deploy wca solution <../examples/kubernetes/monitoring/wca/README.md>`_
+`How deploy cadvisor solution <../examples/kubernetes/monitoring/cadvisor/README.md>`_
 
 
 Task's metrics labels for Kubernetes
