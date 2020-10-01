@@ -33,82 +33,82 @@ Possible wca configuration options
 In wca configuration file one can set below listed parameters.
 Please refer to `example configuration file for kubernetes <../configs/kubernetes/kubernetes_example_allocator.yaml>`_.
 
-.. code-block:: python
 
-    class CgroupDriverType(str, Enum):
-        SYSTEMD = 'systemd'
-        CGROUPFS = 'cgroupfs'
+Getting started
+===============
+Reference configs are in `configuration file for kubernetes <../examples/kubernetes/monitoring>`_.
 
-    @dataclass
-    class KubernetesNode(Node):
-        # We need to know what cgroup driver is used to properly build cgroup paths for pods.
-        #   Reference in source code for kubernetes version stable 1.13:
-        #   https://github.com/kubernetes/kubernetes/blob/v1.13.3/pkg/kubelet/cm/cgroup_manager_linux.go#L207
-        cgroup_driver: CgroupDriverType = field(
-            default_factory=lambda: CgroupDriverType(CgroupDriverType.CGROUPFS))
+`example configuration file for kubernetes <../examples/kubernetes/monitoring/wca>`_
+`example configuration file for kubernetes <../examples/kubernetes/monitoring/cadvisor>`_
 
-        # By default use localhost, however kubelet may not listen on it.
-        kubelet_endpoint: str = 'https://127.0.0.1:10250'
+Below instruction is about run wca as DaemonSet on cluster. This way uses kustomize to deploy all components.
+Kustomize is available from kubectl 1.14.
 
-        # Key and certificate to access kubelet API, if needed.
-        client_private_key: Optional[str] = None
-        client_cert: Optional[str] = None
+1. Prepare cluster
+Workload Collocation Agent required existing 'wca' namespace and label 'monitoring=wca' on nodes,
+where it will be deployed.
 
-        # List of namespaces to monitor pods in.
-        monitored_namespaces: List[str] = field(default_factory=lambda: ["default"])
-
-
-Run wca as DaemonSet on cluster
-===============================
-Reference configs are in `example configuration file for kubernetes <../examples/kubernetes/monitoring>`_.
-
-
-1. Add namespace 'wca'
-
-Namespace can be crated by following command:
+Namespace and label can be crated by using kubectl by following commands:
 
 .. code-block:: bash
 
     kubectl create namespace wca
+    kubectl label nodes node100 node101 node102 monitoring=wca
 
-or
+Where names `node100 node101 node102` should be replaced by your kubernetes node names.
+If you want deploy wca on all nodes, you can delete affinity in daemonset spec.
+
+
+2. Build image(from main project repo) and push to your registry
+
+Build `Docker image <../Dockerfile>`_ and push to private repo. You can use make command to this. Like in example below.
+You have to replace DOCKER_REPOSITORY_URL variable to yours own docker registry.
 
 .. code-block:: bash
 
-    kubectl apply -f manifest/namespace.yaml
+    WCA_IMAGE=${DOCKER_REPOSITORY_URL}/wca
+    WCA_TAG=master
+    make wca_package_in_docker
+    make _wca_docker_devel
+    sudo docker build --network host --target standalone -f Dockerfile -t $WCA_IMAGE:$WCA_TAG .
 
-2. Add private key and certificate to Secrets
+    docker push $WCA_IMAGE:$WCA_TAG
 
-Workload Collocation Agent required private key and certificate to connect with kubelet.
-Example how add this files to Secrets:
 
-.. code-block:: bash
+3. Overwrite docker image name to your local repository in ../examples/kubernetes/monitoring/wca/kustomization.yaml
 
-    sudo kubectl create secret generic kubelet-key-crt --from-file=./client.crt --from-file=./client.key --namespace=wca
+In kustomization.yaml, you can find field **images**. You have to replace DOCKER_REPOSITORY_URL variable to yours own docker registry.
 
-3. Add configuration file to ConfigMap
+```yaml
+...
+images:
+  - name: wca
+    newName: ${DOCKER_REPOSITORY_URL}/wca
+    newTag: master
+```
 
+Note the default image (from **kustomization.yaml**) is using private repository in testing cluster and **master** tag.
+
+4. Adjust the wca configuration
 Workload Collocation Agent requires configuration file.
-`Example Allocator as ConfigMap <../example/manifest/configmap.yaml>`_. To create the resource run:
+`Example config using by Daemonset <../examples/kubernetes/monitoring/wca/wca-config.yaml>`_.
+
+
+
+
+
+`Here is an example config to run wca in allocator mode <../example/manifest/configmap.yaml>`_.
+
+
+5. Deploy wca
+Finally use the command below to deploy all wca components.
 
 .. code-block:: bash
 
-    kubectl apply -f manifest/configmap.yaml
+    kubectl apply -k ./examples/kubernetes/monitoring/wca
 
-4. Build Docker image
 
-Build `Docker image <../Dockerfile>`_ and push to private repo. Then specify image inside
-the daemonset podspec to the pushed image.
-`Example definition DaemonSet <../example/manifest/daemonset.yaml>`_.
-
-5. Run DaemonSet
-
-Use command below to create DaemonSet:
-
-.. code-block:: bash
-
-    kubectl apply -f manifest/daemonset.yaml
-
+`README <../examples/kubernetes/monitoring/wca/README.md>`_ for more advance wca configuration.
 
 
 Task's metrics labels for Kubernetes
