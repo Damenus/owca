@@ -28,7 +28,7 @@ Kustomize is available from kubectl 1.14.
    ```bash
        WCA_IMAGE=${DOCKER_REPOSITORY_URL}/wca
        WCA_TAG=master
-       sudo docker build --network host --target standalone -f Dockerfile -t $WCA_IMAGE:$WCA_TAG .
+       sudo docker build --build-arg MAKE_WCA_PACKAGE=yes --network host --target standalone -f Dockerfile -t $WCA_IMAGE:$WCA_TAG .
        docker push $WCA_IMAGE:$WCA_TAG
    ```
    
