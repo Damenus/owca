@@ -31,7 +31,7 @@ Kustomize is available from kubectl 1.14 or as sperate binary from https://kusto
 
 2. Build image (from main project repo) and push to your registry
 
-   Build Docker image and push to private repo. You can use make command to this. Like in example below.
+   Build Docker image and push to private repo. Like in example below.
    You have to replace `DOCKER_REPOSITORY_URL` variable to your own docker registry.
    
    ```bash
