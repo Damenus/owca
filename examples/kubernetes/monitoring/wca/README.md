@@ -11,7 +11,7 @@ Kustomize is available from kubectl 1.14 or as sperate binary from https://kusto
 
    1. Create `wca` namespace
    
-      Namespace can be crated by using kubectl by a following command:
+      Namespace can be crated by using kubectl by the following command:
       
       ```bash
           kubectl create namespace wca
@@ -19,14 +19,14 @@ Kustomize is available from kubectl 1.14 or as sperate binary from https://kusto
 
    2. Choose monitoring node 
       
-      Label can be crated by using kubectl by a following command:
+      Label can be crated by using kubectl by the following command:
       
       ```bash
           kubectl label nodes node100 node101 node102 monitoring=wca
       ```
       
       Where names `node100 node101 node102` should be replaced by your kubernetes node names.
-      If you want deploy wca on all nodes, you can delete affinity in daemonset spec.
+      If you want to deploy wca on all nodes, you can delete affinity in daemonset spec.
 
 
 2. Build image (from main project repo) and push to your registry
@@ -69,7 +69,7 @@ Kustomize is available from kubectl 1.14 or as sperate binary from https://kusto
    ```
 
 
-After deploy wca, you can deploy Prometheus operator to collect metrics from wca and visual them in Prometheus.
+After deploying wca, you can deploy Prometheus operator to collect metrics from wca and visual them in Prometheus.
 Create `prometheus` namespace and deploy using kustomize `kubectl apply -k examples/kubernetes/monitoring/prometheus`.
 More information you'll find in `examples/kubernetes/monitoring/README.md`.
 

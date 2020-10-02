@@ -1,4 +1,4 @@
-ADVANCE WCA DEPLOY
+ADVANCED WCA DEPLOY
 ==================
 
 WCA can be deployed in 3 different ways
@@ -13,7 +13,7 @@ WCA USING KUBELET
 
 Add private key and certificate to Secrets
 
-Workload Collocation Agent required private key and certificate to connect with kubelet.
+Workload Collocation Agent requires private key and certificate to connect with kubelet.
 Example how add this files to Secrets:
 
 .. code-block:: bash
@@ -21,7 +21,7 @@ Example how add this files to Secrets:
     sudo kubectl create secret generic kubelet-key-crt --from-file=./client.crt --from-file=./client.key --namespace=wca
     
     
-WCA OUTSIDE KUBERNETES
+WCA OUTSIDE OF KUBERNETES
 ---------------
 
 Optionally, you can use token to connect to Kube API Server, while WCA is using outside pod.
