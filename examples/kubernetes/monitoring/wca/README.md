@@ -1,12 +1,12 @@
 Getting started
 ===============
 
-Below instruction is about run wca as DaemonSet on cluster. This way uses kustomize to deploy all components.
-Kustomize is available from kubectl 1.14.
+Below instruction is about run wca as DaemonSet in a cluster. This method uses kustomize to deploy all components.
+Kustomize is available from kubectl 1.14 or as sperate binary from https://kustomize.io/.
 
 1. Prepare cluster
 
-   Workload Collocation Agent required existing `wca` namespace and label `monitoring=wca` on nodes,
+   Workload Collocation Agent requires existing `wca` namespace and label `monitoring=wca` on nodes,
    where it will be deployed.
 
    1. Create `wca` namespace
@@ -32,7 +32,7 @@ Kustomize is available from kubectl 1.14.
 2. Build image (from main project repo) and push to your registry
 
    Build Docker image and push to private repo. You can use make command to this. Like in example below.
-   You have to replace `DOCKER_REPOSITORY_URL` variable to yours own docker registry.
+   You have to replace `DOCKER_REPOSITORY_URL` variable to your own docker registry.
    
    ```bash
        WCA_IMAGE=${DOCKER_REPOSITORY_URL}/wca
