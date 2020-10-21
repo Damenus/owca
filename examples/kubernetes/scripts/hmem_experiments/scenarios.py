@@ -302,8 +302,10 @@ MEMCACHED_MUTILATE_SCENARIOS = [
              reset_workloads_between_steps=False),
     # First touch policy memcached big
     Scenario(name='memcached-mutilate-big-first-touch-policy',
-             workloads_count=[{MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 1}, {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 2},
-                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 3}, {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 4}],
+             workloads_count=[{MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 1},
+                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 2},
+                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 3},
+                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 4}],
              sleep_duration=SLEEP_DURATION, experiment_type=ExperimentType.HMEM_NO_NUMA_BALANCING,
              reset_workloads_between_steps=False),
     # Numa balancing memcached big
@@ -312,8 +314,10 @@ MEMCACHED_MUTILATE_SCENARIOS = [
              sleep_duration=SLEEP_DURATION, experiment_type=ExperimentType.HMEM_NUMA_BALANCING),
     # Numa balancing redis memtier big run one by one
     Scenario(name='memcached-mutilate-big-numa-balancing-one-by-one',
-             workloads_count=[{MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 1}, {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 2},
-                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 3}, {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 4}],
+             workloads_count=[{MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 1},
+                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 2},
+                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 3},
+                              {MEMCACHED_MUTILATE_BIG_DRAM_PMEM: 4}],
              sleep_duration=SLEEP_DURATION, experiment_type=ExperimentType.HMEM_NUMA_BALANCING,
              reset_workloads_between_steps=False),
     # Toptier limit memcached big
@@ -322,8 +326,10 @@ MEMCACHED_MUTILATE_SCENARIOS = [
              sleep_duration=SLEEP_DURATION, experiment_type=ExperimentType.TOPTIER),
     # Toptier limit memcached big run one by one
     Scenario(name='memcached-mutilate-big-toptier-limit-one-by-one',
-             workloads_count=[{MEMCACHED_MUTILATE_BIG_TOPTIER: 1}, {MEMCACHED_MUTILATE_BIG_TOPTIER: 2},
-                              {MEMCACHED_MUTILATE_BIG_TOPTIER: 3}, {MEMCACHED_MUTILATE_BIG_TOPTIER: 4}],
+             workloads_count=[{MEMCACHED_MUTILATE_BIG_TOPTIER: 1},
+                              {MEMCACHED_MUTILATE_BIG_TOPTIER: 2},
+                              {MEMCACHED_MUTILATE_BIG_TOPTIER: 3},
+                              {MEMCACHED_MUTILATE_BIG_TOPTIER: 4}],
              sleep_duration=SLEEP_DURATION, experiment_type=ExperimentType.TOPTIER,
              reset_workloads_between_steps=False),
     # Toptier with coldstart memcached big
