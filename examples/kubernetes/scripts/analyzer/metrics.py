@@ -37,7 +37,7 @@ class Metric(Enum):
     # hmem
     TASK_MEM_NUMA_PAGES = 'task_mem_numa_pages'
 
-    ### raw:
+    # raw:
     # grupa 1
     PLATFORM_CAS_COUNT_READS = 'platform_cas_count_reads'
     PLATFORM_CAS_COUNT_WRITES = 'platform_cas_count_writes'
@@ -51,7 +51,7 @@ class Metric(Enum):
     PLATFORM_RPQ_INSERTS = 'platform_rpq_inserts'
     PLATFORM_IMC_CLOCKTICKS = 'platform_imc_clockticks'
 
-    ### derived_metrics
+    # derived_metrics
     PLATFORM_PMM_READS_BYTES_PER_SECOND = 'platform_pmm_reads_bytes_per_second'
     PLATFORM_PMM_WRITES_BYTES_PER_SECOND = 'platform_pmm_writes_bytes_per_second'
     PLATFORM_PMM_TOTAL_BYTES_PER_SECOND = 'platform_pmm_total_bytes_per_second'
@@ -61,32 +61,6 @@ class Metric(Enum):
     PLATFORM_DRAM_HIT_RATIO = 'platform_dram_hit_ratio'
     PLATFORM_UPI_BANDWIDTH_BYTES_PER_SECOND = 'platform_upi_bandwidth_bytes_per_second'
     PLATFORM_RPQ_READ_LATENCY_SECONDS = 'platform_rpq_read_latency_seconds'
-
-    #### surowe:
-    # 1 grupa
-    # - platform_cas_count_reads
-    # - platform_cas_count_writes
-    # - platform_pmm_bandwidth_reads
-    # - platform_pmm_bandwidth_writes
-    # 2 grupa
-    # - platform_upi_rxl_flits
-    # - platform_upi_txl_flits
-    # 3 grupa
-    # - platform_rpq_occupancy
-    # - platform_rpq_inserts
-    # - platform_imc_clockticks
-    #### pochodne (chyba nie trzeba ich enablowac, albo juz sa enablowane)z 1 pierszej grupy:
-    # - platform_pmm_reads_bytes_per_second
-    # - platform_pmm_writes_bytes_per_second
-    # - platform_pmm_total_bytes_per_second
-    # - platform_dram_reads_bytes_per_second
-    # - platform_dram_writes_bytes_per_second
-    # - platform_dram_total_bytes_per_second
-    # - platform_dram_hit_ratio
-    # wyswietlic sume po socketa (ale nie per pmu/mc)z 2giej grupy:
-    # - platform_upi_bandwidth_bytes_per_second
-    # wyswietlic sume po socketa (ale nie per pmu/mc)z 3 grupy:
-    # - platform_rpq_read_latency_seconds
 
 
 platform_metrics = [
@@ -102,15 +76,24 @@ platform_metrics = [
 ]
 
 MetricLegends = {
-    Metric.PLATFORM_PMM_READS_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_PMM_WRITES_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_PMM_TOTAL_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_DRAM_READS_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_DRAM_WRITES_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_DRAM_TOTAL_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_DRAM_HIT_RATIO: {'quantity': 'ratio', 'helper': '1', },
-    Metric.PLATFORM_UPI_BANDWIDTH_BYTES_PER_SECOND: {'quantity': 'GB/s', 'helper': '1e9', },
-    Metric.PLATFORM_RPQ_READ_LATENCY_SECONDS: {'quantity': 'nanosecond', 'helper': '1e-12', },
+    Metric.PLATFORM_PMM_READS_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'pmm reads'},
+    Metric.PLATFORM_PMM_WRITES_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'pmm writes'},
+    Metric.PLATFORM_PMM_TOTAL_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'pmm total'},
+    Metric.PLATFORM_DRAM_READS_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'dram reads '},
+    Metric.PLATFORM_DRAM_WRITES_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'dram writes'},
+    Metric.PLATFORM_DRAM_TOTAL_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'dram total'},
+    Metric.PLATFORM_DRAM_HIT_RATIO:
+        {'quantity': 'ratio', 'helper': '1', 'name': 'dram hit ratio'},
+    Metric.PLATFORM_UPI_BANDWIDTH_BYTES_PER_SECOND:
+        {'quantity': 'GB/s', 'helper': '1e9', 'name': 'upi bandwidth '},
+    Metric.PLATFORM_RPQ_READ_LATENCY_SECONDS:
+        {'quantity': 'nanosecond', 'helper': '1e-12', 'name': 'rpq read latency'},
 }
 
 
@@ -139,7 +122,7 @@ MetricsQueries = {
     # hmem
     Metric.TASK_MEM_NUMA_PAGES: 'task_mem_numa_pages{host="nodename"} * 4096',
 
-    ### raw:
+    # raw:
     # grupa 1
     Metric.PLATFORM_CAS_COUNT_READS: 'platform_cas_count_reads',
     Metric.PLATFORM_CAS_COUNT_WRITES: 'platform_cas_count_writes',
@@ -153,7 +136,7 @@ MetricsQueries = {
     Metric.PLATFORM_RPQ_INSERTS: 'platform_rpq_inserts',
     Metric.PLATFORM_IMC_CLOCKTICKS: 'platform_imc_clockticks',
 
-    ### derived_metrics
+    # derived_metrics
     Metric.PLATFORM_PMM_READS_BYTES_PER_SECOND:
         'sum(platform_pmm_reads_bytes_per_second{}) by (__name__, nodename, socket)',
     Metric.PLATFORM_PMM_WRITES_BYTES_PER_SECOND:
@@ -172,8 +155,6 @@ MetricsQueries = {
         'sum(platform_upi_bandwidth_bytes_per_second{}) by (__name__, nodename, socket)',
     Metric.PLATFORM_RPQ_READ_LATENCY_SECONDS:
         'avg(platform_rpq_read_latency_seconds{}) by (__name__, nodename, socket)',
-
-
 }
 
 

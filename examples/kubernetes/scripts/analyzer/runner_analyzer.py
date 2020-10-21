@@ -358,11 +358,10 @@ def read_experiment_data(file: str):
 
 def main():
     # base advanced pmbench redis memcached_base_results_2020-10-16-16-09
-    experiment_name = ['pmbench_base_results_', 'pmbench_advanced_results_', ]
-                       # 'redis_base_results_', 'redis_advanced_results_',
-                       # 'memcached_base_results_', 'memcached_advanced_results_']
+    experiment_name = ['pmbench_base_results_', 'pmbench_advanced_results_',
+                       'redis_base_results_', 'redis_advanced_results_',
+                       'memcached_base_results_', 'memcached_advanced_results_']
     date = '2020-10-19-18-10'
-    #name = 'pmbench_advanced_results_2020-10-19-18-10'
 
     for exp in experiment_name:
         name = exp + date
@@ -387,8 +386,11 @@ def main():
                 new_node.performance_metrics[0] = {}
                 new_node.performance_metrics[1] = {}
                 for metric in platform_metrics:
-                    socket0, socket1 = analyzer_queries.query_platform_performance_metric(t_end, metric, node_name)
-                    new_node.performance_metrics[0][metric.name], new_node.performance_metrics[1][metric.name] = socket0, socket1
+                    socket0, socket1 = \
+                        analyzer_queries.query_platform_performance_metric(
+                            t_end, metric, node_name)
+                    new_node.performance_metrics[0][metric.name], \
+                        new_node.performance_metrics[1][metric.name] = socket0, socket1
                 no.append(new_node)
 
             tasks: Dict[str, Task] = analyzer_queries.query_tasks_list(t_end)
