@@ -128,14 +128,11 @@ class ExperimentResults:
             average_latency *= 1e6
             average_throughput *= 1e6
 
-        mbw_local = 0
-        mbw_remote = 0
-        if Metric.TASK_MEM_MBW_LOCAL in task.performance_metrics:
-            mbw_local = self.round_metric(
-                float(task.performance_metrics[Metric.TASK_MEM_MBW_LOCAL][RATE]) / 1e9)
-        if Metric.TASK_MEM_MBW_REMOTE in task.performance_metrics:
-            mbw_remote = self.round_metric(
-                float(task.performance_metrics[Metric.TASK_MEM_MBW_REMOTE][RATE]) / 1e9)
+        mbw_local = self.round_metric(
+            float(task.performance_metrics[Metric.TASK_MEM_MBW_LOCAL][RATE]) / 1e9)
+        mbw_remote = self.round_metric(
+            float(task.performance_metrics[Metric.TASK_MEM_MBW_REMOTE][RATE]) / 1e9)
+
         return average_latency, average_throughput, q09_latency, q09_throughput, \
             numa_nodes, mbw_local, mbw_remote
 

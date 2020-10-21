@@ -26,7 +26,7 @@ from serializator import AnalyzerQueries
 from view import TxtStagesExporter
 from model import Stat, Task, Node, ExperimentMeta, ExperimentType, WStat, ClusterInfoLoader
 from results import ExperimentResults
-from metrics import platform_metrics
+
 
 FORMAT = "%(asctime)-15s:%(levelname)s %(module)s %(message)s"
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
@@ -378,27 +378,13 @@ def main():
             experiment_name = experiment_data["meta"]["name"]
             experiment_type = experiment_data['meta']['params']['type']
             task_counts = experiment_data['meta']['params']['workloads_count']
-
-            nodes: List[str] = analyzer_queries.query_node_list(t_end)
-            no: List[Node] = []
-            for node_name in nodes:
-                new_node = Node(name=node_name)
-                new_node.performance_metrics[0] = {}
-                new_node.performance_metrics[1] = {}
-                for metric in platform_metrics:
-                    socket0, socket1 = \
-                        analyzer_queries.query_platform_performance_metric(
-                            t_end, metric, node_name)
-                    new_node.performance_metrics[0][metric.name], \
-                        new_node.performance_metrics[1][metric.name] = socket0, socket1
-                no.append(new_node)
-
+            nodes: List[Node] = analyzer_queries.query_node_list(t_end)
             tasks: Dict[str, Task] = analyzer_queries.query_tasks_list(t_end)
             analyzer_queries.query_task_performance_metrics(
                 t_end, tasks)
             analyzer_queries.query_task_numa_pages(t_end, tasks)
             latex_file.discover_experiment_data(experiment_name, experiment_type,
-                                                tasks, task_counts, no, description, t_start)
+                                                tasks, task_counts, nodes, description, t_start)
         latex_file.generate_pdf()
 
 
