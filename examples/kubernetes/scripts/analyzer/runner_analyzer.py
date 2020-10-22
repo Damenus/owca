@@ -356,10 +356,10 @@ def read_experiment_data(file: str):
 
 
 def main():
-    # base advanced pmbench redis memcached_base_results_2020-10-16-16-09
-    experiment_name = ['pmbench_base_results_', 'pmbench_advanced_results_',]
-                       # 'redis_base_results_', 'redis_advanced_results_',]
-                       # 'memcached_base_results_', 'memcached_advanced_results_']
+    experiment_name = ['pmbench_base_results_', 'pmbench_advanced_results_',
+                       'redis_base_results_', 'redis_advanced_results_',
+                       'memcached_base_results_', 'memcached_advanced_results_']
+    # example date
     date = '2020-10-21-16-55'
 
     for exp in experiment_name:
@@ -367,7 +367,7 @@ def main():
         results_dir = '../hmem_experiments/' + name
         latex_file = ExperimentResults('Experiment-' + name)
 
-        analyzer_queries = AnalyzerQueries('http://100.64.176.35:30900')
+        analyzer_queries = AnalyzerQueries('http://100.64.176.36:30900')
 
         for file in os.listdir(results_dir):
             experiment_data = read_experiment_data(os.path.join(results_dir, file))
