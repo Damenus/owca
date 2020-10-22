@@ -305,7 +305,7 @@ class ExperimentResults:
         unit_row = [bold('Unit')]
         for metric in metrics.MetricLegends:
             title_row.append(metrics.MetricLegends[metric]['name'])
-            unit_row.append(metrics.MetricLegends[metric]['quantity'])
+            unit_row.append(metrics.MetricLegends[metric]['unit'])
         table.add_hline()
         table.add_row(tuple(title_row))
         table.add_hline()

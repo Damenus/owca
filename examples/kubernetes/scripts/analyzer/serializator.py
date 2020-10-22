@@ -38,9 +38,9 @@ class AnalyzerQueries:
         return nodes
 
     def query_node_list(self, time) -> List[Node]:
-        nodes: List[str] = self.query_node_name_list(time)
-        no: List[Node] = []
-        for node_name in nodes:
+        node_names: List[str] = self.query_node_name_list(time)
+        nodes: List[Node] = []
+        for node_name in node_names:
             new_node = Node(name=node_name)
             new_node.performance_metrics[0] = {}
             new_node.performance_metrics[1] = {}
@@ -50,8 +50,8 @@ class AnalyzerQueries:
                         time, metric, node_name)
                 new_node.performance_metrics[0][metric.name], \
                     new_node.performance_metrics[1][metric.name] = socket0, socket1
-            no.append(new_node)
-        return no
+            nodes.append(new_node)
+        return nodes
 
     def query_tasks_list(self, time) -> Dict[str, Task]:
         query_result = self.prometheus_client.instant_query(MetricsQueries[Metric.TASK_UP], time)
