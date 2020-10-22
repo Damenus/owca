@@ -27,7 +27,6 @@ from view import TxtStagesExporter
 from model import Stat, Task, Node, ExperimentMeta, ExperimentType, WStat, ClusterInfoLoader
 from results import ExperimentResults
 
-
 FORMAT = "%(asctime)-15s:%(levelname)s %(module)s %(message)s"
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 logging.getLogger("requests").setLevel(logging.WARNING)
