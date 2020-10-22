@@ -109,12 +109,16 @@ class ExperimentResults:
         return rounded_metric
 
     def get_metrics(self, task):
-        average_latency = self.round_metric(
-            float(task.performance_metrics[Metric.TASK_LATENCY][AVG]))
+        average_latency = float(task.performance_metrics[Metric.TASK_LATENCY][AVG])
+        q09_latency = float(task.performance_metrics[Metric.TASK_LATENCY][Q09])
+        if 'pmbench' in task.workload_name:
+            average_latency *= 1e6
+            q09_latency *= 1e6
+
+        average_latency = self.round_metric(average_latency)
         average_throughput = self.round_metric(
             float(task.performance_metrics[Metric.TASK_THROUGHPUT][AVG]))
-        q09_latency = self.round_metric(
-            float(task.performance_metrics[Metric.TASK_LATENCY][Q09]))
+        q09_latency = self.round_metric(q09_latency)
         q09_throughput = self.round_metric(
             float(task.performance_metrics[Metric.TASK_THROUGHPUT][Q09]))
         numa_nodes = []
@@ -123,10 +127,6 @@ class ExperimentResults:
                     * 4096 / 1e9
             rounded_value = self.round_metric(value)
             numa_nodes.append(rounded_value)
-
-        if 'pmbench' in task.workload_name:
-            average_latency *= 1e6
-            average_throughput *= 1e6
 
         mbw_local = self.round_metric(
             float(task.performance_metrics[Metric.TASK_MEM_MBW_LOCAL][RATE]) / 1e9)
