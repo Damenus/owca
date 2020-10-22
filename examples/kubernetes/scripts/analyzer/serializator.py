@@ -79,7 +79,7 @@ class AnalyzerQueries:
 
     def query_platform_performance_metrics(self, time: int, nodes: Dict[str, Node]):
         # very important parameter - window_length [s]
-        # Stop working: Metric.PLATFORM_MBW_TOTAL, Metric.POD_SCHEDULED,
+        # Stopped working: Metric.PLATFORM_MBW_TOTAL, Metric.POD_SCHEDULED,
         metrics = (Metric.PLATFORM_MEM_USAGE, Metric.PLATFORM_CPU_REQUESTED,
                    Metric.PLATFORM_CPU_UTIL, Metric.PLATFORM_DRAM_HIT_RATIO,
                    Metric.PLATFORM_WSS_USED)
