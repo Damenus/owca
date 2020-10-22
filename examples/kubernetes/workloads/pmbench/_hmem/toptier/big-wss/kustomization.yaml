@@ -5,4 +5,4 @@ resources:
 - ../../../big-wss
 
 commonAnnotations:
-  toptierlimit.cri-resource-manager.intel.com/pod: "84G"
+  toptierlimit.cri-resource-manager.intel.com/pod: "80G"

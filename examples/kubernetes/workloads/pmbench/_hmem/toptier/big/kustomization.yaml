@@ -5,4 +5,4 @@ resources:
 - ../../../big
 
 commonAnnotations:
-  toptierlimit.cri-resource-manager.intel.com/pod: "44G"
+  toptierlimit.cri-resource-manager.intel.com/pod: "40G"
