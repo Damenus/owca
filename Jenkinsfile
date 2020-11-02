@@ -397,7 +397,7 @@ pipeline {
                     KUSTOMIZATION_MONITORING='examples/kubernetes/monitoring/'
                     KUSTOMIZATION_WORKLOAD='examples/kubernetes/workloads/'
                     WCA_SCHEDULER_PATH='examples/kubernetes/wca-scheduler/'
-                    PKI_TEST_FILES_PATH='/jenkins_home/PKI_TEST'
+                    PKI_TEST_FILES_PATH='/jenkins_home/PKI_TEST_FILES'
                 }
                 steps {
 
