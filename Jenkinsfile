@@ -384,7 +384,9 @@ pipeline {
                 }
             }
         }
-        stage('E2E wca-scheduler') {
+        // This stage require PKI TEST FILES in '/jenkins_home/PKI_TEST' on agent labeled 'Kubernetes';
+        // Copy of files are in installer repo
+        stage('E2E wca-scheduler nginx ssl configuration') {
                 when {expression{return params.E2E_WCA_SCHEDULER}}
                 agent { label 'Kubernetes' }
                 environment {
