@@ -1,0 +1,44 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+nameSuffix: -big
+
+resources:
+- ../base
+
+commonLabels:
+  app: pmbench-normal-big
+
+configMapGenerator:
+- name: pmbench-normal
+  behavior: merge
+  literals:
+    - extra='--pattern normal --shape 1220703 --setsize 80000 --mapsize 80000 2000000 --initialize -a touch -j 4'
+
+  # shape in pages 4kb (4096b)
+  # sigma=9765625 for 40GB setsize
+  # --shape 1627604   wss 49GB 54GB   6sigma == sigma/6
+  # --shape 1395089   wss 42GB 47GB   7sigma == sigma/7
+  # --shape 1220703   wss 37GB 41GB   8sigma == sigma/8
+  # --shape 1085069   wss 33GB 37GB   9sigma == sigma/9
+
+patches:
+- target:
+    kind: StatefulSet
+  patch: |-
+    apiVersion: foo
+    kind: foo
+    metadata:
+      name: foo
+    spec:
+      template:
+        spec:
+          containers:
+          - name: generator
+            resources:
+              requests:
+                cpu: 8
+                memory: 90G
+              limits:
+                cpu: 8
+                memory: 90G
