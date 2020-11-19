@@ -375,7 +375,7 @@ pipeline {
                 }
             }
         }
-        stage('WCA E2E tests') {
+        stage('WCA E2E tests') {
             agent { label 'Kubernetes' }
             when {expression{return params.E2E_K8S_DS}}
             environment {
@@ -388,14 +388,68 @@ pipeline {
                 KUSTOMIZATION_WORKLOAD='examples/kubernetes/workloads/'
             }
             steps {
-                kustomize_monitoring_and_workloads_check()
+                sh "echo GIT_COMMIT=$GIT_COMMIT"
+
+                check_and_configure_kustomize_workloads()
+
+                print('Starting monitoring (wca/cadvisor/prometheus) ...')
+                sh "kubectl label nodes node18 monitoring=wca --overwrite"
+                sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl apply -f -"
+                sleep 40
+
+                expose_prometheus_for_e2e()
+                build_and_deploy_workloads_for_e2e()
+                print('Sleep while workloads are running...')
+                sleep RUN_WORKLOADS_SLEEP_TIME
+                test_wca_metrics()
             }
             post {
                 always {
                     print('Cleaning workloads and monitoring...')
                     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} | kubectl delete -f - --wait=false || true"
                     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl delete -f -  --wait=false || true"
-                    sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus || true" 
+                    sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus || true"
+                    sh "kubectl label nodes node18 monitoring-"
+                    junit 'unit_results.xml'
+                }
+            }
+        }
+        stage('cAdvisor E2E tests') {
+            agent { label 'Kubernetes' }
+            when {expression{return params.E2E_K8S_DS}}
+            environment {
+                BUILD_COMMIT="${GIT_COMMIT}"
+                RUN_WORKLOADS_SLEEP_TIME = "${params.SLEEP_TIME}"
+                PROMETHEUS='http://100.64.176.18:30900'
+                KUBERNETES_HOST='100.64.176.32'
+                KUBECONFIG="${HOME}/.kube/admin.conf"
+                KUSTOMIZATION_MONITORING='examples/kubernetes/monitoring/'
+                KUSTOMIZATION_WORKLOAD='examples/kubernetes/workloads/'
+            }
+            steps {
+                sh "echo GIT_COMMIT=$GIT_COMMIT"
+
+                print('Check prometheus rules (wca/cadvisor/prometheus) ...')
+                sh "cd ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/; ./check_rules.sh"
+
+                print('Starting monitoring (wca/cadvisor/prometheus) ...')
+                sh "kubectl label nodes node18 monitoring=cadvisor --overwrite"
+                sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl apply -f -"
+                sleep 40
+
+                expose_prometheus_for_e2e()
+                build_and_deploy_workloads_for_e2e()
+                print('Sleep while workloads are running...')
+                sleep RUN_WORKLOADS_SLEEP_TIME
+                test_cadvisor_metrics()
+            }
+            post {
+                always {
+                    print('Cleaning workloads and monitoring...')
+                    sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} | kubectl delete -f - --wait=false || true"
+                    sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl delete -f -  --wait=false || true"
+                    sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus || true"
+                    sh "kubectl label nodes node18 monitoring-"
                     junit 'unit_results.xml'
                 }
             }
@@ -463,10 +517,8 @@ pipeline {
 /* Helper function */
 /*----------------------------------------------------------------------------------------------------------*/
 
-def kustomize_monitoring_and_workloads_check() {
-    print('-kustomize_monitoring_and_workloads_check-')
-    sh "echo GIT_COMMIT=$GIT_COMMIT"
-
+def check_and_configure_kustomize_workloads() {
+    // Another stage
     print('Image checks wca and workloads...')
     image_check("wca")
     // examaples/kubernetes workloads like: mysql, memcached, memtier, redis use official images
@@ -475,25 +527,16 @@ def kustomize_monitoring_and_workloads_check() {
         image_check("wca/$image")
     }
 
-    print('Check prometheus rules (wca/cadvisor/prometheus) ...')
-    sh "cd ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/; ./check_rules.sh"
-
+    // Another stage
     print('Configure workloads...')
     kustomize_replace_commit_in_wca()
     def workloads = ["memcached-mutilate", "mysql-hammerdb", "redis-memtier", "stress", "sysbench-memory", "specjbb"]
     for(workload in workloads){
         kustomize_configure_workload_to_test("$workload")
     }
+}
 
-    print('Starting monitoring (wca/cadvisor/prometheus) ...')
-    sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl apply -f -"
-    sleep 40
-
-    print('Create Service for Prometheus, for E2E only')
-    sh "kubectl expose pod prometheus-prometheus-0 --type=NodePort --port=9090 --name=prometheus-nodeport-service --namespace prometheus && \
-        kubectl patch service prometheus-nodeport-service --namespace=prometheus --type='json' --patch='[ \
-        {\"op\": \"replace\", \"path\": \"/spec/ports/0/nodePort\", \"value\":30900}]'"
-
+def build_and_deploy_workloads_for_e2e() {
     print('Deploy workloads...')
     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} | kubectl apply -f - "
 
@@ -502,11 +545,13 @@ def kustomize_monitoring_and_workloads_check() {
     for(item in list){
         sh "kubectl scale --replicas=1 statefulset $item-small"
     }
+}
 
-    print('Sleep while workloads are running...')
-    sleep RUN_WORKLOADS_SLEEP_TIME
-    print('Test kustomize metrics...')
-    test_wca_metrics_kustomize()
+def expose_prometheus_for_e2e() {}
+    print('Create Service for Prometheus, for E2E only')
+    sh "kubectl expose pod prometheus-prometheus-0 --type=NodePort --port=9090 --name=prometheus-nodeport-service --namespace prometheus && \
+        kubectl patch service prometheus-nodeport-service --namespace=prometheus --type='json' --patch='[ \
+        {\"op\": \"replace\", \"path\": \"/spec/ports/0/nodePort\", \"value\":30900}]'"
 }
 
 def kustomize_replace_commit_in_wca() {
@@ -547,10 +592,18 @@ def kustomize_configure_workload_to_test(workload) {
                 filePath: "${WORKSPACE}/examples/kubernetes/workloads/${workload}/kustomization.yaml")])
 }
 
-def test_wca_metrics_kustomize() {
+def test_wca_metrics() {
+    print('Test wca metrics...')
     sh "make venv; source env/bin/activate && \
-        pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics_kustomize --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v && \
-        pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics_kustomize_throughput --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v && \
+        pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v && \
+        pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_wca_metrics_throughput --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v && \
+        deactivate"
+}
+
+def test_cadvisor_metrics() {
+    print('Test cadvisor metrics...')
+    sh "make venv; source env/bin/activate && \
+        pytest ${WORKSPACE}/tests/e2e/test_wca_metrics.py::test_cadvisor_metrics --junitxml=unit_results.xml --log-level=debug --log-cli-level=debug -v && \
         deactivate"
 }
 

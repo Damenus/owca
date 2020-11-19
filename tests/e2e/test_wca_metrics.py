@@ -22,6 +22,7 @@ import logging
 import os
 import pytest
 
+
 _PROMETHEUS_QUERY_PATH = "/api/v1/query"
 _PROMETHEUS_QUERY_RANGE_PATH = "/api/v1/query_range"
 _PROMETHEUS_URL_TPL = '{prometheus}{path}?query={name}'
@@ -73,7 +74,7 @@ def _fetch_metrics(url):
     'redis_rpc_perf'
 ])
 def test_wca_metrics(workload_name):
-    test_wca(workload_name, ['sli', 'task_cycles'])
+    test_metrics(workload_name, ['sli', 'task_cycles'])
 
 
 @pytest.mark.parametrize('workload_name', [
@@ -83,19 +84,29 @@ def test_wca_metrics(workload_name):
     'memcached-mutilate',
     'specjbb'
 ])
-def test_wca_metrics_kustomize(workload_name):
-    test_wca(workload_name, ['apm_sli', 'task_cycles'])
+def test_wca_metrics(workload_name):
+    test_metrics(workload_name, ['apm_sli', 'task_cycles'])
 
 
 # mysql is initializing too long for sli tests
 @pytest.mark.parametrize('workload_name', [
     'mysql-hammerdb'
 ])
-def test_wca_metrics_kustomize_throughput(workload_name):
-    test_wca(workload_name, ['apm_sli2', 'task_cycles'])
+def test_wca_metrics_throughput(workload_name):
+    test_metrics(workload_name, ['apm_sli2', 'task_cycles'])
 
 
-def test_wca(workload_name, metrics):
+@pytest.mark.parametrize('workload_name', [
+    'stress',
+    'redis-memtier',
+    'pmbench',
+    'memcached-mutilate',
+])
+def test_cadvisor_metrics(workload_name):
+    test_metrics(workload_name, ['app_wss', 'app_mem'])
+
+
+def test_metrics(workload_name, metrics):
     assert 'PROMETHEUS' in os.environ, 'prometheus host to connect'
     assert 'BUILD_NUMBER' in os.environ
     assert 'BUILD_COMMIT' in os.environ
