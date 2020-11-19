@@ -547,7 +547,7 @@ def build_and_deploy_workloads_for_e2e() {
     }
 }
 
-def expose_prometheus_for_e2e() {}
+def expose_prometheus_for_e2e() {
     print('Create Service for Prometheus, for E2E only')
     sh "kubectl expose pod prometheus-prometheus-0 --type=NodePort --port=9090 --name=prometheus-nodeport-service --namespace prometheus && \
         kubectl patch service prometheus-nodeport-service --namespace=prometheus --type='json' --patch='[ \
