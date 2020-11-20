@@ -393,7 +393,7 @@ pipeline {
                 check_and_configure_kustomize_workloads()
 
                 print('Starting monitoring (wca/cadvisor/prometheus) ...')
-                sh "kubectl label nodes node18 monitoring=wca --overwrite"
+                sh "kubectl label nodes node32 monitoring=wca --overwrite"
                 sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl apply -f -"
                 sleep 40
 
@@ -409,7 +409,7 @@ pipeline {
                     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} | kubectl delete -f - --wait=false || true"
                     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl delete -f -  --wait=false || true"
                     sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus || true"
-                    sh "kubectl label nodes node18 monitoring-"
+                    sh "kubectl label nodes node32 monitoring-"
                     junit 'unit_results.xml'
                 }
             }
@@ -433,7 +433,7 @@ pipeline {
                 sh "cd ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/; ./check_rules.sh"
 
                 print('Starting monitoring (wca/cadvisor/prometheus) ...')
-                sh "kubectl label nodes node18 monitoring=cadvisor --overwrite"
+                sh "kubectl label nodes node32 monitoring=cadvisor --overwrite"
                 sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl apply -f -"
                 sleep 40
 
@@ -449,7 +449,7 @@ pipeline {
                     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} | kubectl delete -f - --wait=false || true"
                     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_MONITORING} | kubectl delete -f -  --wait=false || true"
                     sh "kubectl delete svc prometheus-nodeport-service --namespace prometheus || true"
-                    sh "kubectl label nodes node18 monitoring-"
+                    sh "kubectl label nodes node32 monitoring-"
                     junit 'unit_results.xml'
                 }
             }
