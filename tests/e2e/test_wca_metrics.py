@@ -73,7 +73,7 @@ def _fetch_metrics(url):
     'twemcache_rpc_perf',
     'redis_rpc_perf'
 ])
-def test_wca_metrics(workload_name):
+def test_wca_metrics_sli(workload_name):
     test_metrics(workload_name, ['sli', 'task_cycles'])
 
 
