@@ -13,7 +13,12 @@ configMapGenerator:
 - name: pmbench-normal
   behavior: merge
   literals:
-    - extra='--pattern normal --shape 1220703 --setsize 80000 --mapsize 80000 2000000 --initialize -a touch -j 4'
+    - extra='--pattern normal --shape 2560000 --setsize 80000 --mapsize 80000 2000000 --initialize -a touch -j 4'
+
+  # for 80GB wss, you should use --shape 2560000
+  # 1sigma(68%) offset=10000MiB 2560000pages   accessed memory=20000MiB  5120000pages
+  # 2sigma(95%) offset=20000MiB 5120000pages   accessed memory=40000MiB 10240000pages
+  # 3sigma(99%) offset=40000MiB 10240000pages  accessed memory=80000MiB 20480000pages
 
 patches:
 - target:
