@@ -508,7 +508,7 @@ def check_and_configure_kustomize_workloads() {
     print('Image checks wca and workloads...')
     image_check("wca")
     // examaples/kubernetes workloads like: mysql, memcached, memtier, redis use official images
-    def images = ["mutilate", "hammerdb", "mysql_tpm_gauge", "memtier_benchmark", "stress_ng", "sysbench", "specjbb"]
+    def images = ["mutilate", "hammerdb", "mysql_tpm_gauge", "memtier_benchmark", "stress_ng", "sysbench", "specjbb", "pmbench"]
     for(image in images){
         image_check("wca/$image")
     }
@@ -516,7 +516,7 @@ def check_and_configure_kustomize_workloads() {
     // Another stage
     print('Configure workloads...')
     kustomize_replace_commit_in_wca()
-    def workloads = ["memcached-mutilate", "mysql-hammerdb", "redis-memtier", "stress", "sysbench-memory", "specjbb"]
+    def workloads = ["memcached-mutilate", "mysql-hammerdb", "redis-memtier", "stress", "sysbench-memory", "specjbb", "pmbench"]
     for(workload in workloads){
         kustomize_configure_workload_to_test("$workload")
     }
@@ -527,7 +527,7 @@ def build_and_deploy_workloads_for_e2e() {
     sh "kustomize build ${WORKSPACE}/${KUSTOMIZATION_WORKLOAD} | kubectl apply -f - "
 
     print('Scale up workloads...')
-    def list = ["mysql-hammerdb", "stress-stream", "redis-memtier", "sysbench-memory", "memcached-mutilate", "specjbb-preset"]
+    def list = ["mysql-hammerdb", "stress-stream", "redis-memtier", "sysbench-memory", "memcached-mutilate", "specjbb-preset", "pmbench"]
     for(item in list){
         sh "kubectl scale --replicas=1 statefulset $item-small"
     }
