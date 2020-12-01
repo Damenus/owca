@@ -415,8 +415,8 @@ pipeline {
             steps {
                 sh "echo GIT_COMMIT=$GIT_COMMIT"
 
-                print('Check prometheus rules (wca/cadvisor/prometheus) ...')
-                sh "cd ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/; ./check_rules.sh"
+                // print('Check prometheus rules (wca/cadvisor/prometheus) ...')
+                // sh "cd ${WORKSPACE}/${KUSTOMIZATION_MONITORING}/prometheus/; ./check_rules.sh"
 
                 print('Starting monitoring (wca/cadvisor/prometheus) ...')
                 sh "kubectl label nodes node32 monitoring=cadvisor --overwrite"
