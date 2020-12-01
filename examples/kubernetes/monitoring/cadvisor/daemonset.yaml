@@ -43,7 +43,7 @@ spec:
           - --disable_metrics=advtcp,process,sched,hugetlb,cpu_topology,tcp,udp,percpu,accelerator,disk,diskIO,network
           - --port=9101
 #          - --referenced_read_interval=15s
-          - --referenced_reset_interval=600s
+          - --referenced_reset_interval=600
           - --store_container_labels=true
           - --raw_cgroup_prefix_whitelist=kubepods
         volumeMounts:
