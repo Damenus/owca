@@ -18,9 +18,10 @@ pipeline {
       booleanParam defaultValue: true, description: 'Run all pre-checks.', name: 'PRECHECKS'
       booleanParam defaultValue: true, description: 'Build WCA image.', name: 'BUILD_WCA_IMAGE'
       booleanParam defaultValue: true, description: 'Build workload images.', name: 'BUILD_IMAGES'
-      booleanParam defaultValue: true, description: 'E2E for Kubernetes as Daemonset.', name: 'E2E_K8S_DS'
+      booleanParam defaultValue: true, description: 'E2E for Kubernetes with wca as Daemonset.', name: 'E2E_K8S_DS'
+      booleanParam defaultValue: true, description: 'E2E for Kubernetes with cAdvisor.', name: 'E2E_cAdvisor'
       booleanParam defaultValue: true, description: 'E2E for wca-scheduler', name: 'E2E_WCA_SCHEDULER'
-      string defaultValue: '300', description: 'Sleep time for E2E tests', name: 'SLEEP_TIME'
+      string defaultValue: '420', description: 'Sleep time for E2E tests', name: 'SLEEP_TIME'
     }
     environment {
         DOCKER_REPOSITORY_URL = '100.64.176.12:80'
@@ -401,7 +402,7 @@ pipeline {
         }
         stage('cAdvisor E2E tests') {
             agent { label 'Kubernetes' }
-            when {expression{return params.E2E_K8S_DS}}
+            when {expression{return params.E2E_cAdvisor}}
             environment {
                 BUILD_COMMIT="${GIT_COMMIT}"
                 RUN_WORKLOADS_SLEEP_TIME = "${params.SLEEP_TIME}"
