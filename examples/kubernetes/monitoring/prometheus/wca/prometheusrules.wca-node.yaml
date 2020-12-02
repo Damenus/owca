@@ -1,0 +1,112 @@
+# The rules are adjusted for parameters of monitoring tool WCA defined in
+# examples/kubernetes/monitoring/wca/wca-config.yaml
+# Especially:
+# interval=60.0 [seconds],
+# wss_membw_threshold=0.01.
+# Input:
+# - any raw data provided by wca monitoring agent
+# - or mock data for virtual pmem node
+# Output:
+# - node_capacity
+# - node_mem_mode_size_bytes
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: wca-node
+spec:
+  groups:
+
+  - name: wca-node
+    rules:
+
+    # ============================ node_capacity_unsafe ===================================
+    # --------------- dim: cpu
+    - record: node_capacity_unsafe
+      expr: 'sum(platform_topology_cpus) by (node)'
+      labels:
+        dim: cpu
+        source: wca
+    # --------------- dim: mem
+    # for 2lm
+    - record: node_capacity_unsafe
+      expr: 'ceil((sum(platform_mem_mode_size_bytes) by (node) / 1e9)) and on(node) platform_mem_mode_size_bytes!=0'
+      labels:
+        dim: mem
+        source: wca
+    # for 1lm
+    - record: node_capacity_unsafe
+      expr: 'ceil(sum(platform_dimm_total_size_bytes{dimm_type="ram"}) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes==0'
+      labels:
+        dim: mem
+        source: wca
+    # --------------- dim: mbw
+    # for 2lm
+    - record: node_capacity_unsafe
+      expr: 'ceil(sum(platform_nvdimm_read_bandwidth_bytes_per_second) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes!=0'
+      labels:
+        dim: mbw_flat
+        source: wca
+    # for 1lm
+    - record: node_capacity_unsafe
+      expr: 'ceil(sum(platform_dimm_speed_bytes_per_second) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes==0'
+      labels:
+        dim: mbw_flat
+        source: wca
+    # --------------- dim: wss
+    # -- 2LM:  0.5, NOTE: wss devaluated to 50% because of direct mapping (that is approximated by us unsafe maximum)
+    # -- HMEM: 1.0, NOTE: kernel based managing of DRAM memory
+    - record: pmem_mode_wss_weight
+      expr: '0.5' # pmem_mode_wss_weight
+      labels:
+        source: wca
+    # for 2lm
+    - record: node_capacity_unsafe
+      expr: 'ceil(sum(platform_dimm_total_size_bytes{dimm_type="ram"}) by (node) * on() group_left pmem_mode_wss_weight{source="wca"} / 1e9) and on(node) platform_mem_mode_size_bytes!=0'
+      labels:
+        dim: wss
+        source: wca
+    # for 1lm: wss on 1lm nodes is just capacity of ram
+    - record: node_capacity_unsafe
+      expr: 'ceil(sum(platform_dimm_total_size_bytes{dimm_type="ram"}) by (node) / 1e9) and on(node) platform_mem_mode_size_bytes==0'
+      labels:
+        dim: wss
+        source: wca
+
+    # =================================== SAFETY WEIGHTS ========================
+    # safety weights: we don't want to fill any resource to it limit;
+    - record: safety_weights
+      expr: '0.7'
+      labels:
+        dim: cpu
+        source: wca
+    - record: safety_weights
+      expr: '0.9'
+      labels:
+        dim: mem
+        source: wca
+    - record: safety_weights
+      expr: '0.7'
+      labels:
+        dim: mbw_flat
+        source: wca
+    - record: safety_weights
+      expr: '0.9'
+      labels:
+        dim: wss
+        source: wca
+
+    # =================================== Final: node_capacity ========================
+    - record: node_capacity
+      expr: node_capacity_unsafe{source="wca"} * on(dim) group_left safety_weights{source="wca"}
+
+    # =================================== node_mem_mode_size_bytes ====================
+    # used by:
+    # - profile_nodes_by_mem uses (for generic score)
+    # - node_type (for scheduler)
+    - record: node_mem_mode_size_bytes
+      expr: 'platform_mem_mode_size_bytes'
+      labels:
+        source: wca
+
+

@@ -1,0 +1,90 @@
+# Generates:
+# - profile_node_by_mem, profile_nodes_by_mem
+# - app_req
+# - profile_app_*
+# - app_profile
+#
+# Based on (should be proived by wca/cadvisor rules)
+# - node: node_capacity, node_mem_mode_size_bytes from (cadvisor/wca)/*_node.yaml
+# - app: app_cpu, app_mem, app_mbw_flat and app_wss from (cadvisor/wca)/*_app.yaml
+
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: score
+spec:
+  groups:
+
+  # ---------------------------- node profile -----------------------------------------
+  - name: score-node-profile
+    rules:
+    # Profile by mem
+    - record: profile_node_by_mem
+      expr: 'node_capacity{dim="cpu"} / on (node, source) node_capacity{dim="mem"}'
+      labels:
+        index: cpu
+    - record: profile_node_by_mem
+      expr: 'node_capacity{dim="mbw_flat"} / on (node, source) node_capacity{dim="mem"}'
+      labels:
+        index: mbw_flat
+    - record: profile_node_by_mem
+      expr: 'node_capacity{dim="wss"} / on (node, source) node_capacity{dim="mem"}'
+      labels:
+        index: wss
+
+    # Note: average (avg) all PMEM nodes
+    - record: profile_nodes_by_mem
+      expr: 'avg(profile_node_by_mem and on(node, source) node_mem_mode_size_bytes != 0) by (index, source)'
+      labels:
+        memory: 2lm
+
+  # ============================ app_req and profile_app_by_mem ==================================================================
+  # Convert monitoring agent provided metrics like: app_cpu, app_mem, app_mbw_flat and app_wss into generic app_req with dim label
+  - name: score-app-profile
+    rules:
+    - record: app_req
+      expr: 'app_cpu'
+      labels:
+        dim: cpu
+    - record: app_req
+      expr: 'app_mem'
+      labels:
+        dim: mem
+    - record: app_req
+      expr: 'app_mbw_flat'
+      labels:
+        dim: mbw_flat
+    - record: app_req
+      expr: 'app_wss'
+      labels:
+        dim: wss
+
+    # ------------------------ requierments normalized by mem
+    - record: profile_app_by_mem
+      expr: 'app_req{dim="cpu"} / on(app, source) app_req{dim="mem"}'
+      labels:
+        index: cpu
+    - record: profile_app_by_mem
+      expr: 'app_req{dim="mbw_flat"} / on(app, source) app_req{dim="mem"}'
+      labels:
+        index: mbw_flat
+    - record: profile_app_by_mem
+      expr: 'app_req{dim="wss"} / on(app, source) app_req{dim="mem"}'
+      labels:
+        index: wss
+
+    # ------------------------ profile normalized by pmem nodes and must contains all 3 dimensions: cpu, wss, membw.
+    - record: profile_app_by_mem_norm
+      expr: 'profile_app_by_mem / on (index, source) group_left profile_nodes_by_mem{memory="2lm"}'
+    - record: profile_app_by_mem_norm_3dim
+      expr: 'profile_app_by_mem_norm and on(app, source) count(profile_app_by_mem_norm) by (app, source) == 3'
+      #expr: 'profile_app_by_mem_norm and on(label_app, source) count(profile_app_by_mem_norm) by (label_app, source) == 3' # old with label_app
+
+    # ------------------------ SCORE calculation
+    - record: profile_app_score_max # lower is better for 2lm
+      expr: 'max(profile_app_by_mem_norm_3dim{index=~"cpu|mbw_flat|wss"}) by (app, source)'
+
+    # ------------------------ FINAL metric "app_profile" just alias for profile_app_score_max
+    - record: app_profile
+      expr: 'profile_app_score_max'
